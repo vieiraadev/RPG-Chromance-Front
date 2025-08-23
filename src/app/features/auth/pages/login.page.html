@@ -1,0 +1,51 @@
+<div class="auth-wrapper">
+  <div class="auth-shell">
+    <div class="auth-media">
+      <img src="/assets/images/login-hero.jpg" alt="RPG Chromance hero" />
+    </div>
+    <div class="auth-form">
+      <div class="form-inner">
+        <h1>Olá Jogador!</h1>
+        <h2>Bem-Vindo de volta</h2>
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <label class="field">
+            <span>Insira seu Email</span>
+            <input 
+              type="email" 
+              formControlName="email" 
+              placeholder="voce@exemplo.com" 
+              autocomplete="email" 
+            />
+          
+          </label>
+          
+          <label class="field">
+            <span>Senha</span>
+            <input 
+              type="password" 
+              formControlName="password" 
+              placeholder="••••••••" 
+              autocomplete="current-password" 
+            />
+           
+          </label>
+          
+          <div class="recover">
+            <a routerLink="/auth/recover">Esqueceu sua senha?</a>
+          </div>
+          
+          <button class="btn-primary" type="submit" [disabled]="form.invalid || loading">
+            {{ loading ? 'Entrando...' : 'Entrar' }}
+          </button>
+          
+          <div class="or">Ou</div>
+          
+          <p class="create">
+            Não tem uma conta? <a routerLink="/auth/signup">Criar Conta</a>
+          </p>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

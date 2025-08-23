@@ -1,0 +1,16 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+html, body {
+  height: 100% !important;
+  margin: 0;
+  padding: 0;
+  background: #000000 !important;
+  overflow-x: hidden;
+}
+
+app-root {
+  min-height: 100vh;
+  background: #000000 !important;
+  display: block;
+}
