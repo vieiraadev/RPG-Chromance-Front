@@ -1,5 +1,3 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
 # Compiled output
 /dist
 /tmp
@@ -8,8 +6,11 @@
 
 # Node
 /node_modules
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+pnpm-debug.log*
+package-lock.json.lck
 
 # IDEs and editors
 .idea/
@@ -29,13 +30,18 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
+/.angular
 .sass-cache/
 /connect.lock
 /coverage
 /libpeerconnection.log
 testem.log
 /typings
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
 
 # System files
 .DS_Store
