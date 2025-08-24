@@ -1,0 +1,76 @@
+<div class="auth-wrapper">
+    <div class="auth-shell">
+      <div class="auth-media">
+        <img src="/assets/images/sigup-hero.jpg" alt="RPG Chromance signup hero" />
+      </div>
+      <div class="auth-form">
+        <div class="form-inner">
+          <h1>Criar Conta</h1>
+          <h2>Comece sua jornada épica</h2>
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <label class="field">
+              <span>Nome</span>
+              <input
+                type="text"
+                formControlName="fullName"
+                placeholder="Seu nome"
+                autocomplete="name"
+              />
+            </label>
+            
+            <label class="field">
+              <span>Insira seu Email</span>
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="voce@exemplo.com"
+                autocomplete="email"
+              />
+            </label>
+            
+            <label class="field">
+              <span>Nome de Usuário</span>
+              <input
+                type="text"
+                formControlName="username"
+                placeholder="@seunome"
+                autocomplete="username"
+              />
+            </label>
+            
+<div class="password-row">
+    <label class="field">
+      <span>Senha</span>
+      <input
+        type="password"
+        formControlName="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+      />
+    </label>
+    
+    <label class="field">
+      <span>Confirmar Senha</span>
+      <input
+        type="password"
+        formControlName="confirmPassword"
+        placeholder="••••••••"
+        autocomplete="new-password"
+      />
+    </label>
+  </div>
+            
+            <button class="btn-primary" type="submit" [disabled]="form.invalid || loading">
+              {{ loading ? 'Criando conta...' : 'Criar Conta' }}
+            </button>
+            
+            <div class="or">Ou</div>
+            
+            <p class="create">
+              Já tem uma conta? <a routerLink="/auth/login">Fazer Login</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

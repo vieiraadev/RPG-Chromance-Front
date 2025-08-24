@@ -1,7 +1,7 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -9,10 +9,11 @@ import { RouterLink } from '@angular/router';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  encapsulation: ViewEncapsulation.None 
+  encapsulation: ViewEncapsulation.None
 })
 export class LoginPageComponent {
   private fb = inject(FormBuilder);
+  private router = inject(Router);
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -24,12 +25,20 @@ export class LoginPageComponent {
 
   submit() {
     if (this.form.invalid || this.loading) return;
-    this.loading = true; this.error = '';
+    
+    this.loading = true;
+    this.error = '';
+    
     const { email, password } = this.form.value;
-
+    
     setTimeout(() => {
       this.loading = false;
       console.log('login', { email, password });
     }, 700);
+  }
+
+  // Método para navegar para a tela de cadastro
+  goToRegister() {
+    this.router.navigate(['/auth/signup']);
   }
 }
