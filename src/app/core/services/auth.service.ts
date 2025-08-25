@@ -1,46 +1,65 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../api/api.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { ApiService } from '../api/api.service';
 
-export interface LoginPayload {
+export interface LoginRequest {
   email: string;
-  password: string;
+  senha: string;   
 }
 
-export interface LoginResponse {
-  access_token: string; // Lembrar de ajustar de acordo com back
-  refresh_token?: string;
+export interface SignupRequest {
+  nome: string;
+  email: string;
+  senha: string;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
+export interface UserOut {
+  id: string;
+  nome: string;
+  email: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenKey = 'auth_token';
-  private refreshKey = 'refresh_token';
+  private tokenKey = 'token'; 
+  private loggedIn$ = new BehaviorSubject<boolean>(!!localStorage.getItem(this.tokenKey));
+  public isLoggedIn$ = this.loggedIn$.asObservable();
 
   constructor(private api: ApiService) {}
 
-  login(payload: LoginPayload): Observable<LoginResponse> {
-    return this.api.post<LoginResponse>('/auth/signin', payload).pipe(
-      tap(res => {
+  signup(body: SignupRequest): Observable<UserOut> {
+    return this.api.post<UserOut>('/api/auth/signup', body);
+  }
+
+  login(body: LoginRequest): Observable<TokenResponse> {
+    return this.api.post<TokenResponse>('/api/auth/login', body).pipe(
+      tap((res) => {
         localStorage.setItem(this.tokenKey, res.access_token);
-        if (res.refresh_token) {
-          localStorage.setItem(this.refreshKey, res.refresh_token);
-        }
+        this.loggedIn$.next(true);
       })
     );
   }
 
-  logout() {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.refreshKey);
+  me(): Observable<UserOut> {
+    return this.api.get<UserOut>('/api/auth/me');
   }
 
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    this.loggedIn$.next(false);
   }
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
   }
 }
