@@ -14,7 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 export class SignupPage implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  
+
   form!: FormGroup;
   loading = false;
 
@@ -26,7 +26,6 @@ export class SignupPage implements OnInit {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]
     });
@@ -38,15 +37,13 @@ export class SignupPage implements OnInit {
     }
 
     this.loading = true;
-    
+
     try {
       const formData = this.form.value;
       console.log('Dados do formulário:', formData);
-      
+
       await this.delay(2000);
-      
       console.log('Cadastro realizado com sucesso');
-      
       this.router.navigate(['/auth/login']);
     } catch (error) {
       console.error('Erro ao realizar cadastro:', error);

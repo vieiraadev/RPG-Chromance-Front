@@ -37,7 +37,6 @@ export class LoginPageComponent {
     }, 700);
   }
 
-  // Método para navegar para a tela de cadastro
   goToRegister() {
     this.router.navigate(['/auth/signup']);
   }
