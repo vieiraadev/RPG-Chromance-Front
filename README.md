@@ -1,59 +1,36 @@
-# RpgChromanceFront
+# 🎮 RPG Chromance - Trainee Wise Systems
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.0.
+Sistema web interativo de RPG baseado em IA, integrando **Angular (front-end)**, **FastAPI (back-end)** e **MongoDB (banco de dados)**.  
+O jogo utiliza **LLM** para gerar narrativas dinâmicas e estruturadas, permitindo que o usuário crie personagens, inicie campanhas e tome decisões livres ou sugeridas.
 
-## Development server
+---
 
-To start a local development server, run:
+## ⚙️ Tecnologias
+- **Front-end**: Angular 17+, SCSS, JWT Auth, consumo de API REST  
+- **Back-end**: FastAPI, MongoDB, Pydantic, autenticação JWT  
+- **IA/LLM**: geração de narrativa e ações, com respostas JSON estruturadas  
+- **Infra**: Healthchecks (`/liveness`, `/readiness`, `/health`)  
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🧑‍💻 Funcionalidades do Front-end (Angular)
+- **Tela inicial**: Login, Cadastro ou Continuar campanha  
+- **Login / Cadastro**: formulários + JWT integrado  
+- **Gestão de Personagens**: criar, listar, excluir, iniciar campanha  
+- **Tela de Jogo**:  
+  - Mostra nome, classe, atributos e inventário  
+  - Narrativa gerada pelo LLM  
+  - Botões com ações sugeridas  
+  - Campo de ação livre  
+- **Histórico**: acompanhar campanhas anteriores  
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 📌 Organização do Projeto
 
-```bash
-ng generate component component-name
-```
+O projeto segue a metodologia **Scrum**, organizada em **sprints semanais**, garantindo entregas incrementais e revisões contínuas.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+A gestão das tarefas é realizada no **Trello**, onde os PBIs (Product Backlog Items) são divididos e acompanhados em cada sprint.  
 
-```bash
-ng generate --help
-```
+🔗 **Acesse o quadro no Trello:** ((https://trello.com/invite/b/68ab8e0ecfbf91119b5c6636/ATTIecabd367f91b8616aeaedd53cb544dfcAD69D16B/rpg-wise))  
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
