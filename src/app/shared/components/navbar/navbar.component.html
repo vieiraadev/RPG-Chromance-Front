@@ -1,0 +1,14 @@
+<aside class="sidebar">
+  <nav class="sidebar-nav">
+    <div
+      *ngFor="let item of navigationItems"
+      class="nav-item"
+      [class.active]="isActive(item.id)"
+      (click)="setActive(item.id)"
+      [title]="item.label"
+    >
+      <i class="nav-icon bx" [ngClass]="item.icon"></i>
+      <span class="nav-text">{{ item.label }}</span>
+    </div>
+  </nav>
+</aside>
