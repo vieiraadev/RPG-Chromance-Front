@@ -1,0 +1,29 @@
+{
+  "name": "Angular Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20-bullseye",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "angular.ng-template",
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  "forwardPorts": [4200],
+  
+  "postCreateCommand": "npm install -g @angular/cli && npm install",
+
+  "remoteUser": "node"
+}
