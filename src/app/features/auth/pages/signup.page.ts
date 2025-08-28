@@ -11,7 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './signup.page.html',
-  styleUrls: ['./signup.page.scss'], 
+  styleUrls: ['./signup.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class SignupPage {
@@ -23,10 +23,10 @@ export class SignupPage {
     {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]], 
+      password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
     },
-    { validators: [passwordsMatchValidator] } 
+    { validators: [passwordsMatchValidator] }
   );
 
   loading = false;
@@ -45,8 +45,10 @@ export class SignupPage {
     const payload = { nome: v.fullName, email: v.email, senha: v.password };
 
     try {
-      await this.auth.signup(payload).toPromise(); 
+      await this.auth.signup(payload).toPromise();
+      
       this.router.navigate(['/auth/login']);
+      
     } catch (e: any) {
       this.error = e?.error?.detail ?? 'Erro ao criar conta';
       console.error('Signup error:', e);

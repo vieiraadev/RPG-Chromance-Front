@@ -5,7 +5,7 @@ import { ApiService } from '../api/api.service';
 
 export interface LoginRequest {
   email: string;
-  senha: string;   
+  senha: string;
 }
 
 export interface SignupRequest {
@@ -27,14 +27,14 @@ export interface UserOut {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenKey = 'token'; 
+  private tokenKey = 'token';
   private loggedIn$ = new BehaviorSubject<boolean>(!!localStorage.getItem(this.tokenKey));
   public isLoggedIn$ = this.loggedIn$.asObservable();
 
   constructor(private api: ApiService) {}
 
-  signup(body: SignupRequest): Observable<UserOut> {
-    return this.api.post<UserOut>('/api/auth/signup', body);
+  signup(body: SignupRequest): Observable<TokenResponse> {
+    return this.api.post<TokenResponse>('/api/auth/signup', body);
   }
 
   login(body: LoginRequest): Observable<TokenResponse> {
