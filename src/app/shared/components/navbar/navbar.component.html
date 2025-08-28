@@ -10,5 +10,10 @@
       <i class="nav-icon bx" [ngClass]="item.icon"></i>
       <span class="nav-text">{{ item.label }}</span>
     </div>
+    
+    <div class="nav-item nav-item-logout" (click)="logout()" title="Sair">
+      <i class="nav-icon bx bx-log-out"></i>
+      <span class="nav-text">Sair</span>
+    </div>
   </nav>
 </aside>
