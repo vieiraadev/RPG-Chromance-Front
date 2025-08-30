@@ -1,0 +1,15 @@
+<app-navbar></app-navbar>
+
+<div class="home-content">
+    <div class="characters-grid">
+      <app-character-card 
+        *ngFor="let char of characters"
+        [character]="char"
+        [isLoading]="isLoading"
+        [showActions]="true"
+        (editClicked)="onEditCharacter($event)"
+        (deleteClicked)="onDeleteCharacter($event)"
+        (characterSelected)="onSelectCharacter($event)">
+      </app-character-card>
+    </div>
+  </div>
