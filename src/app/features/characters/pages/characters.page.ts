@@ -24,23 +24,24 @@ export class CharactersPageComponent implements OnInit {
       },
       {
         id: 2,
-        name: 'Kael Foxfire',
-        raca: 'Raposa Humana',
-        classe: 'Ladino',
-        descricao: 'Um híbrido astuto de raposa e humano, mestre em truques, disfarces e infiltrações silenciosas. Sua agilidade e astúcia fazem dele um aliado valioso e um inimigo perigoso.',
-        atributos: { forca: 12, inteligencia: 18, carisma: 16, destreza: 20 },
+        name: 'Lord Veynar Kron',
+        raca: 'Humano',
+        classe: 'Magnata Sombrio',
+        descricao: 'Um humano implacável e manipulador, chefe supremo da Corporação Obsidian. Sua inteligência estratégica e sede de poder o tornaram o homem mais temido do mundo, controlando governos, exércitos e mercados das sombras.',
+        atributos: { forca: 15, inteligencia: 22, carisma: 20, destreza: 14 },
         imageUrl: 'assets/images/card-image2.jpg'
       },
       
       {
         id: 3,
-        name: 'Aegis-09',
-        raca: 'Autômato',
-        classe: 'Guardião',
-        descricao: 'Um robô de combate forjado em aço e energia arcana. Projetado para proteger e lutar sem hesitar, combina força bruta com cálculos precisos e frieza mecânica.',
-        atributos: { forca: 20, inteligencia: 16, carisma: 8, destreza: 14 },
+        name: 'Netrunner',
+        raca: 'Humano',
+        classe: 'Hacker Sombrio',
+        descricao: 'Um gênio da tecnologia e mestre da invasão digital. Kael é capaz de romper firewalls impenetráveis, manipular inteligências artificiais e controlar sistemas inteiros à distância. Sua mente afiada e sua frieza o tornaram um dos hackers mais temidos do submundo corporativo.',
+        atributos: { forca: 10, inteligencia: 22, carisma: 14, destreza: 18 },
         imageUrl: 'assets/images/card-image3.jpg'
       },
+      
       
   ];
 
