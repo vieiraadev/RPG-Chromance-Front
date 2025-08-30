@@ -28,3 +28,9 @@
     </div>
   </div>
 </div>
+
+<app-add-character-modal
+  [isOpen]="isModalOpen"
+  (closeModal)="closeModal()"
+  (characterCreated)="onCharacterCreated($event)">
+</app-add-character-modal>
