@@ -22,6 +22,26 @@ export class CharactersPageComponent implements OnInit {
         atributos: { forca: 18, inteligencia: 14, carisma: 15, destreza: 16 },
         imageUrl: 'assets/images/card-image1.jpg'
       },
+      {
+        id: 2,
+        name: 'Kael Foxfire',
+        raca: 'Raposa Humana',
+        classe: 'Ladino',
+        descricao: 'Um híbrido astuto de raposa e humano, mestre em truques, disfarces e infiltrações silenciosas. Sua agilidade e astúcia fazem dele um aliado valioso e um inimigo perigoso.',
+        atributos: { forca: 12, inteligencia: 18, carisma: 16, destreza: 20 },
+        imageUrl: 'assets/images/card-image2.jpg'
+      },
+      
+      {
+        id: 3,
+        name: 'Aegis-09',
+        raca: 'Autômato',
+        classe: 'Guardião',
+        descricao: 'Um robô de combate forjado em aço e energia arcana. Projetado para proteger e lutar sem hesitar, combina força bruta com cálculos precisos e frieza mecânica.',
+        atributos: { forca: 20, inteligencia: 16, carisma: 8, destreza: 14 },
+        imageUrl: 'assets/images/card-image3.jpg'
+      },
+      
   ];
 
   isLoading = false;

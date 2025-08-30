@@ -23,27 +23,42 @@
   box-sizing: border-box;
 }
 
+html {
+  height: auto;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  padding: 20px 0; 
-  min-height: 100vh;
+  padding: 20px 0;
+  padding-left: 70px;
+  height: auto;
   background: var(--bg);
   background-image: 
       radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(0, 128, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 80%, rgba(0, 255, 255, 0.05) 0%, transparent 50%);
-  background-attachment: fixed;
   color: var(--text);
   font-family: 'Rajdhani', system-ui, -apple-system, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
   position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.characters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  margin-left: 15px;
+  width: calc(100% - 85px);
 }
 
 .character-card {
-  width: calc(100vw - 40px);
-  max-width: none; 
+  width: 100%;
+  max-width: calc(100% - 40px);
+  margin: 0 auto 30px auto;
   background: var(--card-bg);
   border: 2px solid var(--card-border);
   border-radius: 20px;
@@ -55,13 +70,8 @@ body {
   animation: cardGlow 3s ease-in-out infinite alternate;
   display: grid;
   grid-template-columns: 220px 1fr;
-  grid-template-rows: 1fr auto; 
+  grid-template-rows: 1fr auto;
   min-height: 280px;
-}
-
-@keyframes cardGlow {
-  0% { box-shadow: var(--shadow), 0 0 30px rgba(0, 255, 255, 0.2); }
-  100% { box-shadow: var(--shadow), 0 0 50px rgba(0, 255, 255, 0.4); }
 }
 
 .character-card::before {
@@ -107,7 +117,6 @@ body {
   box-shadow: none;
   position: relative;
   z-index: 15;
-  
   filter: sepia(100%) hue-rotate(200deg) saturate(2) brightness(0.8);
   transition: filter 0.3s ease;
 }
@@ -123,11 +132,6 @@ body {
   font-size: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
-}
-
-@keyframes avatarPulse {
-  0% { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
-  100% { border-color: var(--accent-blue); box-shadow: 0 0 30px rgba(0, 128, 255, 0.5); }
 }
 
 .character-right {
@@ -339,73 +343,91 @@ body {
   margin-left: 6px;
 }
 
-.character-card {
-  width: 100%; 
-  max-width: none; 
-  margin: 0 20px; 
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 20px;
-  box-shadow: var(--shadow), var(--shadow-glow);
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-  position: relative;
-  z-index: 1;
-  animation: cardGlow 3s ease-in-out infinite alternate;
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  grid-template-rows: 1fr auto; 
-  min-height: 280px;
+@keyframes cardGlow {
+  0% { box-shadow: var(--shadow), 0 0 30px rgba(0, 255, 255, 0.2); }
+  100% { box-shadow: var(--shadow), 0 0 50px rgba(0, 255, 255, 0.4); }
+}
+
+@keyframes avatarPulse {
+  0% { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+  100% { border-color: var(--accent-blue); box-shadow: 0 0 30px rgba(0, 128, 255, 0.5); }
 }
 
 @media (max-width: 768px) {
   body {
     padding: 10px 0;
+    padding-left: 60px;
   }
   
   .character-card {
-    margin: 0 10px;
+    margin: 0 auto 20px auto;
+    max-width: calc(100% - 20px);
     grid-template-columns: 1fr;
     max-height: none;
   }
   
   .character-image {
-      border-right: none;
-      border-bottom: 2px solid var(--border);
-      height: 200px;
-      overflow: hidden;
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+    height: 200px;
+    overflow: hidden;
   }
   
   .character-portrait {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
   }
   
   .character-stats {
-      grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
   
   .attributes-grid {
-      grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
   
   .character-actions {
-      flex-direction: column;
+    flex-direction: column;
+  }
+  
+  .characters-container {
+    padding: 10px;
+    margin-left: 10px;
+    width: calc(100% - 70px);
   }
 }
 
 @media (max-width: 480px) {
+  body {
+    padding-left: 10px;
+  }
+  
   .character-card {
-    margin: 0 5px;
+    margin: 0 auto 15px auto;
+    max-width: calc(100% - 10px);
   }
   
   .character-stats {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
   
   .attributes-grid {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
+  
+  .characters-container {
+    padding: 5px;
+    margin-left: 5px;
+    width: calc(100% - 15px);
+  }
+}
+
+app-root,
+.app-root,
+.router-outlet,
+.main-layout {
+  height: auto !important;
+  overflow: visible !important;
 }
