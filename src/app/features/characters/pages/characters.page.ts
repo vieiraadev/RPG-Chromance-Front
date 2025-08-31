@@ -3,12 +3,19 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
 import { CharacterCardComponent } from '@app/shared/components/character-card/character-card.component';
 import { AddCharacterModalComponent } from '@app/shared/components/add-character-modal/add-character-modal.component';
+import { EditCharacterModalComponent } from '@app/shared/components/edit-character-modal/edit-character-modal.component';
 import type { Character } from '@app/shared/components/character-card/character-card.component';
 
 @Component({
   selector: 'app-characters',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, CharacterCardComponent, AddCharacterModalComponent],
+  imports: [
+    CommonModule, 
+    NavbarComponent, 
+    CharacterCardComponent, 
+    AddCharacterModalComponent,
+    EditCharacterModalComponent
+  ],
   templateUrl: './characters.page.html',
   styleUrls: ['./characters.page.scss'],
 })
@@ -33,9 +40,11 @@ export class CharactersPageComponent implements OnInit {
       imageUrl: 'assets/images/card-image2.jpg'
     },
   ];
-
+  
   isLoading = false;
   isModalOpen = false;
+  isEditModalOpen = false;
+  characterToEdit: Character | null = null;
 
   ngOnInit(): void {
     this.loadCharacters();
@@ -50,7 +59,9 @@ export class CharactersPageComponent implements OnInit {
   }
 
   onEditCharacter(character: Character): void {
-    console.log('Editando personagem:', character.name);
+    console.log('Abrindo modal de edição para:', character.name);
+    this.characterToEdit = { ...character };
+    this.isEditModalOpen = true;
   }
 
   onDeleteCharacter(character: Character): void {
@@ -64,16 +75,29 @@ export class CharactersPageComponent implements OnInit {
 
   createNewCharacter(): void {
     this.isModalOpen = true;
-    console.log('Abrindo modal para criar novo personagem...');
+    console.log('Abrindo modal para criar novo personagem');
   }
 
   closeModal(): void {
     this.isModalOpen = false;
   }
 
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+    this.characterToEdit = null;
+  }
+
   onCharacterCreated(newCharacter: Character): void {
     this.addCharacter(newCharacter);
     console.log('Novo personagem criado:', newCharacter.name);
+  }
+
+  onCharacterUpdated(updatedCharacter: Character): void {
+    const index = this.characters.findIndex(c => c.id === updatedCharacter.id);
+    if (index !== -1) {
+      this.characters[index] = { ...updatedCharacter };
+      console.log('Personagem atualizado com sucesso:', updatedCharacter.name);
+    }
   }
 
   addCharacter(newCharacter: Character): void {
