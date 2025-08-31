@@ -87,7 +87,27 @@
               <div class="image-overlay" [style.display]="selectedImageIndex === 7 ? 'flex' : 'none'">
                 <div class="check-icon">✓</div>
               </div>
+
             </div>
+            <div 
+              class="image-option"
+              [class.selected]="selectedImageIndex === 8"
+              (click)="selectImage(8)">
+              <img src="assets/images/card-image9.jpg" alt="Avatar 9" class="avatar-preview">
+              <div class="image-overlay" [style.display]="selectedImageIndex === 8 ? 'flex' : 'none'">
+                <div class="check-icon">✓</div>
+              </div>
+            </div>
+            <div 
+              class="image-option"
+              [class.selected]="selectedImageIndex === 9"
+              (click)="selectImage(9)">
+              <img src="assets/images/card-image10.jpg" alt="Avatar 10" class="avatar-preview">
+              <div class="image-overlay" [style.display]="selectedImageIndex === 9 ? 'flex' : 'none'">
+                <div class="check-icon">✓</div>
+              </div>
+            </div>
+            
           </div>
         </div>
   

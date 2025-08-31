@@ -27,7 +27,9 @@ export class AddCharacterModalComponent {
     'assets/images/card-image5.jpg',
     'assets/images/card-image6.jpg',
     'assets/images/card-image7.jpg',
-    'assets/images/card-image8.jpg'
+    'assets/images/card-image8.jpg',
+    'assets/images/card-image9.jpg',
+    'assets/images/card-image10.jpg'
   ];
 
   newCharacter: Character = {

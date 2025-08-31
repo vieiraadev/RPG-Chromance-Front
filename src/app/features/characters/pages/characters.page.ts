@@ -32,15 +32,6 @@ export class CharactersPageComponent implements OnInit {
       atributos: { forca: 15, inteligencia: 22, carisma: 20, destreza: 14 },
       imageUrl: 'assets/images/card-image2.jpg'
     },
-    {
-      id: 3,
-      name: 'Netrunner',
-      raca: 'Humano',
-      classe: 'Hacker Sombrio',
-      descricao: 'Um gênio da tecnologia e mestre da invasão digital. Kael é capaz de romper firewalls impenetráveis, manipular inteligências artificiais e controlar sistemas inteiros à distância. Sua mente afiada e sua frieza o tornaram um dos hackers mais temidos do submundo corporativo.',
-      atributos: { forca: 10, inteligencia: 22, carisma: 14, destreza: 18 },
-      imageUrl: 'assets/images/card-image3.jpg'
-    },
   ];
 
   isLoading = false;
