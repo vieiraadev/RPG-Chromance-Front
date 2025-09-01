@@ -1,73 +1,80 @@
 <div class="character-card">
-  <div class="character-image">
-    <img 
-      *ngIf="hasValidImage; else fallbackImage"
-      [src]="character.imageUrl"
-      alt="Character portrait"
-      class="character-portrait"
-    />
-
-    <ng-template #fallbackImage>
-      <img 
-        src="assets/images/default-avatar.png" 
-        alt="Imagem padrão" 
+    <div class="character-image">
+      <img
+        *ngIf="hasValidImage; else fallbackImage"
+        [src]="character.imageUrl"
+        alt="Character portrait"
         class="character-portrait"
       />
-    </ng-template>
-  </div>
-  
-  <div class="character-right">
+      <ng-template #fallbackImage>
+        <img
+          src="assets/images/default-avatar.png"
+          alt="Imagem padrão"
+          class="character-portrait"
+        />
+      </ng-template>
+    </div>
+    
+    <div class="character-right">
       <div class="character-header">
-          <h2 class="character-name">{{ formattedName }}</h2>
-          <p class="character-class">{{ character.classe | uppercase }}</p>
+        <h2 class="character-name">{{ formattedName }}</h2>
+        <p class="character-class">{{ character.classe | uppercase }}</p>
       </div>
       
       <div class="character-stats">
-          <div class="stat-group">
-              <div class="stat-label">Nome</div>
-              <div class="stat-value">{{ character.name }}</div>
+        <div class="stat-group">
+          <div class="stat-label">Nome</div>
+          <div class="stat-value">{{ character.name }}</div>
+        </div>
+        
+        <div class="stat-group">
+          <div class="stat-label">Raça</div>
+          <div class="stat-value">{{ character.raca }}</div>
+        </div>
+        
+        <div class="stat-group">
+          <div class="stat-label">Classe</div>
+          <div class="stat-value">{{ character.classe }}</div>
+        </div>
+        
+        <div class="stat-group attributes-section">
+          <div class="stat-label">Atributos</div>
+          <div class="attributes-grid">
+            <div class="attribute-item">
+              <span class="attribute-name">Força</span>
+              <span class="attribute-value">{{ character.atributos.forca }}</span>
+            </div>
+            <div class="attribute-item">
+              <span class="attribute-name">Inteligência</span>
+              <span class="attribute-value">{{ character.atributos.inteligencia }}</span>
+            </div>
+            <div class="attribute-item">
+              <span class="attribute-name">Carisma</span>
+              <span class="attribute-value">{{ character.atributos.carisma }}</span>
+            </div>
+            <div class="attribute-item">
+              <span class="attribute-name">Destreza</span>
+              <span class="attribute-value">{{ character.atributos.destreza }}</span>
+            </div>
           </div>
-          <div class="stat-group">
-              <div class="stat-label">Raça</div>
-              <div class="stat-value">{{ character.raca }}</div>
-          </div>
-          <div class="stat-group">
-              <div class="stat-label">Classe</div>
-              <div class="stat-value">{{ character.classe }}</div>
-          </div>
-          <div class="stat-group">
-              <div class="stat-label">Atributos</div>
-              <div class="attributes-grid">
-                  <div class="attribute-item">
-                      <span class="attribute-name">Força</span>
-                      <span class="attribute-value">{{ character.atributos.forca }}</span>
-                  </div>
-                  <div class="attribute-item">
-                      <span class="attribute-name">Inteligência</span>
-                      <span class="attribute-value">{{ character.atributos.inteligencia }}</span>
-                  </div>
-                  <div class="attribute-item">
-                      <span class="attribute-name">Carisma</span>
-                      <span class="attribute-value">{{ character.atributos.carisma }}</span>
-                  </div>
-                  <div class="attribute-item">
-                      <span class="attribute-name">Destreza</span>
-                      <span class="attribute-value">{{ character.atributos.destreza }}</span>
-                  </div>
-              </div>
-          </div>
+        </div>
+        
+        <div class="stat-group description-section" *ngIf="character.descricao">
+          <div class="stat-label">Descrição</div>
+          <div class="description-text">{{ character.descricao }}</div>
+        </div>
       </div>
-  </div>
-  
-  <div class="character-actions">
+    </div>
+    
+    <div class="character-actions">
       <button class="btn-action primary" (click)="onEdit()">
-          <span>Editar</span>
+        <span>Editar</span>
       </button>
       <button class="btn-action danger" (click)="onDelete()">
-          Deletar
+        Deletar
       </button>
       <button class="btn-action select">
         Selecionar
       </button>
+    </div>
   </div>
-</div>

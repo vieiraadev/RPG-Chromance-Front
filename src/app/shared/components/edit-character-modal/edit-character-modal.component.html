@@ -11,100 +11,11 @@
           <div class="images-grid">
             <div 
               class="image-option"
-              [class.selected]="selectedImageIndex === 0"
-              (click)="selectImage(0)">
-              <img src="assets/images/card-image1.jpg" alt="Avatar 1" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 0 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 1"
-              (click)="selectImage(1)">
-              <img src="assets/images/card-image2.jpg" alt="Avatar 2" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 1 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 2"
-              (click)="selectImage(2)">
-              <img src="assets/images/card-image3.jpg" alt="Avatar 3" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 2 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 3"
-              (click)="selectImage(3)">
-              <img src="assets/images/card-image4.jpg" alt="Avatar 4" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 3 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 4"
-              (click)="selectImage(4)">
-              <img src="assets/images/card-image5.jpg" alt="Avatar 5" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 4 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 5"
-              (click)="selectImage(5)">
-              <img src="assets/images/card-image6.jpg" alt="Avatar 6" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 5 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 6"
-              (click)="selectImage(6)">
-              <img src="assets/images/card-image7.jpg" alt="Avatar 7" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 6 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 7"
-              (click)="selectImage(7)">
-              <img src="assets/images/card-image8.jpg" alt="Avatar 8" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 7 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 8"
-              (click)="selectImage(8)">
-              <img src="assets/images/card-image9.jpg" alt="Avatar 9" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 8 ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
-              </div>
-            </div>
-            
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === 9"
-              (click)="selectImage(9)">
-              <img src="assets/images/card-image10.jpg" alt="Avatar 10" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === 9 ? 'flex' : 'none'">
+              [class.selected]="selectedImageIndex === i"
+              (click)="selectImage(i)"
+              *ngFor="let image of availableImages; let i = index; trackBy: trackByImage">
+              <img [src]="image" [alt]="'Avatar ' + (i + 1)" class="avatar-preview">
+              <div class="image-overlay" [style.display]="selectedImageIndex === i ? 'flex' : 'none'">
                 <div class="check-icon">✓</div>
               </div>
             </div>
@@ -143,7 +54,7 @@
                         class="dropdown-item" 
                         (click)="selectRaca(raca); $event.stopPropagation()"
                         [class.selected]="editingCharacter.raca === raca.value"
-                        *ngFor="let raca of racas">
+                        *ngFor="let raca of racas; trackBy: trackByRaca">
                         <span class="item-label">{{ raca.label }}</span>
                       </div>
                     </div>
@@ -164,7 +75,7 @@
                         class="dropdown-item" 
                         (click)="selectClasse(classe); $event.stopPropagation()"
                         [class.selected]="editingCharacter.classe === classe.value"
-                        *ngFor="let classe of classes">
+                        *ngFor="let classe of classes; trackBy: trackByClasse">
                         <span class="item-label">{{ classe.label }}</span>
                       </div>
                     </div>
@@ -189,7 +100,7 @@
                 <h4>Distribuição de Atributos</h4>
                 <div class="points-counter">
                   <span class="points-remaining">{{remainingPoints}} pontos restantes</span>
-                  <span class="total-points">{{totalPoints}}/72</span>
+                  <span class="total-points">{{totalPoints}}/{{originalTotalPoints}}</span>
                 </div>
               </div>
   

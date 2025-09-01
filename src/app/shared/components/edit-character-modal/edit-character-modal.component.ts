@@ -183,4 +183,8 @@ export class EditCharacterModalComponent implements OnChanges {
   trackByClasse(index: number, item: any): string {
     return item.value;
   }
+
+  trackByImage(index: number, item: string): string {
+    return item;
+  }
 }
