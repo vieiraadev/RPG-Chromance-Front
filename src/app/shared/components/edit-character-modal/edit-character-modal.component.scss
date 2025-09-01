@@ -581,8 +581,7 @@
       gap: 12px;
     }
   }
-  
-  /* Tablets pequenos e celulares grandes (768px e abaixo) */
+
   @media (max-width: 768px) {
     .modal-container {
       width: 100%;
@@ -633,7 +632,6 @@
     }
   }
   
-  /* Celulares médios (600px e abaixo) */
   @media (max-width: 600px) {
     .modal-overlay {
       padding: 0;
@@ -725,8 +723,7 @@
       font-size: 13px;
     }
   }
-  
-  /* Celulares pequenos (480px e abaixo) */
+ 
   @media (max-width: 480px) {
     .modal-header {
       padding: 10px 12px;
@@ -802,8 +799,7 @@
       font-size: 12px;
     }
   }
-  
-  /* Celulares muito pequenos (360px e abaixo) */
+
   @media (max-width: 360px) {
     .modal-title {
       font-size: 12px;

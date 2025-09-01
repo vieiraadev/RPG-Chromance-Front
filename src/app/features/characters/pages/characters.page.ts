@@ -27,16 +27,16 @@ export class CharactersPageComponent implements OnInit {
       raca: 'Humano',
       classe: 'Guerreiro',
       descricao: 'Um humano forte e disciplinado, treinado em batalhas corpo a corpo e liderança em campo de guerra. Conhecido por sua coragem inabalável e senso de honra.',
-      atributos: { forca: 18, inteligencia: 14, carisma: 15, destreza: 16 },
+      atributos: { forca: 16, inteligencia: 12, carisma: 12, destreza: 12 },
       imageUrl: 'assets/images/card-image1.jpg'
     },
     {
       id: 2,
-      name: 'Lord Veynar Kron',
-      raca: 'Humano',
-      classe: 'Magnata Sombrio',
-      descricao: 'Um humano implacável e manipulador, chefe supremo da Corporação Obsidian. Sua inteligência estratégica e sede de poder o tornaram o homem mais temido do mundo, controlando governos, exércitos e mercados das sombras.',
-      atributos: { forca: 15, inteligencia: 22, carisma: 20, destreza: 14 },
+      name: 'Raven Steele',
+      raca: 'Humana',
+      classe: 'Guerreira',
+      descricao: 'Uma combatente implacável das ruas neon da cidade, equipada com implantes cibernéticos de última geração e uma lâmina energética. Treinada para sobreviver no caos urbano, Raven é conhecida por sua força brutal e lealdade apenas à própria liberdade.',
+      atributos: { forca: 10, inteligencia: 18, carisma: 16, destreza: 8 },
       imageUrl: 'assets/images/card-image2.jpg'
     },
   ];

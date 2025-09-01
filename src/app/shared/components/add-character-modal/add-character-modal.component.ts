@@ -139,7 +139,7 @@ export class AddCharacterModalComponent {
   }
 
   get remainingPoints(): number {
-    return 72 - this.totalPoints;
+    return 52 - this.totalPoints;
   }
 
   incrementAttribute(attr: keyof CharacterAttributes): void {
