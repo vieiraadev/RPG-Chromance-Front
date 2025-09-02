@@ -4,15 +4,16 @@ import { NavbarComponent } from '@app/shared/components/navbar/navbar.component'
 import { CharacterCardComponent } from '@app/shared/components/character-card/character-card.component';
 import { AddCharacterModalComponent } from '@app/shared/components/add-character-modal/add-character-modal.component';
 import { EditCharacterModalComponent } from '@app/shared/components/edit-character-modal/edit-character-modal.component';
+import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
 import type { Character } from '@app/shared/components/character-card/character-card.component';
 
 @Component({
   selector: 'app-characters',
   standalone: true,
   imports: [
-    CommonModule, 
-    NavbarComponent, 
-    CharacterCardComponent, 
+    CommonModule,
+    NavbarComponent,
+    CharacterCardComponent,
     AddCharacterModalComponent,
     EditCharacterModalComponent
   ],
@@ -20,31 +21,18 @@ import type { Character } from '@app/shared/components/character-card/character-
   styleUrls: ['./characters.page.scss'],
 })
 export class CharactersPageComponent implements OnInit {
-  characters: Character[] = [
-    {
-      id: 1,
-      name: 'Dorian Blackthorn',
-      raca: 'Humano',
-      classe: 'Guerreiro',
-      descricao: 'Um humano forte e disciplinado, treinado em batalhas corpo a corpo e liderança em campo de guerra. Conhecido por sua coragem inabalável e senso de honra.',
-      atributos: { forca: 16, inteligencia: 12, carisma: 12, destreza: 12 },
-      imageUrl: 'assets/images/card-image1.jpg'
-    },
-    {
-      id: 2,
-      name: 'Raven Steele',
-      raca: 'Humana',
-      classe: 'Guerreira',
-      descricao: 'Uma combatente implacável das ruas neon da cidade, equipada com implantes cibernéticos de última geração e uma lâmina energética. Treinada para sobreviver no caos urbano, Raven é conhecida por sua força brutal e lealdade apenas à própria liberdade.',
-      atributos: { forca: 10, inteligencia: 18, carisma: 16, destreza: 8 },
-      imageUrl: 'assets/images/card-image2.jpg'
-    },
-  ];
-  
+  characters: Character[] = [];
   isLoading = false;
   isModalOpen = false;
   isEditModalOpen = false;
   characterToEdit: Character | null = null;
+  errorMessage = '';
+  
+  currentPage = 1;
+  totalPages = 1;
+  totalCharacters = 0;
+
+  constructor(private characterService: CharacterService) {}
 
   ngOnInit(): void {
     this.loadCharacters();
@@ -52,10 +40,57 @@ export class CharactersPageComponent implements OnInit {
 
   loadCharacters(): void {
     this.isLoading = true;
-    setTimeout(() => {
-      console.log('Personagens carregados:', this.characters.length);
-      this.isLoading = false;
-    }, 600);
+    this.errorMessage = '';
+    
+    this.characterService.listCharacters().subscribe({
+      next: (response) => {
+        this.characters = response.characters.map(char => this.convertToFrontendFormat(char));
+        this.isLoading = false;
+        console.log(`${this.characters.length} personagens carregados do banco`);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar personagens:', error);
+        this.errorMessage = 'Erro ao carregar personagens. Tentando usar dados locais...';
+        this.isLoading = false;
+        
+        this.loadLocalCharacters();
+      }
+    });
+  }
+
+  private convertToFrontendFormat(backendChar: CharacterResponse): Character {
+    return {
+      id: backendChar._id,
+      name: backendChar.name,
+      raca: backendChar.raca,
+      classe: backendChar.classe,
+      descricao: backendChar.descricao || '',
+      atributos: backendChar.atributos,
+      imageUrl: backendChar.imageUrl
+    };
+  }
+
+  private loadLocalCharacters(): void {
+    this.characters = [
+      {
+        id: 'local-1',
+        name: 'Dorian Blackthorn',
+        raca: 'Humano',
+        classe: 'Guerreiro',
+        descricao: 'Um humano forte e disciplinado, treinado em batalhas corpo a corpo e liderança em campo de guerra.',
+        atributos: { forca: 16, inteligencia: 12, carisma: 12, destreza: 12 },
+        imageUrl: 'assets/images/card-image1.jpg'
+      },
+      {
+        id: 'local-2',
+        name: 'Raven Steele',
+        raca: 'Humana',
+        classe: 'Guerreira',
+        descricao: 'Uma combatente implacável das ruas neon da cidade.',
+        atributos: { forca: 10, inteligencia: 18, carisma: 16, destreza: 8 },
+        imageUrl: 'assets/images/card-image2.jpg'
+      }
+    ];
   }
 
   onEditCharacter(character: Character): void {
@@ -65,8 +100,24 @@ export class CharactersPageComponent implements OnInit {
   }
 
   onDeleteCharacter(character: Character): void {
-    this.characters = this.characters.filter((c) => c.id !== character.id);
-    console.log('Personagem deletado com sucesso!');
+    if (!character.id) return;
+    
+    if (String(character.id).startsWith('local-')) {
+      this.characters = this.characters.filter((c) => c.id !== character.id);
+      console.log('Personagem local removido');
+      return;
+    }
+    
+    this.characterService.deleteCharacter(String(character.id)).subscribe({
+      next: () => {
+        this.characters = this.characters.filter((c) => c.id !== character.id);
+        console.log('Personagem deletado do banco com sucesso!');
+      },
+      error: (error) => {
+        console.error('Erro ao deletar personagem:', error);
+        alert('Erro ao deletar personagem. Tente novamente.');
+      }
+    });
   }
 
   onSelectCharacter(character: Character): void {
@@ -87,24 +138,67 @@ export class CharactersPageComponent implements OnInit {
     this.characterToEdit = null;
   }
 
-  onCharacterCreated(newCharacter: Character): void {
-    this.addCharacter(newCharacter);
-    console.log('Novo personagem criado:', newCharacter.name);
+  onCharacterCreated(newCharacter: any): void {
+    const characterToAdd: Character = {
+      id: newCharacter._id || newCharacter.id,
+      name: newCharacter.name,
+      raca: newCharacter.raca,
+      classe: newCharacter.classe,
+      descricao: newCharacter.descricao || '',
+      atributos: newCharacter.atributos,
+      imageUrl: newCharacter.imageUrl
+    };
+    
+    this.characters.unshift(characterToAdd);
+    console.log('Novo personagem adicionado à lista:', characterToAdd.name);
+    
   }
 
   onCharacterUpdated(updatedCharacter: Character): void {
-    const index = this.characters.findIndex(c => c.id === updatedCharacter.id);
-    if (index !== -1) {
-      this.characters[index] = { ...updatedCharacter };
-      console.log('Personagem atualizado com sucesso:', updatedCharacter.name);
+    if (!updatedCharacter.id) return;
+    
+    if (String(updatedCharacter.id).startsWith('local-')) {
+      const index = this.characters.findIndex(c => c.id === updatedCharacter.id);
+      if (index !== -1) {
+        this.characters[index] = { ...updatedCharacter };
+        console.log('Personagem local atualizado');
+      }
+      return;
+    }
+    
+    const updateData = {
+      name: updatedCharacter.name,
+      raca: updatedCharacter.raca,
+      classe: updatedCharacter.classe,
+      descricao: updatedCharacter.descricao,
+      atributos: updatedCharacter.atributos,
+      imageUrl: updatedCharacter.imageUrl
+    };
+    
+    this.characterService.updateCharacter(String(updatedCharacter.id), updateData).subscribe({
+      next: (response) => {
+        const index = this.characters.findIndex(c => c.id === updatedCharacter.id);
+        if (index !== -1) {
+          this.characters[index] = this.convertToFrontendFormat(response);
+          console.log('Personagem atualizado no banco:', response.name);
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar personagem:', error);
+        alert('Erro ao atualizar personagem. Tente novamente.');
+      }
+    });
+  }
+
+  loadMoreCharacters(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadCharacters();
     }
   }
 
-  addCharacter(newCharacter: Character): void {
-    const maxId = this.characters.length
-      ? Math.max(...this.characters.map((c) => Number(c.id) || 0))
-      : 0;
-    newCharacter.id = maxId + 1;
-    this.characters.push(newCharacter);
+  refreshCharacters(): void {
+    this.currentPage = 1;
+    this.loadCharacters();
   }
 }

@@ -1,7 +1,24 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Character, CharacterAttributes } from '../character-card/character-card.component';
+import { CharacterService, CharacterCreate, CharacterResponse } from '../../../core/services/character.service';
+
+export interface Character {
+  _id?: string;
+  name: string;
+  raca: string;
+  classe: string;
+  descricao: string;
+  atributos: CharacterAttributes;
+  imageUrl: string;
+}
+
+export interface CharacterAttributes {
+  forca: number;
+  inteligencia: number;
+  carisma: number;
+  destreza: number;
+}
 
 @Component({
   selector: 'app-add-character-modal',
@@ -18,6 +35,8 @@ export class AddCharacterModalComponent {
   selectedImageIndex = 0;
   isRacaDropdownOpen = false;
   isClasseDropdownOpen = false;
+  isLoading = false;
+  errorMessage = '';
   
   availableImages = [
     'assets/images/card-image1.jpg',
@@ -63,6 +82,8 @@ export class AddCharacterModalComponent {
     { value: 'Assassino Digital', label: 'Assassino Digital' }
   ];
 
+  constructor(private characterService: CharacterService) {}
+
   selectImage(index: number): void {
     this.selectedImageIndex = index;
     this.newCharacter.imageUrl = this.availableImages[index];
@@ -99,14 +120,56 @@ export class AddCharacterModalComponent {
 
   onClose(): void {
     this.closeModal.emit();
+    this.errorMessage = '';
   }
 
   onSubmit(): void {
-    if (this.isFormValid()) {
-      this.characterCreated.emit({ ...this.newCharacter });
-      this.resetForm();
-      this.onClose();
+    if (!this.isFormValid()) {
+      this.errorMessage = 'Por favor, preencha todos os campos obrigatórios';
+      return;
     }
+
+    if (this.remainingPoints < 0) {
+      this.errorMessage = 'Você excedeu o limite de pontos de atributos';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const characterData: CharacterCreate = {
+      name: this.newCharacter.name.trim(),
+      raca: this.newCharacter.raca,
+      classe: this.newCharacter.classe,
+      descricao: this.newCharacter.descricao || '',
+      atributos: this.newCharacter.atributos,
+      imageUrl: this.newCharacter.imageUrl
+    };
+
+    this.characterService.createCharacter(characterData).subscribe({
+      next: (response: CharacterResponse) => {
+        const createdCharacter: Character = {
+          _id: response._id,
+          name: response.name,
+          raca: response.raca,
+          classe: response.classe,
+          descricao: response.descricao,
+          atributos: response.atributos,
+          imageUrl: response.imageUrl
+        };
+
+        this.characterCreated.emit(createdCharacter);
+        
+        this.resetForm();
+        this.onClose();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao criar personagem:', error);
+        this.errorMessage = error.error?.detail || 'Erro ao criar personagem. Tente novamente.';
+        this.isLoading = false;
+      }
+    });
   }
 
   isFormValid(): boolean {
@@ -131,6 +194,7 @@ export class AddCharacterModalComponent {
     };
     this.selectedImageIndex = 0;
     this.closeDropdowns();
+    this.errorMessage = '';
   }
 
   get totalPoints(): number {
