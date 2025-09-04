@@ -17,6 +17,12 @@
   --accent-blue: #0080ff;
   --accent-green: #00ff88;
   --input-bg: rgba(15, 15, 30, 0.8);
+  --progress-bg: rgba(0, 20, 40, 0.6);
+  --progress-border: rgba(0, 255, 255, 0.2);
+  --progress-fill: linear-gradient(90deg, #00ffff, #0080ff);
+  --progress-glow: rgba(0, 255, 255, 0.4);
+  --progress-text: #ffffff;
+  --accent: #00ffff;
 }
 
 * {
@@ -272,6 +278,184 @@ body {
   color: var(--accent);
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
+
+.attribute-container {
+  margin-bottom: 12px;
+
+  .attribute-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    .attribute-name {
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+
+    .attribute-value {
+      color: var(--progress-text);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+    }
+  }
+
+  .progress-bar-container {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    background: var(--progress-bg);
+    border: 1px solid var(--progress-border);
+    border-radius: 8px;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 255, 0.05) 2px,
+        rgba(0, 255, 255, 0.05) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--progress-fill);
+      border-radius: 7px;
+      position: relative;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 0 15px var(--progress-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      z-index: 2;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.3) 0%,
+          rgba(255, 255, 255, 0.1) 50%,
+          rgba(255, 255, 255, 0.3) 100%
+        );
+        border-radius: 7px;
+        animation: shimmer 2s ease-in-out infinite;
+      }
+    }
+
+    .progress-bar-glow {
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--progress-fill);
+      border-radius: 10px;
+      opacity: 0.3;
+      filter: blur(4px);
+      z-index: 0;
+      transition: opacity 0.3s ease;
+    }
+  }
+
+  &:hover {
+    .progress-bar-glow {
+      opacity: 0.6;
+    }
+
+    .progress-bar-container {
+      border-color: var(--accent);
+      box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .attribute-name {
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+    }
+  }
+
+  &.strength {
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #0080ff, #0096ff);
+      box-shadow: 
+        0 0 15px rgba(0, 128, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar-glow {
+      background: linear-gradient(90deg, #0080ff, #0096ff);
+    }
+  }
+
+  &.intelligence {
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #00a0ff, #00b4ff);
+      box-shadow: 
+        0 0 15px rgba(0, 160, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar-glow {
+      background: linear-gradient(90deg, #00a0ff, #00b4ff);
+    }
+  }
+
+  &.agility {
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #00a0ff, #00b4ff);
+      box-shadow: 
+        0 0 15px rgba(0, 255, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar-glow {
+      background: linear-gradient(90deg, #00ffff, #00e6e6);
+    }
+  }
+
+  &.charisma {
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #4da6ff, #66b3ff);
+      box-shadow: 
+        0 0 15px rgba(77, 166, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar-glow {
+      background: linear-gradient(90deg, #4da6ff, #66b3ff);
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 
 .description-text {
   font-size: 13px;

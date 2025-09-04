@@ -1,80 +1,119 @@
 <div class="character-card">
-    <div class="character-image">
+  <div class="character-image">
+    <img
+      *ngIf="hasValidImage; else fallbackImage"
+      [src]="character.imageUrl"
+      alt="Character portrait"
+      class="character-portrait"
+    />
+    <ng-template #fallbackImage>
       <img
-        *ngIf="hasValidImage; else fallbackImage"
-        [src]="character.imageUrl"
-        alt="Character portrait"
+        src="assets/images/default-avatar.png"
+        alt="Imagem padrão"
         class="character-portrait"
       />
-      <ng-template #fallbackImage>
-        <img
-          src="assets/images/default-avatar.png"
-          alt="Imagem padrão"
-          class="character-portrait"
-        />
-      </ng-template>
+    </ng-template>
+  </div>
+  
+  <div class="character-right">
+    <div class="character-header">
+      <h2 class="character-name">{{ formattedName }}</h2>
+      <p class="character-class">{{ character.classe | uppercase }}</p>
     </div>
     
-    <div class="character-right">
-      <div class="character-header">
-        <h2 class="character-name">{{ formattedName }}</h2>
-        <p class="character-class">{{ character.classe | uppercase }}</p>
+    <div class="character-stats">
+      <div class="stat-group">
+        <div class="stat-label">Nome</div>
+        <div class="stat-value">{{ character.name }}</div>
       </div>
       
-      <div class="character-stats">
-        <div class="stat-group">
-          <div class="stat-label">Nome</div>
-          <div class="stat-value">{{ character.name }}</div>
-        </div>
-        
-        <div class="stat-group">
-          <div class="stat-label">Raça</div>
-          <div class="stat-value">{{ character.raca }}</div>
-        </div>
-        
-        <div class="stat-group">
-          <div class="stat-label">Classe</div>
-          <div class="stat-value">{{ character.classe }}</div>
-        </div>
-        
-        <div class="stat-group attributes-section">
-          <div class="stat-label">Atributos</div>
-          <div class="attributes-grid">
-            <div class="attribute-item">
+      <div class="stat-group">
+        <div class="stat-label">Raça</div>
+        <div class="stat-value">{{ character.raca }}</div>
+      </div>
+      
+      <div class="stat-group">
+        <div class="stat-label">Classe</div>
+        <div class="stat-value">{{ character.classe }}</div>
+      </div>
+      
+      <div class="stat-group attributes-section">
+        <div class="stat-label">Atributos</div>
+        <div class="attributes-grid">
+          <div class="attribute-container strength">
+            <div class="attribute-label">
               <span class="attribute-name">Força</span>
-              <span class="attribute-value">{{ character.atributos.forca }}</span>
+              <span class="attribute-value">{{ character.atributos.forca }}/20</span>
             </div>
-            <div class="attribute-item">
+            <div class="progress-bar-container">
+              <div class="progress-bar-glow"></div>
+              <div 
+                class="progress-bar-fill" 
+                [style.width.%]="(character.atributos.forca / 20) * 100">
+              </div>
+            </div>
+          </div>
+
+          <div class="attribute-container intelligence">
+            <div class="attribute-label">
               <span class="attribute-name">Inteligência</span>
-              <span class="attribute-value">{{ character.atributos.inteligencia }}</span>
+              <span class="attribute-value">{{ character.atributos.inteligencia }}/20</span>
             </div>
-            <div class="attribute-item">
+            <div class="progress-bar-container">
+              <div class="progress-bar-glow"></div>
+              <div 
+                class="progress-bar-fill" 
+                [style.width.%]="(character.atributos.inteligencia / 20) * 100">
+              </div>
+            </div>
+          </div>
+
+          <div class="attribute-container charisma">
+            <div class="attribute-label">
               <span class="attribute-name">Carisma</span>
-              <span class="attribute-value">{{ character.atributos.carisma }}</span>
+              <span class="attribute-value">{{ character.atributos.carisma }}/20</span>
             </div>
-            <div class="attribute-item">
+            <div class="progress-bar-container">
+              <div class="progress-bar-glow"></div>
+              <div 
+                class="progress-bar-fill" 
+                [style.width.%]="(character.atributos.carisma / 20) * 100">
+              </div>
+            </div>
+          </div>
+
+          <div class="attribute-container agility">
+            <div class="attribute-label">
               <span class="attribute-name">Destreza</span>
-              <span class="attribute-value">{{ character.atributos.destreza }}</span>
+              <span class="attribute-value">{{ character.atributos.destreza }}/20</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-glow"></div>
+              <div 
+                class="progress-bar-fill" 
+                [style.width.%]="(character.atributos.destreza / 20) * 100">
+              </div>
             </div>
           </div>
         </div>
-        
-        <div class="stat-group description-section" *ngIf="character.descricao">
-          <div class="stat-label">Descrição</div>
-          <div class="description-text">{{ character.descricao }}</div>
-        </div>
+      </div>
+      
+      <div class="stat-group description-section" *ngIf="character.descricao">
+        <div class="stat-label">Descrição</div>
+        <div class="description-text">{{ character.descricao }}</div>
       </div>
     </div>
-    
-    <div class="character-actions">
-      <button class="btn-action primary" (click)="onEdit()">
-        <span>Editar</span>
-      </button>
-      <button class="btn-action danger" (click)="onDelete()">
-        Deletar
-      </button>
-      <button class="btn-action select">
-        Selecionar
-      </button>
-    </div>
   </div>
+  
+  <div class="character-actions">
+    <button class="btn-action primary" (click)="onEdit()">
+      <span>Editar</span>
+    </button>
+    <button class="btn-action danger" (click)="onDelete()">
+      Deletar
+    </button>
+    <button class="btn-action select">
+      Selecionar
+    </button>
+  </div>
+</div>
