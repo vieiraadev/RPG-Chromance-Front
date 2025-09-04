@@ -1,0 +1,204 @@
+<app-navbar></app-navbar>
+
+<div class="campaigns-page campaigns-container">
+    <div class="campaigns-page-header">
+      <div class="campaigns-header-content">
+        <h1 class="campaigns-page-title">
+          Minhas Campanhas
+        </h1>
+        <p class="campaigns-page-subtitle">Crie campanhas e vá para batalha</p>
+      </div>
+    </div>
+  
+    <div *ngIf="isLoading" class="campaigns-loading-container">
+      <div class="campaigns-loading-spinner"></div>
+      <p>Carregando campanhas...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="campaigns-list-grid">
+      
+      <div class="campaigns-list-card" (click)="openCampaign('arena-sombras')">
+        <div class="campaigns-card-image-container">
+          <img src="./assets/images/campaign-image1.jpg" alt="Arena das Sombras" class="campaigns-card-image">
+          <div class="campaigns-card-overlay"></div>
+        </div>
+        
+        <div class="campaigns-card-content">
+          <div class="campaigns-card-header">
+            <h3 class="campaigns-card-title">Arena das Sombras: O Combate Cibernético</h3>
+            <p class="campaigns-card-description">
+              Dois lutadores se enfrentam em uma arena clandestina no coração de uma cidade cyberpunk. 
+              Cercados por uma multidão mascarada e iluminados por letreiros de neon, carne e aço se encaram 
+              em um duelo brutal pela sobrevivência.
+            </p>
+          </div>
+          
+          <div class="campaigns-card-footer">
+            <div class="campaigns-card-stats">
+              <div class="campaigns-stat-item">
+                <i class='bx bx-trophy'></i>
+                <span>Nível 15</span>
+              </div>
+              <div class="campaigns-stat-item">
+                <i class='bx bx-group'></i>
+                <span>2-4 Jogadores</span>
+              </div>
+              <div class="campaigns-stat-item">
+                <i class='bx bx-time-five'></i>
+                <span>45 min</span>
+              </div>
+            </div>
+    
+            <div class="campaigns-card-actions">
+              <button class="campaigns-btn-play">
+                <i class='bx bx-play-circle'></i>
+                Jogar
+              </button>
+              <button class="campaigns-btn-info">
+                <i class='bx bx-info-circle'></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="campaigns-list-card" (click)="openCampaign('laboratorio-cristais')">
+        <div class="campaigns-card-image-container">
+          <img src="./assets/images/campaign-image2.jpg" alt="Laboratório de Cristais" class="campaigns-card-image">
+          <div class="campaigns-card-overlay"></div>
+        </div>
+        
+        <div class="campaigns-card-content">
+          <div class="campaigns-card-header">
+            <h3 class="campaigns-card-title">Laboratório de Cristais Arcanos</h3>
+            <p class="campaigns-card-description">
+              No subsolo da cidade, um cientista obsecado realiza experimentos com cristais energéticos instáveis. 
+              O ambiente é tomado por tubos cheios de líquidos brilhantes, máquinas pulsantes e explosões ocasionais de energia.
+            </p>
+          </div>
+          
+          <div class="campaigns-card-footer">
+            <div class="campaigns-card-stats">
+              <div class="campaigns-stat-item">
+                <i class='bx bx-trophy'></i>
+                <span>Nível 20</span>
+              </div>
+              <div class="campaigns-stat-item">
+                <i class='bx bx-group'></i>
+                <span>3-5 Jogadores</span>
+              </div>
+              <div class="campaigns-stat-item">
+                <i class='bx bx-time-five'></i>
+                <span>60 min</span>
+              </div>
+            </div>
+    
+            <div class="campaigns-card-actions">
+              <button class="campaigns-btn-play">
+                <i class='bx bx-play-circle'></i>
+                Jogar
+              </button>
+              <button class="campaigns-btn-info">
+                <i class='bx bx-info-circle'></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="campaigns-list-card" (click)="openCampaign('laboratorio-cristais-2')">
+        <div class="campaigns-card-image-container">
+          <img src="assets/images/campaign-image3.jpg" alt="Laboratório de Cristais" class="campaigns-card-image">
+          <div class="campaigns-card-overlay"></div>
+        </div>
+        
+        <div class="campaigns-card-content">
+          <div class="campaigns-card-header">
+            <h3 class="campaigns-card-title">Laboratório de Cristais Arcanos</h3>
+            <p class="campaigns-card-description">
+              No subsolo da cidade, um cientista obsecado realiza experimentos com cristais energéticos instáveis. 
+              O ambiente é tomado por tubos cheios de líquidos brilhantes, máquinas pulsantes e explosões ocasionais de energia.
+            </p>
+          </div>
+          
+          <div class="campaigns-card-footer">
+            <div class="campaigns-card-stats">
+              <div class="campaigns-stat-item">
+                <i class='bx bx-trophy'></i>
+                <span>Nível 25</span>
+              </div>
+              <div class="campaigns-stat-item">
+                <i class='bx bx-group'></i>
+                <span>4-6 Jogadores</span>
+              </div>
+              <div class="campaigns-stat-item">
+                <i class='bx bx-time-five'></i>
+                <span>90 min</span>
+              </div>
+            </div>
+    
+            <div class="campaigns-card-actions">
+              <button class="campaigns-btn-play">
+                <i class='bx bx-play-circle'></i>
+                Jogar
+              </button>
+              <button class="campaigns-btn-info">
+                <i class='bx bx-info-circle'></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="campaigns-add-card" (click)="createNewCampaign()">
+        <div class="campaigns-add-content">
+          <i class='bx bx-plus-circle campaigns-add-icon'></i>
+          <span class="campaigns-add-text">Nova Campanha</span>
+        </div>
+      </div>
+    </div>
+  
+    <div class="campaigns-detail-panel" *ngIf="selectedCampaign" [class.active]="showDetail">
+      <button class="campaigns-close-detail" (click)="closeDetail()">
+        <i class='bx bx-x'></i>
+      </button>
+  
+      <div class="campaigns-detail-content">
+        <div class="campaigns-detail-image">
+          <img [src]="selectedCampaign.image" [alt]="selectedCampaign.title">
+        </div>
+  
+        <div class="campaigns-detail-info">
+          <h2 class="campaigns-detail-title">{{ selectedCampaign.title }}</h2>
+          <p class="campaigns-detail-description">{{ selectedCampaign.fullDescription }}</p>
+  
+          <div class="campaigns-detail-rewards">
+            <h3>Recompensas disponíveis</h3>
+            <div class="campaigns-rewards-grid">
+              <div class="campaigns-reward-item">
+                <i class='bx bx-sword' [class]="'icon-' + selectedCampaign.rewards[0].type"></i>
+                <span>{{ selectedCampaign.rewards[0].name }}</span>
+              </div>
+              <div class="campaigns-reward-item">
+                <i class='bx bx-shield' [class]="'icon-' + selectedCampaign.rewards[1].type"></i>
+                <span>{{ selectedCampaign.rewards[1].name }}</span>
+              </div>
+              <div class="campaigns-reward-item">
+                <i class='bx bx-heart' [class]="'icon-' + selectedCampaign.rewards[2].type"></i>
+                <span>{{ selectedCampaign.rewards[2].name }}</span>
+              </div>
+              <div class="campaigns-reward-item">
+                <i class='bx bx-chip' [class]="'icon-' + selectedCampaign.rewards[3].type"></i>
+                <span>{{ selectedCampaign.rewards[3].name }}</span>
+              </div>
+            </div>
+          </div>
+  
+          <button class="campaigns-btn-start">
+            <i class='bx bx-rocket'></i>
+            Iniciar Campanha
+          </button>
+        </div>
+      </div>
+    </div>
+</div>

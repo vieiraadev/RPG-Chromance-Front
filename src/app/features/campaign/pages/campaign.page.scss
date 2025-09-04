@@ -1,0 +1,779 @@
+.campaigns-page {
+  --bg: #0a0a0a;
+  --card-bg: rgba(10, 10, 20, 0.9);
+  --card-border: rgba(0, 255, 255, 0.3);
+  --muted: #64748b;
+  --text: #e2e8f0;
+  --text-bright: #f1f5f9;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(0, 150, 255, 0.5);
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 30px rgba(0, 255, 255, 0.2);
+  --brand: linear-gradient(45deg, #0080ff, #00a0ff);
+  --brand-hover: linear-gradient(45deg, #00a0ff, #0080ff);
+  --brand-contrast: #fff;
+  --accent: #00ffff;
+  --accent-blue: #0080ff;
+  --input-bg: rgba(15, 15, 30, 0.8);
+  --danger: #ff0066;
+  --success: #00ff88;
+  --warning: #ffaa00;
+}
+
+.campaigns-page.campaigns-container {
+  min-height: 100vh;
+  background: #000000;
+  margin-left: 80px;
+  padding: 20px;
+  width: calc(100% - 80px);
+  box-sizing: border-box;
+  position: relative;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.sidebar:hover ~ .campaigns-page.campaigns-container,
+body:has(.sidebar:hover) .campaigns-page.campaigns-container {
+  margin-left: 240px; 
+  width: calc(100% - 240px);
+}
+
+.campaigns-page-header {
+  text-align: left;
+  margin-bottom: 40px;
+  max-width: 100%;
+  
+  .campaigns-header-content {
+    margin: 0;
+  }
+
+  .campaigns-page-title {
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .campaigns-page-subtitle {
+    color: #ffffff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 1px;
+    opacity: 0.9;
+  }
+}
+
+.campaigns-loading-container {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text);
+
+  .campaigns-loading-spinner {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--border);
+    border-radius: 50%;
+    border-top-color: var(--accent);
+    animation: campaigns-spin 1s ease-in-out infinite;
+    margin: 0 auto 25px;
+  }
+
+  p {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.3rem;
+    margin: 0;
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    animation: campaigns-pulse 2s ease-in-out infinite;
+  }
+}
+
+.campaigns-list-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 60px 0;
+  box-sizing: border-box;
+}
+
+.campaigns-list-card {
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow), var(--shadow-glow);
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: campaigns-slideInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+  position: relative;
+  width: 100%;
+  display: flex;
+  min-height: 280px;
+  box-sizing: border-box;
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-5px) scale(1.01);
+    border-color: var(--accent);
+    box-shadow: 
+      var(--shadow), 
+      0 0 50px rgba(0, 255, 255, 0.6),
+      inset 0 0 30px rgba(0, 255, 255, 0.1);
+
+    .campaigns-card-overlay {
+      opacity: 0.3;
+    }
+
+    .campaigns-card-image {
+      transform: scale(1.05);
+    }
+
+    .campaigns-btn-play {
+      background: var(--brand-hover);
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 128, 255, 0.4);
+    }
+
+    .campaigns-btn-info {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+  }
+
+  &:active {
+    transform: translateY(-2px) scale(1.005);
+  }
+
+  .campaigns-card-image-container {
+    position: relative;
+    width: 350px;
+    height: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    .campaigns-card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .campaigns-card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+  }
+
+  .campaigns-card-content {
+    padding: 25px 30px;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .campaigns-card-header {
+      .campaigns-card-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin: 0 0 15px 0;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        letter-spacing: 1px;
+        line-height: 1.3;
+        transition: color 0.3s ease;
+      }
+
+      .campaigns-card-description {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 25px;
+        opacity: 0.9;
+      }
+    }
+
+    .campaigns-card-footer {
+      .campaigns-card-stats {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+
+        .campaigns-stat-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-family: 'Rajdhani', sans-serif;
+          font-size: 0.95rem;
+          color: var(--text-bright);
+          transition: all 0.3s ease;
+
+          &:hover {
+            color: var(--accent);
+          }
+
+          i {
+            color: var(--accent);
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            transition: all 0.3s ease;
+          }
+        }
+      }
+
+      .campaigns-card-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+
+        .campaigns-btn-play {
+          padding: 14px 28px;
+          background: var(--brand);
+          border: 2px solid var(--accent);
+          border-radius: 10px;
+          color: var(--brand-contrast);
+          font-family: 'Rajdhani', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          backdrop-filter: blur(10px);
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          white-space: nowrap;
+
+          i {
+            font-size: 1.3rem;
+          }
+
+          &:hover {
+            background: var(--brand-hover);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 128, 255, 0.4);
+          }
+
+          &:active {
+            transform: translateY(-1px);
+          }
+        }
+
+        .campaigns-btn-info {
+          width: 50px;
+          height: 50px;
+          background: transparent;
+          border: 2px solid var(--border);
+          border-radius: 10px;
+          color: var(--text-bright);
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          backdrop-filter: blur(10px);
+
+          i {
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+          }
+
+          &:hover {
+            border-color: var(--border-hover);
+            color: var(--accent);
+            background: rgba(0, 255, 255, 0.1);
+            transform: scale(1.05);
+            
+            i {
+              text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.campaigns-add-card {
+  width: 100%;
+  background: var(--card-bg);
+  border: 2px dashed var(--card-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow), var(--shadow-glow);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: campaigns-slideInUp 0.6s ease-out forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+  transform: translateY(30px);
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: var(--accent);
+    border-style: solid;
+    transform: translateY(-5px);
+    box-shadow: var(--shadow), 0 0 50px rgba(0, 255, 255, 0.6);
+
+    .campaigns-add-icon {
+      transform: scale(1.1);
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    }
+
+    .campaigns-add-text {
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    }
+  }
+
+  .campaigns-add-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 2;
+
+    .campaigns-add-icon {
+      font-size: 4rem;
+      font-weight: 300;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .campaigns-add-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+.campaigns-detail-panel {
+  position: fixed;
+  top: 0;
+  right: -450px;
+  width: 450px;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.95);
+  border-left: 1px solid var(--card-border);
+  box-shadow: -15px 0 40px rgba(0, 0, 0, 0.7), -5px 0 30px rgba(0, 255, 255, 0.1);
+  z-index: 1001;
+  transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow-y: auto;
+  backdrop-filter: blur(20px);
+
+  &.active {
+    right: 0;
+  }
+
+  .campaigns-close-detail {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+
+    i {
+      font-size: 1.5rem;
+    }
+
+    &:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+      transform: rotate(90deg) scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 0, 102, 0.5);
+    }
+  }
+
+  .campaigns-detail-content {
+    padding: 30px;
+    position: relative;
+    z-index: 2;
+
+    .campaigns-detail-image {
+      width: 100%;
+      height: 250px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 30px;
+      border: 2px solid var(--border);
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: var(--card-border);
+        box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover img {
+        transform: scale(1.05);
+      }
+    }
+
+    .campaigns-detail-info {
+      .campaigns-detail-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 15px 0;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        letter-spacing: 1px;
+      }
+
+      .campaigns-detail-description {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1rem;
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+
+      .campaigns-detail-rewards {
+        margin-bottom: 30px;
+
+        h3 {
+          font-family: 'Orbitron', monospace;
+          font-size: 1.1rem;
+          color: var(--text-bright);
+          margin-bottom: 15px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .campaigns-rewards-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+
+          .campaigns-reward-item {
+            background: rgba(0, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+
+            &:hover {
+              background: rgba(0, 255, 255, 0.06);
+              border-color: var(--card-border);
+              transform: translateY(-2px);
+              box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+            }
+
+            i {
+              font-size: 1.6rem;
+              color: var(--accent);
+              text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+
+              &.icon-weapon { color: var(--danger); }
+              &.icon-armor { color: var(--accent-blue); }
+              &.icon-health { color: var(--success); }
+              &.icon-tech { color: var(--warning); }
+            }
+
+            span {
+              font-family: 'Rajdhani', sans-serif;
+              font-size: 0.9rem;
+              color: var(--text);
+              opacity: 0.9;
+            }
+          }
+        }
+      }
+
+      .campaigns-btn-start {
+        width: 100%;
+        padding: 14px 28px;
+        background: var(--brand);
+        border: 2px solid var(--accent);
+        border-radius: 10px;
+        color: var(--brand-contrast);
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        i {
+          font-size: 1.3rem;
+        }
+
+        &:hover {
+          background: var(--brand-hover);
+          border-color: var(--accent);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(0, 128, 255, 0.4);
+        }
+
+        &:active {
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+}
+
+@keyframes campaigns-slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes campaigns-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes campaigns-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1400px) {
+  .campaigns-list-card {
+    .campaigns-card-image-container {
+      width: 300px;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .campaigns-list-card {
+    .campaigns-card-image-container {
+      width: 280px;
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .campaigns-list-card {
+    .campaigns-card-image-container {
+      width: 250px;
+    }
+
+    .campaigns-card-content {
+      padding: 20px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .campaigns-page.campaigns-container {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+    padding: 15px;
+  }
+
+  .sidebar:hover ~ .campaigns-page.campaigns-container,
+  body:has(.sidebar:hover) .campaigns-page.campaigns-container {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+
+  .campaigns-page-header {
+    margin-bottom: 30px;
+    
+    .campaigns-page-title {
+      font-size: 2.2rem;
+    }
+
+    .campaigns-page-subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .campaigns-list-card {
+    flex-direction: column;
+    min-height: auto;
+
+    .campaigns-card-image-container {
+      width: 100%;
+      height: 200px;
+    }
+
+    .campaigns-card-content {
+      .campaigns-card-footer {
+        .campaigns-card-stats {
+          gap: 20px;
+        }
+
+        .campaigns-card-actions {
+          flex-direction: column;
+
+          .campaigns-btn-play {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .campaigns-add-card {
+    min-height: 200px;
+
+    .campaigns-add-content {
+      .campaigns-add-icon {
+        font-size: 3rem;
+      }
+
+      .campaigns-add-text {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .campaigns-detail-panel {
+    width: 100%;
+    
+    .campaigns-detail-content {
+      padding: 25px 20px;
+      
+      .campaigns-detail-rewards {
+        .campaigns-rewards-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .campaigns-page.campaigns-container {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+    padding: 10px;
+  }
+
+  .campaigns-page-header {
+    .campaigns-page-title {
+      font-size: 1.9rem;
+    }
+
+    .campaigns-page-subtitle {
+      font-size: 0.95rem;
+    }
+  }
+
+  .campaigns-list-card {
+    .campaigns-card-content {
+      padding: 20px;
+      
+      .campaigns-card-header {
+        .campaigns-card-title {
+          font-size: 1.2rem;
+        }
+        
+        .campaigns-card-description {
+          font-size: 0.9rem;
+        }
+      }
+      
+      .campaigns-card-footer {
+        .campaigns-card-stats {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    }
+  }
+
+  .campaigns-add-card {
+    min-height: 180px;
+
+    .campaigns-add-content {
+      .campaigns-add-icon {
+        font-size: 2.5rem;
+      }
+
+      .campaigns-add-text {
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+      }
+    }
+  }
+}

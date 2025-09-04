@@ -34,7 +34,17 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   
-  // Profile 
+  // Campaigns
+  {
+    path: 'campaigns',
+    loadComponent: () =>
+      import('@app/features/campaign/pages/campaign.page').then(
+        m => m.CampaignsComponent
+      ),
+    canActivate: [AuthGuard],
+  },
+  
+  // Profile
   {
     path: 'profile',
     loadComponent: () =>
