@@ -75,7 +75,7 @@ export class CampaignsComponent implements OnInit {
     },
     {
       id: 'laboratorio-cristais-2',
-      title: 'Laboratório de Cristais Arcanos - Modo Extremo',
+      title: 'Coliseu de Neon',
       description: 'No coração da cidade subterrânea, em um beco cercado por prédios decadentes e iluminado apenas por letreiros de neon, ocorre o torneio clandestino mais brutal do submundo. Aqui, guerreiros e máquinas se enfrentam em lutas sangrentas, enquanto a multidão mascarada assiste em êxtase.',
       fullDescription: 'No coração da cidade subterrânea, em um beco cercado por prédios decadentes e iluminado apenas por letreiros de neon, ocorre o torneio clandestino mais brutal do submundo. Aqui, guerreiros e máquinas se enfrentam em lutas sangrentas, enquanto a multidão mascarada assiste em êxtase.',
       image: './assets/images/campaign-image3.jpg',

@@ -329,77 +329,6 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
   }
 }
 
-.campaigns-add-card {
-  width: 100%;
-  background: var(--card-bg);
-  border: 2px dashed var(--card-border);
-  border-radius: 20px;
-  box-shadow: var(--shadow), var(--shadow-glow);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  animation: campaigns-slideInUp 0.6s ease-out forwards;
-  animation-delay: 0.4s;
-  opacity: 0;
-  transform: translateY(30px);
-  min-height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(20px);
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
-
-  &:hover {
-    border-color: var(--accent);
-    border-style: solid;
-    transform: translateY(-5px);
-    box-shadow: var(--shadow), 0 0 50px rgba(0, 255, 255, 0.6);
-
-    .campaigns-add-icon {
-      transform: scale(1.1);
-      text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-    }
-
-    .campaigns-add-text {
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-    }
-  }
-
-  .campaigns-add-content {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    position: relative;
-    z-index: 2;
-
-    .campaigns-add-icon {
-      font-size: 4rem;
-      font-weight: 300;
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-      margin-bottom: 10px;
-      transition: all 0.3s ease;
-      font-family: 'Orbitron', monospace;
-    }
-
-    .campaigns-add-text {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-bright);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-      transition: all 0.3s ease;
-    }
-  }
-}
-
 .campaigns-detail-panel {
   position: fixed;
   top: 0;
@@ -693,20 +622,6 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
     }
   }
 
-  .campaigns-add-card {
-    min-height: 200px;
-
-    .campaigns-add-content {
-      .campaigns-add-icon {
-        font-size: 3rem;
-      }
-
-      .campaigns-add-text {
-        font-size: 0.9rem;
-      }
-    }
-  }
-
   .campaigns-detail-panel {
     width: 100%;
     
@@ -758,21 +673,6 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
           flex-direction: column;
           gap: 10px;
         }
-      }
-    }
-  }
-
-  .campaigns-add-card {
-    min-height: 180px;
-
-    .campaigns-add-content {
-      .campaigns-add-icon {
-        font-size: 2.5rem;
-      }
-
-      .campaigns-add-text {
-        font-size: 0.8rem;
-        letter-spacing: 1px;
       }
     }
   }
