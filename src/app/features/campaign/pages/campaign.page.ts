@@ -39,7 +39,7 @@ export class CampaignsComponent implements OnInit {
   private mockCampaigns: Campaign[] = [
     {
       id: 'arena-sombras',
-      title: 'O Cubo das Sombras',
+      title: 'Capítulo 1 : O Cubo das Sombras',
       description: 'Nas profundezas de uma catedral em ruínas, o guerreiro sombrio encontra a Relíquia Perdida — um cubo pulsante de energia ancestral. Para conquistá-lo, deve enfrentar as armadilhas ocultas que protegem seu poder e resistir à corrupção que emana da própria relíquia. Cada passo ecoa no salão silencioso, enquanto a luz azul da espada e do artefato guia seu caminho através da escuridão. O destino do mundo depende de sua escolha: dominar o cubo ou ser consumido por ele.',
       fullDescription: 'Nas profundezas de uma catedral em ruínas, o guerreiro sombrio encontra a Relíquia Perdida — um cubo pulsante de energia ancestral. Para conquistá-lo, deve enfrentar as armadilhas ocultas que protegem seu poder e resistir à corrupção que emana da própria relíquia. Cada passo ecoa no salão silencioso, enquanto a luz azul da espada e do artefato guia seu caminho através da escuridão. O destino do mundo depende de sua escolha: dominar o cubo ou ser consumido por ele.',
       image: './assets/images/campaign-thumb1.jpg',
@@ -57,7 +57,7 @@ export class CampaignsComponent implements OnInit {
     },
     {
       id: 'laboratorio-cristais',
-      title: 'Laboratório de Cristais Arcanos',
+      title: 'Capítulo 2 : Laboratório de Cristais Arcanos',
       description: 'Em um laboratório oculto nas profundezas da fortaleza inimiga, um cientista obcecado conduz experiências proibidas com fragmentos de energia arcana. Sua última criação gerou uma reação instável, transformando o local em um campo de chamas e caos. O jogador deve atravessar o laboratório em colapso, evitando explosões e defendendo-se das máquinas de defesa ativadas pelo surto de energia.',
       fullDescription: 'Em um laboratório oculto nas profundezas da fortaleza inimiga, um cientista obcecado conduz experiências proibidas com fragmentos de energia arcana. Sua última criação gerou uma reação instável, transformando o local em um campo de chamas e caos. O jogador deve atravessar o laboratório em colapso, evitando explosões e defendendo-se das máquinas de defesa ativadas pelo surto de energia.',
       image: './assets/images/campaign-thumb2.jpg',
@@ -74,8 +74,8 @@ export class CampaignsComponent implements OnInit {
       isLocked: false
     },
     {
-      id: 'laboratorio-cristais-2',
-      title: 'Coliseu de Neon',
+      id: 'coliseu-de-Neon',
+      title: 'Capítulo 3 : Coliseu de Neon',
       description: 'No coração da cidade subterrânea, em um beco cercado por prédios decadentes e iluminado apenas por letreiros de neon, ocorre o torneio clandestino mais brutal do submundo. Aqui, guerreiros e máquinas se enfrentam em lutas sangrentas, enquanto a multidão mascarada assiste em êxtase.',
       fullDescription: 'No coração da cidade subterrânea, em um beco cercado por prédios decadentes e iluminado apenas por letreiros de neon, ocorre o torneio clandestino mais brutal do submundo. Aqui, guerreiros e máquinas se enfrentam em lutas sangrentas, enquanto a multidão mascarada assiste em êxtase.',
       image: './assets/images/campaign-image3.jpg',
