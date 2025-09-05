@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
+import { SelectCharacterModalComponent } from '@app/shared/components/select-character-modal/select-character-modal.component';
+import { Character } from '@app/shared/components/character-card/character-card.component';
 import { Router } from '@angular/router';
 
 interface Reward {
@@ -26,7 +28,7 @@ interface Campaign {
 @Component({
   selector: 'app-campaigns',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, SelectCharacterModalComponent],
   templateUrl: './campaign.page.html',
   styleUrls: ['./campaign.page.scss']
 })
@@ -35,6 +37,8 @@ export class CampaignsComponent implements OnInit {
   campaigns: Campaign[] = [];
   selectedCampaign: Campaign | null = null;
   showDetail: boolean = false;
+  showCharacterModal: boolean = false;
+  campaignToStart: Campaign | null = null;
 
   private mockCampaigns: Campaign[] = [
     {
@@ -128,10 +132,38 @@ export class CampaignsComponent implements OnInit {
     }, 500);
   }
 
-  startCampaign(campaignId: string): void {
-    this.router.navigate(['/game', campaignId]);
+  startCampaign(campaign?: Campaign): void {
+    const campaignToStart = campaign || this.selectedCampaign;
+    
+    console.log('startCampaign chamado com:', campaignToStart);
+    
+    if (campaignToStart) {
+      this.campaignToStart = campaignToStart;
+      this.showCharacterModal = true;
+      console.log('Modal deveria abrir. showCharacterModal:', this.showCharacterModal);
+    } else {
+      console.error('Nenhuma campanha disponível para iniciar');
+    }
   }
 
+  onCharacterSelected(character: Character): void {
+    console.log('Personagem selecionado:', character);
+    console.log('Iniciando campanha:', this.campaignToStart?.id);
+    
+    localStorage.setItem('selectedCharacter', JSON.stringify(character));
+    localStorage.setItem('currentCampaign', JSON.stringify(this.campaignToStart));
+    
+    if (this.campaignToStart) {
+      this.router.navigate(['/game', this.campaignToStart.id], {
+        queryParams: { characterId: character.id }
+      });
+    }
+  }
+
+  onCloseCharacterModal(): void {
+    this.showCharacterModal = false;
+    this.campaignToStart = null;
+  }
 
   createNewCampaign(): void {
     this.router.navigate(['/campaign/create']);

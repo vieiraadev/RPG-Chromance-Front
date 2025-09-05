@@ -102,6 +102,7 @@ export class CharacterCardComponent implements OnInit {
       this.character.imageUrl = this.FALLBACK_IMAGE;
     }
   }
+
   get totalAttributePoints(): number {
     const a = this.character.atributos;
     return a.forca + a.inteligencia + a.carisma + a.destreza;

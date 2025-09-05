@@ -48,7 +48,7 @@
             </div>
     
             <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play">
+              <button class="campaigns-btn-play" (click)="startCampaign(campaigns[0]); $event.stopPropagation()">
                 <i class='bx bx-play-circle'></i>
                 Jogar
               </button>
@@ -93,7 +93,7 @@
             
     
             <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play">
+              <button class="campaigns-btn-play" (click)="startCampaign(campaigns[1]); $event.stopPropagation()">
                 <i class='bx bx-play-circle'></i>
                 Jogar
               </button>
@@ -135,17 +135,18 @@
             </div>
     
             <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play">
+              <button class="campaigns-btn-play" (click)="$event.stopPropagation(); startCampaign(campaigns[2])">
                 <i class='bx bx-play-circle'></i>
                 Jogar
               </button>
-              <button class="campaigns-btn-info">
+              <button class="campaigns-btn-info" (click)="$event.stopPropagation()">
                 <i class='bx bx-info-circle'></i>
               </button>
             </div>
           </div>
         </div>
       </div>
+    </div>
   
     <div class="campaigns-detail-panel" *ngIf="selectedCampaign" [class.active]="showDetail">
       <button class="campaigns-close-detail" (click)="closeDetail()">
@@ -183,11 +184,18 @@
             </div>
           </div>
   
-          <button class="campaigns-btn-start">
+          <button class="campaigns-btn-start" (click)="startCampaign()">
             <i class='bx bx-rocket'></i>
             Iniciar Campanha
           </button>
         </div>
       </div>
     </div>
+
+    <app-select-character-modal
+      [isOpen]="showCharacterModal"
+      [campaignTitle]="campaignToStart?.title || ''"
+      (close)="onCloseCharacterModal()"
+      (characterSelected)="onCharacterSelected($event)">
+    </app-select-character-modal>
 </div>
