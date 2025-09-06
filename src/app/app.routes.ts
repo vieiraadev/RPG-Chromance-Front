@@ -20,7 +20,7 @@ export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () =>
-      import('@app/features/game/pages/home.page').then(m => m.HomePageComponent),
+      import('@app/features/home/pages/home.page').then(m => m.HomePageComponent),
     canActivate: [AuthGuard],
   },
   
