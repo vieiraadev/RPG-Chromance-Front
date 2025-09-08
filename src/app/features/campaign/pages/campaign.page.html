@@ -17,125 +17,66 @@
 
     <div *ngIf="!isLoading" class="campaigns-list-grid">
       
-      <div class="campaigns-list-card" (click)="openCampaign('arena-sombras')">
+      <div class="campaigns-list-card" 
+           *ngFor="let campaign of campaigns; let i = index"
+           (click)="openCampaign(campaign.campaign_id)"
+           [class.locked]="campaign.is_locked">
+        
         <div class="campaigns-card-image-container">
-          <img src="./assets/images/campaign-image1.jpg" alt="Arena das Sombras" class="campaigns-card-image">
+          <img [src]="campaign.image" [alt]="campaign.title" class="campaigns-card-image">
           <div class="campaigns-card-overlay"></div>
+          
+          <div *ngIf="campaign.is_locked" class="campaigns-locked-overlay">
+            <i class='bx bx-lock-alt'></i>
+            <span>Bloqueado</span>
+          </div>
         </div>
         
         <div class="campaigns-card-content">
           <div class="campaigns-card-header">
-            <h3 class="campaigns-card-title">Capítulo 1 : O Cubo das Sombras</h3>
+            <h3 class="campaigns-card-title">{{ campaign.title }}</h3>
             <p class="campaigns-card-description">
-              Nas profundezas de uma catedral em ruínas, o guerreiro sombrio encontra a Relíquia Perdida
-               — um cubo pulsante de energia ancestral. Para conquistá-lo, deve enfrentar as armadilhas ocultas
-              que protegem seu poder e resistir à corrupção que emana da própria relíquia. Cada passo ecoa no salão silencioso,
-              enquanto a luz azul da espada e do artefato guia seu caminho através da escuridão. O destino do mundo depende de sua
-              escolha: dominar o cubo ou ser consumido por ele.
+              {{ campaign.description }}
             </p>
           </div>
           
           <div class="campaigns-card-footer">
             <div class="campaigns-card-stats">
-              <div class="campaigns-stat-item">
-                <i class='bx bx-brain'></i>
-                <span>Status recomendado: Inteligência 17+</span>
+              <div class="campaigns-stat-item" [ngSwitch]="campaign.chapter">
+                <ng-container *ngSwitchCase="1">
+                  <i class='bx bx-brain'></i>
+                  <span>Status recomendado: Inteligência 17+</span>
+                </ng-container>
+                <ng-container *ngSwitchCase="2">
+                  <i class='bx bx-run'></i>
+                  <span>Status recomendado: Destreza 18+</span>
+                </ng-container>
+                <ng-container *ngSwitchCase="3">
+                  <i class='bx bx-dumbbell'></i>
+                  <span>Status recomendado: Força 20+</span>
+                </ng-container>
               </div>
-              <div class="campaigns-stat-item">
-                <i class='bx bx-compass'></i>
-                <span>Estilo: Exploração</span>
-              </div>
-            </div>
-    
-            <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play" (click)="startCampaign(campaigns[0]); $event.stopPropagation()">
-                <i class='bx bx-play-circle'></i>
-                Jogar
-              </button>
-              <button class="campaigns-btn-info">
-                <i class='bx bx-info-circle'></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-      <div class="campaigns-list-card" (click)="openCampaign('laboratorio-cristais')">
-        <div class="campaigns-card-image-container">
-          <img src="./assets/images/campaign-image2.jpg" alt="Laboratório de Cristais" class="campaigns-card-image">
-          <div class="campaigns-card-overlay"></div>
-        </div>
-        
-        <div class="campaigns-card-content">
-          <div class="campaigns-card-header">
-            <h3 class="campaigns-card-title">Capítulo 2 : Laboratório de Cristais Arcanos</h3>
-            <p class="campaigns-card-description">
-              Em um laboratório oculto nas profundezas da fortaleza inimiga,
-               um cientista obcecado conduz experiências proibidas com fragmentos
-               de energia arcana. Sua última criação gerou uma reação instável,
-               transformando o local em um campo de chamas e caos. O jogador
-                deve atravessar o laboratório em colapso, evitando explosões
-                e defendendo-se das máquinas de defesa ativadas pelo surto de energia.
-            </p>
-          </div>
-          
-          <div class="campaigns-card-footer">
-            <div class="campaigns-card-stats">
-              <div class="campaigns-stat-item">
-                <i class='bx bx-run'></i>
-                <span>Status recomendado: Destreza 18+</span>
-              </div>
-              <div class="campaigns-stat-item">
-                <i class='bx bx-shield-alt-2'></i>
-                <span>Estilo: Sobrevivência</span>
-              </div>
-            </div>
-            
-    
-            <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play" (click)="startCampaign(campaigns[1]); $event.stopPropagation()">
-                <i class='bx bx-play-circle'></i>
-                Jogar
-              </button>
-              <button class="campaigns-btn-info">
-                <i class='bx bx-info-circle'></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="campaigns-list-card" (click)="openCampaign('coliseu-de-Neon')">
-        <div class="campaigns-card-image-container">
-          <img src="./assets/images/campaign-image3.jpg" alt="Laboratório de Cristais" class="campaigns-card-image">
-          <div class="campaigns-card-overlay"></div>
-        </div>
-        
-        <div class="campaigns-card-content">
-          <div class="campaigns-card-header">
-            <h3 class="campaigns-card-title">Capítulo 3 : Coliseu de Neon</h3>
-            <p class="campaigns-card-description">
-              No coração da cidade subterrânea, em um beco cercado por prédios
-              decadentes e iluminado apenas por letreiros de neon, ocorre o torneio 
-              clandestino mais brutal do submundo. Aqui, guerreiros e máquinas se enfrentam 
-              em lutas sangrentas, enquanto a multidão mascarada assiste em êxtase.
-            </p>
-          </div>
-          
-          <div class="campaigns-card-footer">
-            <div class="campaigns-card-stats">
-              <div class="campaigns-stat-item">
-                <i class='bx bx-dumbbell'></i>
-                <span>Status recomendado: Força 20+</span>
-              </div>
-              <div class="campaigns-stat-item">
-                <i class='bx bx-bolt-circle'></i>
-                <span>Estilo: Ação</span>
+              
+              <div class="campaigns-stat-item" [ngSwitch]="campaign.chapter">
+                <ng-container *ngSwitchCase="1">
+                  <i class='bx bx-compass'></i>
+                  <span>Estilo: Exploração</span>
+                </ng-container>
+                <ng-container *ngSwitchCase="2">
+                  <i class='bx bx-shield-alt-2'></i>
+                  <span>Estilo: Sobrevivência</span>
+                </ng-container>
+                <ng-container *ngSwitchCase="3">
+                  <i class='bx bx-bolt-circle'></i>
+                  <span>Estilo: Ação</span>
+                </ng-container>
               </div>
             </div>
     
             <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play" (click)="$event.stopPropagation(); startCampaign(campaigns[2])">
+              <button class="campaigns-btn-play" 
+                      (click)="startCampaign(campaign); $event.stopPropagation()"
+                      [disabled]="campaign.is_locked">
                 <i class='bx bx-play-circle'></i>
                 Jogar
               </button>
@@ -160,31 +101,21 @@
   
         <div class="campaigns-detail-info">
           <h2 class="campaigns-detail-title">{{ selectedCampaign.title }}</h2>
-          <p class="campaigns-detail-description">{{ selectedCampaign.fullDescription }}</p>
+          <p class="campaigns-detail-description">{{ selectedCampaign.full_description }}</p>
   
           <div class="campaigns-detail-rewards">
             <h3>Recompensas disponíveis</h3>
             <div class="campaigns-rewards-grid">
-              <div class="campaigns-reward-item">
-                <i class='bx bx-sword' [class]="'icon-' + selectedCampaign.rewards[0].type"></i>
-                <span>{{ selectedCampaign.rewards[0].name }}</span>
-              </div>
-              <div class="campaigns-reward-item">
-                <i class='bx bx-shield' [class]="'icon-' + selectedCampaign.rewards[1].type"></i>
-                <span>{{ selectedCampaign.rewards[1].name }}</span>
-              </div>
-              <div class="campaigns-reward-item">
-                <i class='bx bx-heart' [class]="'icon-' + selectedCampaign.rewards[2].type"></i>
-                <span>{{ selectedCampaign.rewards[2].name }}</span>
-              </div>
-              <div class="campaigns-reward-item">
-                <i class='bx bx-chip' [class]="'icon-' + selectedCampaign.rewards[3].type"></i>
-                <span>{{ selectedCampaign.rewards[3].name }}</span>
+              <div class="campaigns-reward-item" *ngFor="let reward of selectedCampaign.rewards">
+                <i [class]="getRewardIconClass(reward.icon)"></i>
+                <span>{{ reward.name }}</span>
               </div>
             </div>
           </div>
   
-          <button class="campaigns-btn-start" (click)="startCampaign()">
+          <button class="campaigns-btn-start" 
+                  (click)="startCampaign()"
+                  [disabled]="selectedCampaign.is_locked">
             <i class='bx bx-rocket'></i>
             Iniciar Campanha
           </button>
