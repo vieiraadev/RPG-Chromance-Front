@@ -103,8 +103,30 @@
                   <span class="total-points">{{totalPoints}}/{{originalTotalPoints}}</span>
                 </div>
               </div>
-  
+            
               <div class="attributes-container">
+                <div class="attribute-control">
+                  <label>Vida</label>
+                  <div class="attribute-input">
+                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('vida')" 
+                            [disabled]="editingCharacter.atributos.vida <= 8">-</button>
+                    <span class="attr-value">{{editingCharacter.atributos.vida}}</span>
+                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('vida')"
+                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.vida >= 20">+</button>
+                  </div>
+                </div>
+            
+                <div class="attribute-control">
+                  <label>Energia</label>
+                  <div class="attribute-input">
+                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('energia')"
+                            [disabled]="editingCharacter.atributos.energia <= 8">-</button>
+                    <span class="attr-value">{{editingCharacter.atributos.energia}}</span>
+                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('energia')"
+                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.energia >= 20">+</button>
+                  </div>
+                </div>
+            
                 <div class="attribute-control">
                   <label>Força</label>
                   <div class="attribute-input">
@@ -115,7 +137,7 @@
                             [disabled]="remainingPoints <= 0 || editingCharacter.atributos.forca >= 20">+</button>
                   </div>
                 </div>
-  
+            
                 <div class="attribute-control">
                   <label>Inteligência</label>
                   <div class="attribute-input">
@@ -124,28 +146,6 @@
                     <span class="attr-value">{{editingCharacter.atributos.inteligencia}}</span>
                     <button type="button" class="attr-btn plus" (click)="incrementAttribute('inteligencia')"
                             [disabled]="remainingPoints <= 0 || editingCharacter.atributos.inteligencia >= 20">+</button>
-                  </div>
-                </div>
-  
-                <div class="attribute-control">
-                  <label>Carisma</label>
-                  <div class="attribute-input">
-                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('carisma')"
-                            [disabled]="editingCharacter.atributos.carisma <= 8">-</button>
-                    <span class="attr-value">{{editingCharacter.atributos.carisma}}</span>
-                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('carisma')"
-                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.carisma >= 20">+</button>
-                  </div>
-                </div>
-  
-                <div class="attribute-control">
-                  <label>Destreza</label>
-                  <div class="attribute-input">
-                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('destreza')"
-                            [disabled]="editingCharacter.atributos.destreza <= 8">-</button>
-                    <span class="attr-value">{{editingCharacter.atributos.destreza}}</span>
-                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('destreza')"
-                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.destreza >= 20">+</button>
                   </div>
                 </div>
               </div>

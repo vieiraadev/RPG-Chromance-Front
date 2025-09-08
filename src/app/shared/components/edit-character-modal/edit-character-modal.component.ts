@@ -40,10 +40,10 @@ export class EditCharacterModalComponent implements OnChanges {
     classe: '',
     descricao: '',
     atributos: {
+      vida: 10,
+      energia: 10,
       forca: 10,
-      inteligencia: 10,
-      carisma: 10,
-      destreza: 10
+      inteligencia: 10
     },
     imageUrl: 'assets/images/card-image1.jpg'
   };
@@ -78,10 +78,10 @@ export class EditCharacterModalComponent implements OnChanges {
         atributos: { ...this.character.atributos }
       };
 
-      this.originalTotalPoints = this.character.atributos.forca + 
-                                this.character.atributos.inteligencia + 
-                                this.character.atributos.carisma + 
-                                this.character.atributos.destreza;
+      this.originalTotalPoints = this.character.atributos.vida + 
+                                this.character.atributos.energia +
+                                this.character.atributos.forca + 
+                                this.character.atributos.inteligencia;
 
       const imageIndex = this.availableImages.indexOf(this.character.imageUrl || '');
       this.selectedImageIndex = imageIndex >= 0 ? imageIndex : 0;
@@ -147,9 +147,10 @@ export class EditCharacterModalComponent implements OnChanges {
              this.editingCharacter.classe.trim());
   }
 
+  // CORRIGIDO: Agora usa os novos atributos
   get totalPoints(): number {
     const attr = this.editingCharacter.atributos;
-    return attr.forca + attr.inteligencia + attr.carisma + attr.destreza;
+    return attr.vida + attr.energia + attr.forca + attr.inteligencia;
   }
 
   get remainingPoints(): number {

@@ -78,7 +78,7 @@ export class CharactersPageComponent implements OnInit {
         raca: 'Humano',
         classe: 'Guerreiro',
         descricao: 'Um humano forte e disciplinado, treinado em batalhas corpo a corpo e liderança em campo de guerra.',
-        atributos: { forca: 16, inteligencia: 12, carisma: 12, destreza: 12 },
+        atributos: { vida: 16, energia: 12, forca: 14, inteligencia: 10 },
         imageUrl: 'assets/images/card-image1.jpg'
       },
       {
@@ -87,7 +87,7 @@ export class CharactersPageComponent implements OnInit {
         raca: 'Humana',
         classe: 'Guerreira',
         descricao: 'Uma combatente implacável das ruas neon da cidade.',
-        atributos: { forca: 10, inteligencia: 18, carisma: 16, destreza: 8 },
+        atributos: { vida: 14, energia: 16, forca: 10, inteligencia: 12 },
         imageUrl: 'assets/images/card-image2.jpg'
       }
     ];

@@ -14,10 +14,10 @@ export interface Character {
 }
 
 export interface CharacterAttributes {
+  vida: number;
+  energia: number;
   forca: number;
   inteligencia: number;
-  carisma: number;
-  destreza: number;
 }
 
 @Component({
@@ -57,10 +57,10 @@ export class AddCharacterModalComponent {
     classe: '',
     descricao: '',
     atributos: {
+      vida: 10,
+      energia: 10,
       forca: 10,
-      inteligencia: 10,
-      carisma: 10,
-      destreza: 10
+      inteligencia: 10
     },
     imageUrl: 'assets/images/card-image1.jpg'
   };
@@ -185,10 +185,10 @@ export class AddCharacterModalComponent {
       classe: '',
       descricao: '',
       atributos: {
+        vida: 10,
+        energia: 10,
         forca: 10,
-        inteligencia: 10,
-        carisma: 10,
-        destreza: 10
+        inteligencia: 10
       },
       imageUrl: 'assets/images/card-image1.jpg'
     };
@@ -199,7 +199,7 @@ export class AddCharacterModalComponent {
 
   get totalPoints(): number {
     const attr = this.newCharacter.atributos;
-    return attr.forca + attr.inteligencia + attr.carisma + attr.destreza;
+    return attr.vida + attr.energia + attr.forca + attr.inteligencia;
   }
 
   get remainingPoints(): number {

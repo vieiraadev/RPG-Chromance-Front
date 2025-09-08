@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 html, body {
-  height: 100% !important;
+  height: 100%;
   margin: 0;
   padding: 0;
-  background: #000000 !important;
+  background: #000000;
   overflow-x: hidden;
+  font-family: 'Rajdhani', sans-serif;
 }
 
 app-root {
   min-height: 100vh;
-  background: #000000 !important;
   display: block;
 }

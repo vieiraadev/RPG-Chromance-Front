@@ -83,10 +83,10 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
         classe: 'Assassina',
         descricao: '',
         atributos: {
-          forca: 14,
-          inteligencia: 16,
-          carisma: 18,
-          destreza: 20
+          vida: 14,
+          energia: 16,
+          forca: 18,
+          inteligencia: 20
         },
         imageUrl: 'assets/images/card-image1.jpg'
       },
@@ -97,10 +97,10 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
         classe: 'Guerreiro',
         descricao: '',
         atributos: {
-          forca: 20,
-          inteligencia: 12,
-          carisma: 14,
-          destreza: 16
+          vida: 20,
+          energia: 12,
+          forca: 14,
+          inteligencia: 16
         },
         imageUrl: 'assets/images/card-image2.jpg'
       },
@@ -111,16 +111,14 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
         classe: 'Maga',
         descricao: '',
         atributos: {
-          forca: 10,
-          inteligencia: 20,
-          carisma: 16,
-          destreza: 14
+          vida: 10,
+          energia: 20,
+          forca: 16,
+          inteligencia: 14
         },
         imageUrl: 'assets/images/card-image3.jpg'
       }
     ];
-    
-    console.log('Personagens mock carregados:', this.characters);
   }
 
   onCharacterSelect(character: Character) {

@@ -40,6 +40,34 @@
       <div class="stat-group attributes-section">
         <div class="stat-label">Atributos</div>
         <div class="attributes-grid">
+          <div class="attribute-container health">
+            <div class="attribute-label">
+              <span class="attribute-name">Vida</span>
+              <span class="attribute-value">{{ character.atributos.vida }}/20</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-glow"></div>
+              <div 
+                class="progress-bar-fill" 
+                [style.width.%]="(character.atributos.vida / 20) * 100">
+              </div>
+            </div>
+          </div>
+
+          <div class="attribute-container energy">
+            <div class="attribute-label">
+              <span class="attribute-name">Energia</span>
+              <span class="attribute-value">{{ character.atributos.energia }}/20</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-glow"></div>
+              <div 
+                class="progress-bar-fill" 
+                [style.width.%]="(character.atributos.energia / 20) * 100">
+              </div>
+            </div>
+          </div>
+
           <div class="attribute-container strength">
             <div class="attribute-label">
               <span class="attribute-name">Força</span>
@@ -67,34 +95,6 @@
               </div>
             </div>
           </div>
-
-          <div class="attribute-container charisma">
-            <div class="attribute-label">
-              <span class="attribute-name">Carisma</span>
-              <span class="attribute-value">{{ character.atributos.carisma }}/20</span>
-            </div>
-            <div class="progress-bar-container">
-              <div class="progress-bar-glow"></div>
-              <div 
-                class="progress-bar-fill" 
-                [style.width.%]="(character.atributos.carisma / 20) * 100">
-              </div>
-            </div>
-          </div>
-
-          <div class="attribute-container agility">
-            <div class="attribute-label">
-              <span class="attribute-name">Destreza</span>
-              <span class="attribute-value">{{ character.atributos.destreza }}/20</span>
-            </div>
-            <div class="progress-bar-container">
-              <div class="progress-bar-glow"></div>
-              <div 
-                class="progress-bar-fill" 
-                [style.width.%]="(character.atributos.destreza / 20) * 100">
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       
@@ -105,14 +105,14 @@
     </div>
   </div>
   
-  <div class="character-actions">
+  <div class="character-actions" *ngIf="showActions">
     <button class="btn-action primary" (click)="onEdit()">
       <span>Editar</span>
     </button>
     <button class="btn-action danger" (click)="onDelete()">
       Deletar
     </button>
-    <button class="btn-action select">
+    <button class="btn-action select" (click)="onSelect()">
       Selecionar
     </button>
   </div>

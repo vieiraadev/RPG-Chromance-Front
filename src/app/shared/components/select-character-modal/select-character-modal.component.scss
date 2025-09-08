@@ -1,3 +1,25 @@
+:host {
+  display: block;
+  width: 100%;
+  
+  --local-bg: #0a0a0a;
+  --local-card-bg: rgba(10, 10, 20, 0.9);
+  --local-card-border: rgba(0, 255, 255, 0.3);
+  --local-muted: #64748b;
+  --local-text: #e2e8f0;
+  --local-text-bright: #f1f5f9;
+  --local-border: rgba(255, 255, 255, 0.1);
+  --local-border-hover: rgba(0, 150, 255, 0.5);
+  --local-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  --local-shadow-glow: 0 0 30px rgba(0, 255, 255, 0.2);
+  --local-accent: #00ffff;
+  --local-accent-blue: #0080ff;
+  --local-input-bg: rgba(15, 15, 30, 0.8);
+  --local-brand: linear-gradient(45deg, #0080ff, #00a0ff);
+  --local-brand-hover: linear-gradient(45deg, #00a0ff, #0080ff);
+  --local-brand-contrast: #fff;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -14,10 +36,10 @@
 }
 
 .modal-container {
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
+  background: var(--local-card-bg);
+  border: 2px solid var(--local-card-border);
   border-radius: 20px;
-  box-shadow: var(--shadow), var(--shadow-glow);
+  box-shadow: var(--local-shadow), var(--local-shadow-glow);
   backdrop-filter: blur(20px);
   width: 90vw;
   max-width: 1400px;
@@ -31,7 +53,7 @@
 
 .modal-header {
   padding: 2rem 2.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--local-border);
   background: rgba(0, 255, 255, 0.05);
   position: relative;
   z-index: 1;
@@ -40,19 +62,19 @@
     font-family: 'Orbitron', monospace;
     font-size: 2rem;
     font-weight: 700;
-    color: var(--text-bright);
+    color: var(--local-text-bright);
     margin: 0;
     margin-bottom: 0.5rem;
     text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
   }
 
   .modal-subtitle {
-    color: var(--muted);
+    color: var(--local-muted);
     font-size: 1rem;
     margin: 0;
 
     .campaign-name {
-      color: var(--accent);
+      color: var(--local-accent);
       font-weight: 600;
     }
   }
@@ -63,7 +85,7 @@
     right: 1.5rem;
     background: none;
     border: none;
-    color: var(--muted);
+    color: var(--local-muted);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -75,7 +97,7 @@
     font-size: 1.5rem;
 
     &:hover {
-      color: var(--accent);
+      color: var(--local-accent);
       background: rgba(255, 255, 255, 0.1);
       transform: scale(1.1);
     }
@@ -99,14 +121,17 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--accent);
+    background: var(--local-accent);
     border-radius: 4px;
 
     &:hover {
-      background: var(--accent);
+      background: var(--local-accent);
       opacity: 0.8;
     }
   }
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--local-accent) rgba(0, 0, 0, 0.2);
 }
 
 .loading-container {
@@ -115,13 +140,13 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  color: var(--muted);
+  color: var(--local-muted);
 
   .loading-spinner {
     width: 60px;
     height: 60px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
+    border: 3px solid var(--local-border);
+    border-top-color: var(--local-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1.5rem;
@@ -138,7 +163,7 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  color: var(--text-bright);
+  color: var(--local-text-bright);
 
   i {
     font-size: 4rem;
@@ -152,9 +177,9 @@
   }
 
   .retry-button {
-    background: var(--brand);
-    border: 2px solid var(--accent);
-    color: var(--brand-contrast);
+    background: var(--local-brand);
+    border: 2px solid var(--local-accent);
+    color: var(--local-brand-contrast);
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-size: 1rem;
@@ -166,7 +191,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: var(--brand-hover);
+      background: var(--local-brand-hover);
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 128, 255, 0.4);
     }
@@ -179,17 +204,17 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  color: var(--muted);
+  color: var(--local-muted);
 
   i {
     font-size: 5rem;
-    color: var(--accent);
+    color: var(--local-accent);
     opacity: 0.3;
     margin-bottom: 1rem;
   }
 
   h3 {
-    color: var(--text-bright);
+    color: var(--local-text-bright);
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
   }
@@ -200,9 +225,9 @@
   }
 
   .create-character-button {
-    background: var(--brand);
-    border: 2px solid var(--accent);
-    color: var(--brand-contrast);
+    background: var(--local-brand);
+    border: 2px solid var(--local-accent);
+    color: var(--local-brand-contrast);
     padding: 1rem 2rem;
     border-radius: 10px;
     font-size: 1rem;
@@ -215,12 +240,12 @@
 
     i {
       font-size: 1.5rem;
-      color: var(--brand-contrast);
+      color: var(--local-brand-contrast);
       opacity: 1;
     }
 
     &:hover {
-      background: var(--brand-hover);
+      background: var(--local-brand-hover);
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 128, 255, 0.4);
     }
@@ -259,9 +284,9 @@
     position: absolute;
     top: -10px;
     right: -10px;
-    background: var(--brand);
-    border: 2px solid var(--accent);
-    color: var(--brand-contrast);
+    background: var(--local-brand);
+    border: 2px solid var(--local-accent);
+    color: var(--local-brand-contrast);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -296,7 +321,7 @@
 
 .modal-footer {
   padding: 1.5rem 2.5rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--local-border);
   background: rgba(0, 255, 255, 0.02);
   display: flex;
   justify-content: space-between;
@@ -308,15 +333,15 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: var(--muted);
+    color: var(--local-muted);
 
     i {
       font-size: 1.5rem;
-      color: var(--accent);
+      color: var(--local-accent);
     }
 
     strong {
-      color: var(--accent);
+      color: var(--local-accent);
       font-weight: 600;
     }
   }
@@ -326,9 +351,9 @@
     gap: 1rem;
 
     .btn-cancel {
-      background: var(--input-bg);
-      border: 2px solid var(--border);
-      color: var(--text-bright);
+      background: var(--local-input-bg);
+      border: 2px solid var(--local-border);
+      color: var(--local-text-bright);
       padding: 0.75rem 1.5rem;
       border-radius: 8px;
       font-size: 1rem;
@@ -340,16 +365,16 @@
       letter-spacing: 1px;
 
       &:hover {
-        border-color: var(--accent);
+        border-color: var(--local-accent);
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 150, 255, 0.2);
       }
     }
 
     .btn-confirm {
-      background: var(--brand);
-      border: 2px solid var(--accent);
-      color: var(--brand-contrast);
+      background: var(--local-brand);
+      border: 2px solid var(--local-accent);
+      color: var(--local-brand-contrast);
       padding: 0.75rem 2rem;
       border-radius: 8px;
       font-size: 1rem;
@@ -368,7 +393,7 @@
       }
 
       &:hover:not(:disabled) {
-        background: var(--brand-hover);
+        background: var(--local-brand-hover);
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 128, 255, 0.4);
       }

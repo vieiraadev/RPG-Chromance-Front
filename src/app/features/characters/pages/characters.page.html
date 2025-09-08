@@ -1,28 +1,29 @@
 <app-navbar></app-navbar>
-
-<div class="home-content">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Meus Personagens</h1>
-      <p class="page-subtitle">Forje e programe seus personagens nas ruas neon</p>
+<div class="characters-page-container">
+  <div class="home-content">
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">Meus Personagens</h1>
+        <p class="page-subtitle">Forje e programe seus personagens nas ruas neon</p>
+      </div>
     </div>
-  </div>
-  
-  <div class="characters-grid">
-    <app-character-card
-      *ngFor="let char of characters"
-      [character]="char"
-      [isLoading]="isLoading"
-      [showActions]="true"
-      (editClicked)="onEditCharacter($event)"
-      (deleteClicked)="onDeleteCharacter($event)"
-      (characterSelected)="onSelectCharacter($event)">
-    </app-character-card>
     
-    <div class="add-character-card" (click)="createNewCharacter()">
-      <div class="add-card-content">
-        <div class="add-icon">+</div>
-        <div class="add-text">Adicionar Novo Personagem</div>
+    <div class="characters-grid">
+      <app-character-card
+        *ngFor="let char of characters"
+        [character]="char"
+        [isLoading]="isLoading"
+        [showActions]="true"
+        (editClicked)="onEditCharacter($event)"
+        (deleteClicked)="onDeleteCharacter($event)"
+        (characterSelected)="onSelectCharacter($event)">
+      </app-character-card>
+      
+      <div class="add-character-card" (click)="createNewCharacter()">
+        <div class="add-card-content">
+          <div class="add-icon">+</div>
+          <div class="add-text">Adicionar Novo Personagem</div>
+        </div>
       </div>
     </div>
   </div>

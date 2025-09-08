@@ -4,10 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../config/environment';
 
 export interface CharacterAttributes {
+  vida: number;
+  energia: number;
   forca: number;
   inteligencia: number;
-  carisma: number;
-  destreza: number;
 }
 
 export interface CharacterCreate {
