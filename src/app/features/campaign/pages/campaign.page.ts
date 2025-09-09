@@ -4,7 +4,7 @@ import { NavbarComponent } from '@app/shared/components/navbar/navbar.component'
 import { SelectCharacterModalComponent } from '@app/shared/components/select-character-modal/select-character-modal.component';
 import { Character } from '@app/shared/components/character-card/character-card.component';
 import { Router } from '@angular/router';
-import { CampaignService, Campaign } from '@app/core/services/campaign.service';
+import { CampaignService, Campaign, ActiveCampaignStatus } from '@app/core/services/campaign.service';
 
 @Component({
   selector: 'app-campaigns',
@@ -22,6 +22,11 @@ export class CampaignsComponent implements OnInit {
   campaignToStart: Campaign | null = null;
   errorMessage: string = '';
 
+  activeCampaignStatus: ActiveCampaignStatus = {
+    has_active_campaign: false,
+    active_campaign: null
+  };
+
   constructor(
     private router: Router,
     private campaignService: CampaignService
@@ -29,6 +34,7 @@ export class CampaignsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCampaigns();
+    this.loadActiveCampaignStatus();
   }
 
   private loadCampaigns(): void {
@@ -49,6 +55,18 @@ export class CampaignsComponent implements OnInit {
         this.isLoading = false;
         
         this.loadMockCampaigns();
+      }
+    });
+  }
+
+  private loadActiveCampaignStatus(): void {
+    this.campaignService.getActiveCampaignStatus().subscribe({
+      next: (status) => {
+        this.activeCampaignStatus = status;
+        console.log('Status campanha ativa:', status);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar status da campanha ativa:', err);
       }
     });
   }
@@ -111,6 +129,106 @@ export class CampaignsComponent implements OnInit {
     ];
   }
 
+  isActiveCampaign(campaign: Campaign): boolean {
+    if (!this.activeCampaignStatus.has_active_campaign) {
+      return false;
+    }
+    
+    const activeCampaign = this.activeCampaignStatus.active_campaign;
+    return activeCampaign?.campaign_id === campaign.campaign_id;
+  }
+
+  isOccupiedByCampaign(campaign: Campaign): boolean {
+    if (!this.activeCampaignStatus.has_active_campaign) {
+      return false;
+    }
+    
+    const activeCampaign = this.activeCampaignStatus.active_campaign;
+    return activeCampaign?.campaign_id !== campaign.campaign_id;
+  }
+
+  getCampaignButtonText(campaign: Campaign): string {
+    if (!this.activeCampaignStatus.has_active_campaign) {
+      return 'Iniciar Campanha';
+    }
+    
+    const activeCampaign = this.activeCampaignStatus.active_campaign;
+    if (activeCampaign && activeCampaign.campaign_id === campaign.campaign_id) {
+      return 'Continue';
+    }
+    
+    return `Ocupado por ${activeCampaign?.active_character_name || 'outro jogador'}`;
+  }
+
+  isCampaignButtonEnabled(campaign: Campaign): boolean {
+    if (!this.activeCampaignStatus.has_active_campaign) {
+      return true;
+    }
+    
+    const activeCampaign = this.activeCampaignStatus.active_campaign;
+    return activeCampaign?.campaign_id === campaign.campaign_id;
+  }
+
+  onCampaignButtonClick(campaign: Campaign): void {
+    if (!this.activeCampaignStatus.has_active_campaign) {
+      this.startNewCampaign(campaign);
+    } else {
+      const activeCampaign = this.activeCampaignStatus.active_campaign;
+      if (activeCampaign?.campaign_id === campaign.campaign_id) {
+        this.continueCampaign(activeCampaign);
+      }
+    }
+  }
+
+  private startNewCampaign(campaign: Campaign): void {
+    console.log('Iniciando nova campanha:', campaign);
+    this.campaignToStart = campaign;
+    this.showCharacterModal = true;
+  }
+
+  private continueCampaign(campaign: Campaign): void {
+    console.log('Continuando campanha:', campaign);
+    
+    const navigationData = {
+      campaignId: campaign.campaign_id,
+      campaignTitle: campaign.title,
+      characterId: campaign.active_character_id || '',
+      characterName: campaign.active_character_name || '',
+      currentChapter: campaign.current_chapter || 1,
+      chaptersCompleted: campaign.chapters_completed || []
+    };
+
+    localStorage.setItem('gameData', JSON.stringify(navigationData));
+    
+    this.router.navigate(['/game'], {
+      queryParams: {
+        campaign: campaign.campaign_id,
+        character: campaign.active_character_id || '',
+        continue: 'true'
+      }
+    });
+  }
+
+  cancelActiveCampaign(): void {
+    const activeCampaign = this.activeCampaignStatus.active_campaign;
+    if (!activeCampaign) return;
+
+    if (confirm(`Deseja encerrar a campanha ativa "${activeCampaign.title}"? O progresso será perdido.`)) {
+      this.campaignService.cancelCampaign(activeCampaign.campaign_id).subscribe({
+        next: (response) => {
+          console.log('Campanha cancelada:', response);
+          alert('Campanha encerrada com sucesso!');
+          this.loadActiveCampaignStatus();
+          this.loadCampaigns();
+        },
+        error: (err) => {
+          console.error('Erro ao cancelar campanha:', err);
+          alert('Erro ao encerrar campanha.');
+        }
+      });
+    }
+  }
+
   openCampaign(campaignId: string): void {
     const campaign = this.campaigns.find(c => c.id === campaignId || c.campaign_id === campaignId);
     
@@ -149,15 +267,39 @@ export class CampaignsComponent implements OnInit {
 
   onCharacterSelected(character: Character): void {
     console.log('Personagem selecionado:', character);
-    console.log('Iniciando campanha:', this.campaignToStart?.campaign_id);
+    console.log('Dados da campanha:', this.campaignToStart);
     
-    localStorage.setItem('selectedCharacter', JSON.stringify(character));
-    localStorage.setItem('currentCampaign', JSON.stringify(this.campaignToStart));
+    const campaignId = this.campaignToStart?.campaign_id || this.campaignToStart?.id;
+    console.log('Campaign ID a ser usado:', campaignId);
     
-    if (this.campaignToStart) {
-      this.router.navigate(['/game', this.campaignToStart.campaign_id], {
-        queryParams: { characterId: character.id }
+    if (this.campaignToStart && campaignId) {
+      const navigationData = {
+        campaignId: campaignId,
+        campaignTitle: this.campaignToStart.title,
+        characterId: character.id,
+        characterName: character.name,
+        characterClass: character.classe,
+        characterRace: character.raca,
+        characterAttributes: character.atributos,
+        characterImage: character.imageUrl,
+        currentChapter: 1,
+        chaptersCompleted: []
+      };
+
+      localStorage.setItem('gameData', JSON.stringify(navigationData));
+      
+      this.router.navigate(['/game'], {
+        queryParams: {
+          campaign: campaignId,
+          character: character.id
+        }
       });
+    } else {
+      console.error('Dados da campanha incompletos:', {
+        campaignToStart: this.campaignToStart,
+        campaignId: campaignId
+      });
+      alert('Erro: Dados da campanha não foram encontrados. Tente novamente.');
     }
   }
 
@@ -186,6 +328,7 @@ export class CampaignsComponent implements OnInit {
         next: (campaigns) => {
           console.log('Campanhas populadas com sucesso:', campaigns);
           this.loadCampaigns();
+          this.loadActiveCampaignStatus(); 
         },
         error: (error) => {
           console.error('Erro ao popular campanhas:', error);

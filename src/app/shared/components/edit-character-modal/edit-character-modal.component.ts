@@ -35,6 +35,7 @@ export class EditCharacterModalComponent implements OnChanges {
   ];
 
   editingCharacter: Character = {
+    id: '',
     name: '',
     raca: '',
     classe: '',
@@ -74,8 +75,13 @@ export class EditCharacterModalComponent implements OnChanges {
   private initializeEditingCharacter(): void {
     if (this.character) {
       this.editingCharacter = {
-        ...this.character,
-        atributos: { ...this.character.atributos }
+        id: this.character.id,
+        name: this.character.name,
+        raca: this.character.raca,
+        classe: this.character.classe,
+        descricao: this.character.descricao,
+        atributos: { ...this.character.atributos },
+        imageUrl: this.character.imageUrl
       };
 
       this.originalTotalPoints = this.character.atributos.vida + 
@@ -136,7 +142,10 @@ export class EditCharacterModalComponent implements OnChanges {
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      this.characterUpdated.emit({ ...this.editingCharacter });
+      this.characterUpdated.emit({ 
+        ...this.editingCharacter,
+        id: this.editingCharacter.id || this.character?.id || ''
+      });
       this.onClose();
     }
   }
@@ -144,10 +153,10 @@ export class EditCharacterModalComponent implements OnChanges {
   isFormValid(): boolean {
     return !!(this.editingCharacter.name.trim() && 
              this.editingCharacter.raca.trim() && 
-             this.editingCharacter.classe.trim());
+             this.editingCharacter.classe.trim() &&
+             this.editingCharacter.id); 
   }
 
-  // CORRIGIDO: Agora usa os novos atributos
   get totalPoints(): number {
     const attr = this.editingCharacter.atributos;
     return attr.vida + attr.energia + attr.forca + attr.inteligencia;

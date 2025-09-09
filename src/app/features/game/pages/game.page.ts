@@ -39,13 +39,13 @@ interface InventoryItem {
 }
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-game',
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss']
 })
-export class HomePageComponent implements OnInit, AfterViewChecked {
+export class GamePageComponent implements OnInit, AfterViewChecked {
   @ViewChild('storyContent') storyContent!: ElementRef;
 
   isLoading = false;
@@ -362,7 +362,7 @@ export class HomePageComponent implements OnInit, AfterViewChecked {
         this.addStoryEntry('narrator', 'Você prepara o dispositivo de hacking, pronto para quebrar sistemas de segurança.');
         break;
       case 'ammo':
-        this.addStoryEntry('narrator', 'Você recarrega sua arma. Clique metálico ecoa enquanto a munição é inserida.');
+        this.addStoryEntry('narrator', 'Você recarrega sua arma. Clique metálico ecoa enquindo a munição é inserida.');
         break;
     }
   }

@@ -21,6 +21,7 @@ export interface CharacterCreate {
 
 export interface CharacterResponse {
   _id: string;
+  id?: string; 
   name: string;
   raca: string;
   classe: string;
@@ -29,6 +30,7 @@ export interface CharacterResponse {
   imageUrl: string;
   user_id?: string;
   created_at: string;
+  updated_at?: string;
   active: boolean;
 }
 

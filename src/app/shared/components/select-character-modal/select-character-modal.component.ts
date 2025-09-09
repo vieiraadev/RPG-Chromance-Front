@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { CharacterCardComponent, Character } from '../character-card/character-card.component';
 import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
+import { CampaignService } from '@app/core/services/campaign.service';
 
 @Component({
   selector: 'app-select-character-modal',
@@ -13,6 +14,8 @@ import { CharacterService, CharacterResponse } from '@app/core/services/characte
 export class SelectCharacterModalComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() campaignTitle = '';
+  @Input() campaignId = '';
+  @Input() campaignChapter = 1;
   @Output() close = new EventEmitter<void>();
   @Output() characterSelected = new EventEmitter<Character>();
 
@@ -20,9 +23,13 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
   selectedCharacter: Character | null = null;
   isLoading = false;
   error: string | null = null;
+  isStartingCampaign = false;
   private hasLoadedCharacters = false;
 
-  constructor(private characterService: CharacterService) {}
+  constructor(
+    private characterService: CharacterService,
+    private campaignService: CampaignService
+  ) {}
 
   ngOnInit() {
     this.loadMockCharacters();
@@ -52,7 +59,7 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
         this.isLoading = false;
         this.hasLoadedCharacters = true;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erro ao carregar personagens da API:', err);
         this.error = 'Erro ao carregar personagens da API. Usando dados locais.';
         this.isLoading = false;
@@ -63,13 +70,15 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
   }
 
   private mapCharacterResponse(char: CharacterResponse): Character {
+    const characterId = char._id || char.id || `temp-${Date.now()}`;
+    
     return {
-      id: char._id,
-      name: char.name,
-      raca: char.raca,
-      classe: char.classe,
-      descricao: char.descricao,
-      atributos: char.atributos,
+      id: characterId,
+      name: char.name || 'Nome não informado',
+      raca: char.raca || 'Raça não informada',
+      classe: char.classe || 'Classe não informada', 
+      descricao: char.descricao || '',
+      atributos: char.atributos || { vida: 10, energia: 10, forca: 10, inteligencia: 10 },
       imageUrl: char.imageUrl || 'assets/images/default-avatar.png'
     };
   }
@@ -77,11 +86,11 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
   private loadMockCharacters() {
     this.characters = [
       {
-        id: '1',
+        id: 'mock-1',
         name: 'Lyra Shadowbane',
         raca: 'Élfica',
         classe: 'Assassina',
-        descricao: '',
+        descricao: 'Uma assassina élfica habilidosa.',
         atributos: {
           vida: 14,
           energia: 16,
@@ -91,11 +100,11 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
         imageUrl: 'assets/images/card-image1.jpg'
       },
       {
-        id: '2',
+        id: 'mock-2',
         name: 'Thorin Ironforge',
         raca: 'Anão',
         classe: 'Guerreiro',
-        descricao: '',
+        descricao: 'Um guerreiro anão resistente.',
         atributos: {
           vida: 20,
           energia: 12,
@@ -105,11 +114,11 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
         imageUrl: 'assets/images/card-image2.jpg'
       },
       {
-        id: '3',
+        id: 'mock-3',
         name: 'Zara Mindweaver',
         raca: 'Humana',
         classe: 'Maga',
-        descricao: '',
+        descricao: 'Uma maga humana poderosa.',
         atributos: {
           vida: 10,
           energia: 20,
@@ -127,15 +136,41 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
   }
 
   onConfirmSelection() {
-    if (this.selectedCharacter) {
+    if (this.selectedCharacter && this.campaignId) {
       console.log('Confirmando seleção de:', this.selectedCharacter);
-      this.characterSelected.emit(this.selectedCharacter);
-      this.onClose();
+      
+      this.isStartingCampaign = true;
+      this.campaignService.startCampaign(
+        this.selectedCharacter.id, 
+        this.campaignId,
+        this.selectedCharacter.name
+      ).subscribe({
+        next: (response: any) => {
+          console.log('Campanha iniciada:', response);
+          
+          this.characterSelected.emit(this.selectedCharacter!);
+          
+          setTimeout(() => {
+            this.onClose();
+          }, 100);
+        },
+        error: (err: any) => {
+          console.error('Erro ao iniciar campanha:', err);
+          this.isStartingCampaign = false;
+          
+          if (err.error?.detail) {
+            alert(`Erro: ${err.error.detail}`);
+          } else {
+            alert('Erro ao iniciar campanha. Tente novamente.');
+          }
+        }
+      });
     }
   }
 
   onClose() {
     console.log('Fechando modal');
+    this.isStartingCampaign = false;
     this.close.emit();
     this.selectedCharacter = null;
   }
@@ -144,5 +179,9 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
     if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.onClose();
     }
+  }
+
+  goToCharacters() {
+    this.onClose();
   }
 }

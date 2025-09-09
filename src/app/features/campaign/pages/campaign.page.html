@@ -7,6 +7,21 @@
           Minhas Campanhas
         </h1>
         <p class="campaigns-page-subtitle">Construa campanhas lendárias e prove seu valor no campo de batalha</p>
+        
+        <div class="active-campaign-status" *ngIf="activeCampaignStatus.has_active_campaign">
+          <div class="status-card">
+            <i class='bx bx-play-circle'></i>
+            <div class="status-info">
+              <span class="status-text">Campanha Ativa:</span>
+              <strong>{{ activeCampaignStatus.active_campaign?.title }}</strong>
+              <small>Jogando como {{ activeCampaignStatus.active_campaign?.active_character_name }}</small>
+            </div>
+            <button class="btn-cancel-global" (click)="cancelActiveCampaign()">
+              <i class='bx bx-x'></i>
+              Encerrar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   
@@ -20,7 +35,9 @@
       <div class="campaigns-list-card" 
            *ngFor="let campaign of campaigns; let i = index"
            (click)="openCampaign(campaign.campaign_id)"
-           [class.locked]="campaign.is_locked">
+           [class.locked]="campaign.is_locked"
+           [class.active]="isActiveCampaign(campaign)"
+           [class.occupied]="isOccupiedByCampaign(campaign)">
         
         <div class="campaigns-card-image-container">
           <img [src]="campaign.image" [alt]="campaign.title" class="campaigns-card-image">
@@ -29,6 +46,16 @@
           <div *ngIf="campaign.is_locked" class="campaigns-locked-overlay">
             <i class='bx bx-lock-alt'></i>
             <span>Bloqueado</span>
+          </div>
+
+          <div *ngIf="isActiveCampaign(campaign)" class="campaigns-active-indicator">
+            <i class='bx bx-play-circle'></i>
+            <span>Em Progresso</span>
+          </div>
+
+          <div *ngIf="isOccupiedByCampaign(campaign)" class="campaigns-occupied-indicator">
+            <i class='bx bx-user'></i>
+            <span>{{ activeCampaignStatus.active_campaign?.active_character_name }}</span>
           </div>
         </div>
         
@@ -74,12 +101,36 @@
             </div>
     
             <div class="campaigns-card-actions">
-              <button class="campaigns-btn-play" 
-                      (click)="startCampaign(campaign); $event.stopPropagation()"
-                      [disabled]="campaign.is_locked">
-                <i class='bx bx-play-circle'></i>
-                Jogar
-              </button>
+              
+              <ng-container *ngIf="!activeCampaignStatus.has_active_campaign">
+                <button class="campaigns-btn-play" 
+                        (click)="onCampaignButtonClick(campaign); $event.stopPropagation()"
+                        [disabled]="campaign.is_locked">
+                  <i class='bx bx-play-circle'></i>
+                  Iniciar Campanha
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="activeCampaignStatus.has_active_campaign && isActiveCampaign(campaign)">
+                <button class="campaigns-btn-continue" 
+                        (click)="onCampaignButtonClick(campaign); $event.stopPropagation()">
+                  <i class='bx bx-play'></i>
+                  Continue
+                </button>
+                <button class="campaigns-btn-cancel" 
+                        (click)="cancelActiveCampaign(); $event.stopPropagation()">
+                  <i class='bx bx-stop'></i>
+                  Encerrar
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="activeCampaignStatus.has_active_campaign && !isActiveCampaign(campaign)">
+                <button class="campaigns-btn-occupied" disabled>
+                  <i class='bx bx-user'></i>
+                  Ocupado
+                </button>
+              </ng-container>
+
               <button class="campaigns-btn-info" (click)="$event.stopPropagation()">
                 <i class='bx bx-info-circle'></i>
               </button>
@@ -112,13 +163,35 @@
               </div>
             </div>
           </div>
-  
-          <button class="campaigns-btn-start" 
-                  (click)="startCampaign()"
-                  [disabled]="selectedCampaign.is_locked">
-            <i class='bx bx-rocket'></i>
-            Iniciar Campanha
-          </button>
+
+          <ng-container *ngIf="!activeCampaignStatus.has_active_campaign">
+            <button class="campaigns-btn-start" 
+                    (click)="startCampaign()"
+                    [disabled]="selectedCampaign.is_locked">
+              <i class='bx bx-rocket'></i>
+              Iniciar Campanha
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="activeCampaignStatus.has_active_campaign && isActiveCampaign(selectedCampaign)">
+            <div class="detail-actions-group">
+              <button class="campaigns-btn-continue-detail" (click)="onCampaignButtonClick(selectedCampaign)">
+                <i class='bx bx-play'></i>
+                Continue Campanha
+              </button>
+              <button class="campaigns-btn-cancel-detail" (click)="cancelActiveCampaign()">
+                <i class='bx bx-stop'></i>
+                Encerrar Campanha
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="activeCampaignStatus.has_active_campaign && !isActiveCampaign(selectedCampaign)">
+            <button class="campaigns-btn-occupied-detail" disabled>
+              <i class='bx bx-user'></i>
+              Campanha Ocupada por {{ activeCampaignStatus.active_campaign?.active_character_name }}
+            </button>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -126,6 +199,8 @@
     <app-select-character-modal
       [isOpen]="showCharacterModal"
       [campaignTitle]="campaignToStart?.title || ''"
+      [campaignId]="campaignToStart?.campaign_id || campaignToStart?.id || ''"
+      [campaignChapter]="campaignToStart?.chapter || 1"
       (close)="onCloseCharacterModal()"
       (characterSelected)="onCharacterSelected($event)">
     </app-select-character-modal>

@@ -1,71 +1,86 @@
 <div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2 class="modal-title">Selecione seu Personagem</h2>
-        <p class="modal-subtitle" *ngIf="campaignTitle">
-          Para iniciar: <span class="campaign-name">{{ campaignTitle }}</span>
-        </p>
-        <button class="modal-close" (click)="onClose()">
-          <i class='bx bx-x'></i>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">Selecione seu Personagem</h2>
+      <p class="modal-subtitle" *ngIf="campaignTitle">
+        Para iniciar: <span class="campaign-name">{{ campaignTitle }}</span>
+      </p>
+      <button class="modal-close" (click)="onClose()">
+        <i class='bx bx-x'></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading State -->
+      <div class="loading-container" *ngIf="isLoading">
+        <i class='bx bx-loader-alt bx-spin'></i>
+        <p>Carregando personagens...</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-container" *ngIf="error && !isLoading">
+        <i class='bx bx-error-circle'></i>
+        <p>{{ error }}</p>
+        <button class="retry-button" (click)="loadCharacters()">
+          <i class='bx bx-refresh'></i>
+          Tentar Novamente
         </button>
       </div>
-  
-      <div class="modal-body">
-        <div class="error-container" *ngIf="error">
-          <i class='bx bx-error-circle'></i>
-          <p>{{ error }}</p>
-          <button class="retry-button" (click)="loadCharacters()">
-            <i class='bx bx-refresh'></i>
-            Tentar Novamente
-          </button>
-        </div>
-  
-        <div class="empty-container" *ngIf="!error && characters.length === 0">
-          <i class='bx bx-user-x'></i>
-          <h3>Nenhum personagem encontrado</h3>
-          <p>Crie um personagem para começar sua aventura!</p>
-          <button class="create-character-button">
-            <i class='bx bx-plus-circle'></i>
-            Criar Personagem
-          </button>
-        </div>
-  
-        <div class="characters-grid" *ngIf="!error && characters.length > 0">
-          <div class="character-wrapper" 
-               *ngFor="let character of characters"
-               [class.selected]="selectedCharacter?.id === character.id"
-               (click)="onCharacterSelect(character)">
-            
-            <div class="selection-indicator" *ngIf="selectedCharacter?.id === character.id">
-              <i class='bx bx-check-circle'></i>
-            </div>
-            
-            <app-character-card 
-              [character]="character"
-              [showActions]="false"
-              (characterSelected)="onCharacterSelect($event)">
-            </app-character-card>
-          </div>
-        </div>
+
+      <!-- Empty State -->
+      <div class="empty-container" *ngIf="!error && !isLoading && characters.length === 0">
+        <i class='bx bx-user-x'></i>
+        <h3>Nenhum personagem encontrado</h3>
+        <p>Crie um personagem para começar sua aventura!</p>
+        <button class="create-character-button" (click)="goToCharacters()">
+          <i class='bx bx-plus-circle'></i>
+          Criar Personagem
+        </button>
       </div>
-  
-      <div class="modal-footer" *ngIf="!error && characters.length > 0">
-        <div class="selected-info" *ngIf="selectedCharacter">
-          <i class='bx bx-user-check'></i>
-          <span>Selecionado: <strong>{{ selectedCharacter.name }}</strong></span>
-        </div>
-        
-        <div class="action-buttons">
-          <button class="btn-cancel" (click)="onClose()">
-            Cancelar
-          </button>
-          <button class="btn-confirm" 
-                  [disabled]="!selectedCharacter"
-                  (click)="onConfirmSelection()">
-            <i class='bx bx-play-circle'></i>
-            Iniciar com este Personagem
-          </button>
+
+      <!-- Characters Grid -->
+      <div class="characters-grid" *ngIf="!error && !isLoading && characters.length > 0">
+        <div class="character-wrapper"
+             *ngFor="let character of characters"
+             [class.selected]="selectedCharacter?.id === character.id"
+             (click)="onCharacterSelect(character)">
+          
+          <!-- Indicador de Seleção -->
+          <div class="selection-indicator" *ngIf="selectedCharacter?.id === character.id">
+            <i class='bx bx-check-circle'></i>
+          </div>
+
+          <!-- Card do Personagem -->
+          <app-character-card
+            [character]="character"
+            [showActions]="false"
+            (characterSelected)="onCharacterSelect($event)">
+          </app-character-card>
         </div>
       </div>
     </div>
+
+    <!-- Footer com ações -->
+    <div class="modal-footer" *ngIf="!error && !isLoading && characters.length > 0">
+      <div class="selected-info" *ngIf="selectedCharacter">
+        <i class='bx bx-user-check'></i>
+        <span>Selecionado: <strong>{{ selectedCharacter.name }}</strong></span>
+      </div>
+      
+      <div class="action-buttons">
+        <button class="btn-cancel" (click)="onClose()" [disabled]="isStartingCampaign">
+          Cancelar
+        </button>
+        <button class="btn-confirm"
+                [disabled]="!selectedCharacter || isStartingCampaign"
+                (click)="onConfirmSelection()">
+          <div class="button-content">
+            <i class='bx bx-loader-alt bx-spin' *ngIf="isStartingCampaign"></i>
+            <i class='bx bx-play-circle' *ngIf="!isStartingCampaign"></i>
+            <span>{{ isStartingCampaign ? 'Iniciando...' : 'Iniciar com este Personagem' }}</span>
+          </div>
+        </button>
+      </div>
+    </div>
   </div>
+</div>

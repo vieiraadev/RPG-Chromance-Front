@@ -3,7 +3,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-  
+
   // Auth
   {
     path: 'auth/login',
@@ -15,7 +15,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/auth/pages/signup.page').then(m => m.SignupPage),
   },
-  
+
   // Home
   {
     path: 'home',
@@ -23,7 +23,7 @@ export const routes: Routes = [
       import('@app/features/home/pages/home.page').then(m => m.HomePageComponent),
     canActivate: [AuthGuard],
   },
-  
+
   // Characters
   {
     path: 'characters',
@@ -33,7 +33,7 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
-  
+
   // Campaigns
   {
     path: 'campaigns',
@@ -43,7 +43,17 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
-  
+
+  // Game
+  {
+    path: 'game',
+    loadComponent: () =>
+      import('@app/features/game/pages/game.page').then(
+        m => m.GamePageComponent
+      ),
+    canActivate: [AuthGuard],
+  },
+
   // Profile
   {
     path: 'profile',
@@ -53,6 +63,6 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
-  
+
   { path: '**', redirectTo: 'auth/login' },
 ];

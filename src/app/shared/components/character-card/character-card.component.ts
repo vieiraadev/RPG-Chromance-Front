@@ -9,7 +9,7 @@ export interface CharacterAttributes {
 }
 
 export interface Character {
-  id?: string;
+  id: string; // OBRIGATÓRIO - não opcional
   name: string;
   raca: string;
   classe: string;
