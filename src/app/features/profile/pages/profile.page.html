@@ -9,104 +9,106 @@
   </div>
   
   <div class="profile-container">
-    <div class="avatar-section">
-      <div class="avatar-container">
+    <div class="profile-main-card">
+      <div class="avatar-section">
         <div class="avatar-circle">
           <span class="avatar-text">{{ getInitials() }}</span>
         </div>
         <button class="change-avatar-btn" (click)="changeAvatar()">
-          <i class="bx bx-camera"></i>
+          <i class="bx bx-camera btn-icon"></i>
           Alterar Foto
         </button>
       </div>
-    </div>
-
-    <div class="profile-info-card">
-      <div class="card-header">
-        <h2 class="card-title">Informações Pessoais</h2>
-        <button class="edit-btn" (click)="toggleEdit()" [class.active]="isEditing">
-          <i class="bx" [class.bx-save]="isEditing" [class.bx-edit]="!isEditing"></i>
-          {{ isEditing ? 'Salvar' : 'Editar' }}
-        </button>
-      </div>
       
-      <div class="profile-fields">
-        <div class="field-group">
-          <label class="field-label">Nome Completo</label>
-          <div class="field-container">
-            <input
-              type="text"
-              class="field-input"
-              [(ngModel)]="userProfile.name"
-              [readonly]="!isEditing"
-              placeholder="Digite seu nome completo">
-            <div class="field-icon">
-              <i class="bx bx-user"></i>
+      <div class="card-divider"></div>
+      
+      <div class="info-section">
+        <div class="card-header">
+          <h2 class="card-title">Informações Pessoais</h2>
+          <button class="edit-btn" (click)="toggleEdit()" [class.active]="isEditing">
+            <i class="bx btn-icon" [class.bx-save]="isEditing" [class.bx-edit]="!isEditing"></i>
+            {{ isEditing ? 'Salvar' : 'Editar' }}
+          </button>
+        </div>
+        
+        <div class="profile-fields">
+          <div class="field-group">
+            <label class="field-label">Nome Completo</label>
+            <div class="field-container">
+              <input
+                type="text"
+                class="field-input"
+                [(ngModel)]="userProfile.name"
+                [readonly]="!isEditing"
+                placeholder="Digite seu nome completo">
+              <div class="field-icon">
+                <i class="bx bx-user"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <div class="field-container">
+              <input
+                type="email"
+                class="field-input"
+                [(ngModel)]="userProfile.email"
+                [readonly]="!isEditing"
+                placeholder="Digite seu email">
+              <div class="field-icon">
+                <i class="bx bx-envelope"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field-group">
+            <label class="field-label">Senha</label>
+            <div class="field-container">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                class="field-input"
+                [(ngModel)]="userProfile.password"
+                [readonly]="!isEditing"
+                placeholder="Digite sua senha">
+              <div class="field-icon password-toggle" (click)="togglePassword()">
+                <i class="bx" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"></i>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="field-group">
-          <label class="field-label">Email</label>
-          <div class="field-container">
-            <input
-              type="email"
-              class="field-input"
-              [(ngModel)]="userProfile.email"
-              [readonly]="!isEditing"
-              placeholder="Digite seu email">
-            <div class="field-icon">
-              <i class="bx bx-envelope"></i>
-            </div>
-          </div>
+        
+        <div class="action-buttons" *ngIf="isEditing">
+          <button class="save-btn" (click)="saveProfile()">
+            <i class="bx bx-save btn-icon"></i>
+            Salvar Alterações
+          </button>
+          <button class="cancel-btn" (click)="cancelEdit()">
+            <i class="bx bx-x btn-icon"></i>
+            Cancelar
+          </button>
         </div>
-
-        <div class="field-group">
-          <label class="field-label">Senha</label>
-          <div class="field-container">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              class="field-input"
-              [(ngModel)]="userProfile.password"
-              [readonly]="!isEditing"
-              placeholder="Digite sua senha">
-            <div class="field-icon password-toggle" (click)="togglePassword()">
-              <i class="bx" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="action-buttons" *ngIf="isEditing">
-        <button class="save-btn" (click)="saveProfile()">
-          <i class="bx bx-save btn-icon"></i>
-          Salvar Alterações
-        </button>
-        <button class="cancel-btn" (click)="cancelEdit()">
-          <i class="bx bx-x btn-icon"></i>
-          Cancelar
-        </button>
       </div>
     </div>
-
+    
     <div class="stats-section">
       <div class="stat-card">
         <div class="stat-icon"><i class="bx bx-calendar"></i></div>
         <div class="stat-info">
           <div class="stat-label">Membro desde</div>
-          <div class="stat-value">{{ getMemberSince() }}</div>
+          <div class="stat-value">14/01/2024</div>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><i class="bx bx-time"></i></div>
+        <div class="stat-icon"><i class="bx bx-check-circle"></i></div>
         <div class="stat-info">
-          <div class="stat-label">Último login</div>
-          <div class="stat-value">{{ getLastLogin() }}</div>
+          <div class="stat-label">Status</div>
+          <div class="stat-value">Ativo</div>
         </div>
       </div>
     </div>
   </div>
-
+  
   <div class="loading-overlay" *ngIf="isLoading">
     <div class="loading-container">
       <div class="loading-spinner"></div>
