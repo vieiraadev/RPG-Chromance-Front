@@ -27,7 +27,6 @@ export class NavbarComponent implements OnInit {
     { id: 'home',        label: 'Home',             icon: 'bx-home',     path: '/home' },
     { id: 'characters',  label: 'Meus Personagens', icon: 'bx-group',    path: '/characters' },
     { id: 'campaigns',   label: 'Campanhas',        icon: 'bx-map-alt',  path: '/campaigns' },
-    { id: 'play',        label: 'Jogar',            icon: 'bx-joystick', path: '/play' },
     { id: 'profile',     label: 'Perfil',           icon: 'bx-user',     path: '/profile' },
   ];
 
