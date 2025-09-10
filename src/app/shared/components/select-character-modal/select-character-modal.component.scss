@@ -268,7 +268,7 @@
   transition: all 0.3s ease;
   border-radius: 15px;
   padding: 0.25rem;
-  overflow: visible !important; // Garantir que elementos posicionados fora sejam visíveis
+  overflow: visible !important;
 
   &.selected:not(.unavailable) {
     background: rgba(0, 255, 255, 0.1);
@@ -294,7 +294,6 @@
     transform: translateY(-5px);
   }
 
-  // Status do personagem
   .character-status {
     position: absolute;
     top: 8px;
@@ -332,7 +331,6 @@
     }
   }
 
-  // Indicador de seleção
   .selection-indicator {
     position: absolute;
     top: -10px;
@@ -357,7 +355,6 @@
     }
   }
 
-  // Ações da campanha (botão encerrar)
   .campaign-actions {
     position: absolute;
     bottom: 8px;
@@ -397,7 +394,6 @@
     }
   }
 
-  // Mostrar ações ao passar o mouse
   &.unavailable:hover .campaign-actions {
     opacity: 1;
   }
@@ -506,7 +502,6 @@
   }
 }
 
-// Modal de confirmação para cancelar campanha
 .confirmation-overlay {
   position: fixed;
   top: 0;
@@ -630,7 +625,6 @@
   }
 }
 
-// Animações
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -662,7 +656,6 @@
   }
 }
 
-// Responsividade
 @media (max-width: 768px) {
   .modal-container {
     width: 95vw;
@@ -694,7 +687,6 @@
     border-radius: 16px;
   }
 
-  // Ajuste para mobile - botão fica no canto direito
   .character-wrapper .campaign-actions {
     right: 12px !important;
     bottom: 12px !important;

@@ -11,13 +11,11 @@
     </div>
 
     <div class="modal-body">
-      <!-- Loading State -->
       <div class="loading-container" *ngIf="isLoading">
         <i class='bx bx-loader-alt bx-spin'></i>
         <p>Carregando personagens...</p>
       </div>
 
-      <!-- Error State -->
       <div class="error-container" *ngIf="error && !isLoading">
         <i class='bx bx-error-circle'></i>
         <p>{{ error }}</p>
@@ -27,7 +25,6 @@
         </button>
       </div>
 
-      <!-- Empty State -->
       <div class="empty-container" *ngIf="!error && !isLoading && characters.length === 0">
         <i class='bx bx-user-x'></i>
         <h3>Nenhum personagem encontrado</h3>
@@ -38,19 +35,16 @@
         </button>
       </div>
 
-      <!-- Characters Grid -->
       <div class="characters-grid" *ngIf="!error && !isLoading && characters.length > 0">
         <div class="character-wrapper"
              *ngFor="let character of characters"
              [class.selected]="selectedCharacter?.id === character.id"
              (click)="onCharacterSelect(character)">
-          
-          <!-- Indicador de Seleção -->
+
           <div class="selection-indicator" *ngIf="selectedCharacter?.id === character.id">
             <i class='bx bx-check-circle'></i>
           </div>
 
-          <!-- Card do Personagem -->
           <app-character-card
             [character]="character"
             [showActions]="false"
@@ -60,7 +54,6 @@
       </div>
     </div>
 
-    <!-- Footer com ações -->
     <div class="modal-footer" *ngIf="!error && !isLoading && characters.length > 0">
       <div class="selected-info" *ngIf="selectedCharacter">
         <i class='bx bx-user-check'></i>
