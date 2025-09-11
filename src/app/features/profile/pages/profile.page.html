@@ -1,5 +1,4 @@
 <app-navbar></app-navbar>
-
 <div class="profile-content">
   <div class="page-header">
     <div class="header-content">
@@ -7,8 +6,29 @@
       <p class="page-subtitle">Controle seus dados no submundo digital</p>
     </div>
   </div>
-  
-  <div class="profile-container">
+
+  <!-- Loading inicial -->
+  <div class="loading-overlay" *ngIf="isLoadingProfile">
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Carregando perfil...</p>
+    </div>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="profile-container" *ngIf="!isLoadingProfile">
+    
+    <!-- Mensagens de erro e sucesso -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <i class="bx bx-error-circle"></i>
+      {{ errorMessage }}
+    </div>
+    
+    <div class="alert alert-success" *ngIf="successMessage">
+      <i class="bx bx-check-circle"></i>
+      {{ successMessage }}
+    </div>
+
     <div class="profile-main-card">
       <div class="avatar-section">
         <div class="avatar-circle">
@@ -19,18 +39,25 @@
           Alterar Foto
         </button>
       </div>
-      
+
       <div class="card-divider"></div>
-      
+
       <div class="info-section">
         <div class="card-header">
           <h2 class="card-title">Informações Pessoais</h2>
-          <button class="edit-btn" (click)="toggleEdit()" [class.active]="isEditing">
-            <i class="bx btn-icon" [class.bx-save]="isEditing" [class.bx-edit]="!isEditing"></i>
+          <button 
+            class="edit-btn" 
+            (click)="toggleEdit()" 
+            [class.active]="isEditing"
+            [disabled]="isLoading">
+            <i class="bx btn-icon" 
+               [class.bx-save]="isEditing" 
+               [class.bx-edit]="!isEditing">
+            </i>
             {{ isEditing ? 'Salvar' : 'Editar' }}
           </button>
         </div>
-        
+
         <div class="profile-fields">
           <div class="field-group">
             <label class="field-label">Nome Completo</label>
@@ -40,13 +67,15 @@
                 class="field-input"
                 [(ngModel)]="userProfile.name"
                 [readonly]="!isEditing"
-                placeholder="Digite seu nome completo">
+                [disabled]="isLoading"
+                placeholder="Digite seu nome completo"
+                maxlength="100">
               <div class="field-icon">
                 <i class="bx bx-user"></i>
               </div>
             </div>
           </div>
-          
+
           <div class="field-group">
             <label class="field-label">Email</label>
             <div class="field-container">
@@ -55,48 +84,77 @@
                 class="field-input"
                 [(ngModel)]="userProfile.email"
                 [readonly]="!isEditing"
+                [disabled]="isLoading"
                 placeholder="Digite seu email">
               <div class="field-icon">
                 <i class="bx bx-envelope"></i>
               </div>
             </div>
           </div>
-          
+
           <div class="field-group">
-            <label class="field-label">Senha</label>
+            <label class="field-label">Nova Senha (opcional)</label>
             <div class="field-container">
               <input
                 [type]="showPassword ? 'text' : 'password'"
                 class="field-input"
                 [(ngModel)]="userProfile.password"
                 [readonly]="!isEditing"
-                placeholder="Digite sua senha">
-              <div class="field-icon password-toggle" (click)="togglePassword()">
-                <i class="bx" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"></i>
+                [disabled]="isLoading"
+                placeholder="Digite uma nova senha (deixe vazio para manter a atual)"
+                minlength="6"
+                maxlength="100">
+              <div class="field-icon password-toggle" 
+                   (click)="togglePassword()" 
+                   *ngIf="isEditing">
+                <i class="bx" 
+                   [class.bx-show]="!showPassword" 
+                   [class.bx-hide]="showPassword">
+                </i>
+              </div>
+              <div class="field-icon" *ngIf="!isEditing">
+                <i class="bx bx-lock"></i>
               </div>
             </div>
+            <small class="field-hint" *ngIf="isEditing">
+              Deixe em branco para manter a senha atual
+            </small>
           </div>
         </div>
-        
+
         <div class="action-buttons" *ngIf="isEditing">
-          <button class="save-btn" (click)="saveProfile()">
+          <button 
+            class="save-btn" 
+            (click)="saveProfile()"
+            [disabled]="isLoading">
             <i class="bx bx-save btn-icon"></i>
-            Salvar Alterações
+            <span *ngIf="!isLoading">Salvar Alterações</span>
+            <span *ngIf="isLoading">Salvando...</span>
           </button>
-          <button class="cancel-btn" (click)="cancelEdit()">
+          <button 
+            class="cancel-btn" 
+            (click)="cancelEdit()"
+            [disabled]="isLoading">
             <i class="bx bx-x btn-icon"></i>
             Cancelar
           </button>
         </div>
       </div>
     </div>
-    
+
     <div class="stats-section">
       <div class="stat-card">
         <div class="stat-icon"><i class="bx bx-calendar"></i></div>
         <div class="stat-info">
           <div class="stat-label">Membro desde</div>
-          <div class="stat-value">14/01/2024</div>
+          <div class="stat-value">{{ getMemberSince() }}</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="bx bx-time"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Último acesso</div>
+          <div class="stat-value">{{ getLastLogin() }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -108,7 +166,8 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- Loading durante salvamento -->
   <div class="loading-overlay" *ngIf="isLoading">
     <div class="loading-container">
       <div class="loading-spinner"></div>

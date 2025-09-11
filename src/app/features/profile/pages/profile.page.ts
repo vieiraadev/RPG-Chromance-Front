@@ -1,14 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NavbarComponent } from '@shared/components/navbar/navbar.component';
+import { AuthService, UserOut } from '@core/services/auth.service';
+import { ApiService } from '@core/api/api.service';
 
 interface UserProfile {
+  id: string;
   name: string;
   email: string;
   password: string;
   memberSince: Date;
   lastLogin: Date;
+}
+
+interface UpdateProfileRequest {
+  nome: string;
+  email: string;
+  senha?: string;
 }
 
 @Component({
@@ -20,6 +30,7 @@ interface UserProfile {
 })
 export class ProfilePageComponent implements OnInit {
   userProfile: UserProfile = {
+    id: '',
     name: '',
     email: '',
     password: '',
@@ -28,6 +39,7 @@ export class ProfilePageComponent implements OnInit {
   };
 
   originalProfile: UserProfile = {
+    id: '',
     name: '',
     email: '',
     password: '',
@@ -38,38 +50,75 @@ export class ProfilePageComponent implements OnInit {
   isEditing: boolean = false;
   showPassword: boolean = false;
   isLoading: boolean = false;
+  isLoadingProfile: boolean = true;
+  errorMessage: string = '';
+  successMessage: string = '';
 
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private apiService: ApiService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.loadUserProfile();
   }
 
   loadUserProfile() {
-    const savedUser = localStorage.getItem('currentUser');
-    
-    if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      this.userProfile = {
-        name: userData.name || 'Nome do Usuário',
-        email: userData.email || 'usuario@email.com',
-        password: userData.password || '••••••••',
-        memberSince: new Date(userData.memberSince) || new Date(),
-        lastLogin: new Date(userData.lastLogin) || new Date()
-      };
-    } else {
-      this.userProfile = {
-        name: 'João Silva',
-        email: 'joao.silva@email.com',
-        password: 'minhasenha123',
-        memberSince: new Date('2024-01-15'),
-        lastLogin: new Date()
-      };
+    this.isLoadingProfile = true;
+    this.errorMessage = '';
+  
+    // Verifica se o usuário está autenticado
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
     }
-
-    this.originalProfile = { ...this.userProfile };
+  
+    // Busca dados do usuário via API
+    this.authService.me().subscribe({
+      next: (userData) => {
+        if (userData) {
+          this.userProfile = {
+            id: userData.id,
+            name: userData.nome,
+            email: userData.email,
+            password: '', // Não exibimos a senha real
+            memberSince: new Date(), // Seria ideal ter essa data na API
+            lastLogin: new Date()    // Seria ideal ter essa data na API
+          };
+  
+          this.originalProfile = { ...this.userProfile };
+        }
+        this.isLoadingProfile = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar perfil:', error);
+        
+        if (error.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+  
+        this.errorMessage = 'Erro ao carregar dados do perfil. Tente novamente.';
+        
+        this.loadMockData();
+        this.isLoadingProfile = false;
+      }
+    });
   }
 
+  private loadMockData() {
+    this.userProfile = {
+      id: 'mock-id',
+      name: 'Usuário Teste',
+      email: 'teste@email.com',
+      password: '',
+      memberSince: new Date('2024-01-15'),
+      lastLogin: new Date()
+    };
+    this.originalProfile = { ...this.userProfile };
+  }
 
   getInitials(): string {
     if (!this.userProfile.name) return 'UN';
@@ -87,6 +136,8 @@ export class ProfilePageComponent implements OnInit {
       this.saveProfile();
     } else {
       this.isEditing = true;
+      this.errorMessage = '';
+      this.successMessage = '';
     }
   }
 
@@ -96,27 +147,50 @@ export class ProfilePageComponent implements OnInit {
     }
 
     this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
 
     try {
-      await this.delay(1500);
-
-      const updatedUser = {
-        ...this.userProfile,
-        lastLogin: new Date()
+      const updateData: UpdateProfileRequest = {
+        nome: this.userProfile.name.trim(),
+        email: this.userProfile.email.trim()
       };
 
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      if (this.userProfile.password && this.userProfile.password.trim()) {
+        updateData.senha = this.userProfile.password.trim();
+      }
+
+      await this.apiService.put('/api/auth/profile', updateData).toPromise();
 
       this.originalProfile = { ...this.userProfile };
-      
       this.isEditing = false;
-      this.isLoading = false;
-      
-      console.log('Perfil salvo com sucesso!');
-      
-    } catch (error) {
-      this.isLoading = false;
+      this.showPassword = false;
+      this.successMessage = 'Perfil atualizado com sucesso!';
+
+      this.userProfile.password = '';
+
+      setTimeout(() => {
+        this.loadUserProfile();
+      }, 1000);
+
+    } catch (error: any) {
       console.error('Erro ao salvar perfil:', error);
+      
+      if (error.status === 401) {
+        this.authService.logout();
+        this.router.navigate(['/auth/login']);
+        return;
+      }
+
+      if (error.status === 400) {
+        this.errorMessage = error.error?.detail || 'Dados inválidos. Verifique as informações.';
+      } else if (error.status === 409) {
+        this.errorMessage = 'Este email já está sendo usado por outro usuário.';
+      } else {
+        this.errorMessage = 'Erro ao salvar perfil. Tente novamente.';
+      }
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -124,6 +198,8 @@ export class ProfilePageComponent implements OnInit {
     this.userProfile = { ...this.originalProfile };
     this.isEditing = false;
     this.showPassword = false;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   togglePassword() {
@@ -131,12 +207,11 @@ export class ProfilePageComponent implements OnInit {
   }
 
   changeAvatar() {
-    console.log('Alterar avatar...');
+    console.log('Função de alterar avatar será implementada em breve...');
   }
 
   getMemberSince(): string {
     if (!this.userProfile.memberSince) return 'N/A';
-    
     return this.formatDate(this.userProfile.memberSince);
   }
 
@@ -168,29 +243,33 @@ export class ProfilePageComponent implements OnInit {
   }
 
   private validateForm(): boolean {
+    this.errorMessage = '';
+
     if (!this.userProfile.name.trim()) {
-      alert('Nome é obrigatório');
+      this.errorMessage = 'Nome é obrigatório';
+      return false;
+    }
+
+    if (this.userProfile.name.trim().length < 2) {
+      this.errorMessage = 'Nome deve ter pelo menos 2 caracteres';
       return false;
     }
 
     if (!this.userProfile.email.trim()) {
-      alert('Email é obrigatório');
+      this.errorMessage = 'Email é obrigatório';
       return false;
     }
 
     if (!this.isValidEmail(this.userProfile.email)) {
-      alert('Email inválido');
+      this.errorMessage = 'Email inválido';
       return false;
     }
 
-    if (!this.userProfile.password.trim()) {
-      alert('Senha é obrigatória');
-      return false;
-    }
-
-    if (this.userProfile.password.length < 6) {
-      alert('Senha deve ter pelo menos 6 caracteres');
-      return false;
+    if (this.userProfile.password && this.userProfile.password.trim()) {
+      if (this.userProfile.password.length < 6) {
+        this.errorMessage = 'Senha deve ter pelo menos 6 caracteres';
+        return false;
+      }
     }
 
     return true;
@@ -201,12 +280,15 @@ export class ProfilePageComponent implements OnInit {
     return emailRegex.test(email);
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 
-  logout() {
-    localStorage.removeItem('currentUser');
-    console.log('Usuário deslogado');
+  private clearMessages(delay: number = 5000) {
+    setTimeout(() => {
+      this.errorMessage = '';
+      this.successMessage = '';
+    }, delay);
   }
 }
