@@ -68,13 +68,11 @@ export class ProfilePageComponent implements OnInit {
     this.isLoadingProfile = true;
     this.errorMessage = '';
   
-    // Verifica se o usuário está autenticado
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/auth/login']);
       return;
     }
   
-    // Busca dados do usuário via API
     this.authService.me().subscribe({
       next: (userData) => {
         if (userData) {
@@ -82,9 +80,9 @@ export class ProfilePageComponent implements OnInit {
             id: userData.id,
             name: userData.nome,
             email: userData.email,
-            password: '', // Não exibimos a senha real
-            memberSince: new Date(), // Seria ideal ter essa data na API
-            lastLogin: new Date()    // Seria ideal ter essa data na API
+            password: '', 
+            memberSince: new Date(userData.created_at), 
+            lastLogin: new Date()   
           };
   
           this.originalProfile = { ...this.userProfile };
@@ -141,7 +139,7 @@ export class ProfilePageComponent implements OnInit {
     }
   }
 
-  async saveProfile() {
+  saveProfile() {
     if (!this.validateForm()) {
       return;
     }
@@ -150,48 +148,50 @@ export class ProfilePageComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    try {
-      const updateData: UpdateProfileRequest = {
-        nome: this.userProfile.name.trim(),
-        email: this.userProfile.email.trim()
-      };
+    const updateData: UpdateProfileRequest = {
+      nome: this.userProfile.name.trim(),
+      email: this.userProfile.email.trim()
+    };
 
-      if (this.userProfile.password && this.userProfile.password.trim()) {
-        updateData.senha = this.userProfile.password.trim();
-      }
-
-      await this.apiService.put('/api/auth/profile', updateData).toPromise();
-
-      this.originalProfile = { ...this.userProfile };
-      this.isEditing = false;
-      this.showPassword = false;
-      this.successMessage = 'Perfil atualizado com sucesso!';
-
-      this.userProfile.password = '';
-
-      setTimeout(() => {
-        this.loadUserProfile();
-      }, 1000);
-
-    } catch (error: any) {
-      console.error('Erro ao salvar perfil:', error);
-      
-      if (error.status === 401) {
-        this.authService.logout();
-        this.router.navigate(['/auth/login']);
-        return;
-      }
-
-      if (error.status === 400) {
-        this.errorMessage = error.error?.detail || 'Dados inválidos. Verifique as informações.';
-      } else if (error.status === 409) {
-        this.errorMessage = 'Este email já está sendo usado por outro usuário.';
-      } else {
-        this.errorMessage = 'Erro ao salvar perfil. Tente novamente.';
-      }
-    } finally {
-      this.isLoading = false;
+    if (this.userProfile.password && this.userProfile.password.trim()) {
+      updateData.senha = this.userProfile.password.trim();
     }
+
+    this.apiService.put('/api/auth/profile', updateData).subscribe({
+      next: (response) => {
+        this.originalProfile = { ...this.userProfile };
+        this.isEditing = false;
+        this.showPassword = false;
+        this.successMessage = 'Perfil atualizado com sucesso!';
+
+        this.userProfile.password = '';
+
+        setTimeout(() => {
+          this.loadUserProfile();
+        }, 1000);
+
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao salvar perfil:', error);
+        
+        if (error.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        if (error.status === 400) {
+          this.errorMessage = error.error?.detail || 'Dados inválidos. Verifique as informações.';
+        } else if (error.status === 409) {
+          this.errorMessage = 'Este email já está sendo usado por outro usuário.';
+        } else {
+          this.errorMessage = 'Erro ao salvar perfil. Tente novamente.';
+        }
+
+        this.isLoading = false;
+      }
+    });
   }
 
   cancelEdit() {

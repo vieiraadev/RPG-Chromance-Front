@@ -23,6 +23,7 @@ export interface UserOut {
   id: string;
   nome: string;
   email: string;
+  created_at: string;
 }
 
 @Injectable({ providedIn: 'root' })
