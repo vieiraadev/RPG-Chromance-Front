@@ -1,0 +1,85 @@
+<div class="villain-carousel">
+  
+    <div class="carousel-container" #carouselContainer>
+      <div class="carousel-track" [class.animating]="isAnimating">
+        <div class="carousel-slides">
+          <div
+            class="carousel-slide"
+            *ngFor="let villain of visibleVillains; let i = index"
+            [class.active]="i === 1"
+            [class.prev]="i === 0"
+            [class.next]="i === 2">
+            
+            <div class="carousel-character-card">
+              <div class="character-image">
+                <img
+                  *ngIf="hasValidImage(villain.imageUrl); else fallbackImage"
+                  [src]="villain.imageUrl"
+                  alt="Character portrait"
+                  class="character-portrait"
+                />
+                <ng-template #fallbackImage>
+                  <img
+                    src="assets/images/default-avatar.png"
+                    alt="Imagem padrão"
+                    class="character-portrait"
+                  />
+                </ng-template>
+              </div>
+              
+              <div class="character-content">
+                <h3 class="character-name">{{ villain.name }}</h3>
+                <p class="character-class">{{ villain.classe | uppercase }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-navigation">
+      <button
+        class="carousel-nav prev"
+        (click)="prevVillain()"
+        [disabled]="isAnimating"
+        aria-label="Vilão anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15,18 9,12 15,6"></polyline>
+        </svg>
+      </button>
+  
+      <div class="carousel-indicators">
+        <button
+          *ngFor="let villain of villains; let i = index"
+          class="indicator"
+          [class.active]="i === currentIndex"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Ir para ' + villain.name">
+          <span class="indicator-dot"></span>
+        </button>
+      </div>
+  
+      <button
+        class="carousel-nav next"
+        (click)="nextVillain()"
+        [disabled]="isAnimating"
+        aria-label="Próximo vilão">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9,18 15,12 9,6"></polyline>
+        </svg>
+      </button>
+    </div>
+  
+    <div class="carousel-info">
+      <div class="info-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ villains.length }}</span>
+          <span class="stat-label">Vilões Catalogados</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">∞</span>
+          <span class="stat-label">Ameaça Level</span>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -3,7 +3,6 @@
     width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
-    
     --local-bg: #0a0a0a;
     --local-bg-gradient: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
     --local-card-bg: rgba(10, 10, 20, 0.9);
@@ -20,36 +19,42 @@
     --local-brand-contrast: #fff;
     --local-accent: #00ffff;
     --local-accent-blue: #0080ff;
+  }
   
-    .home-content {
-      padding: 20px 20px 40px 20px;
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 100vw;
-      box-sizing: border-box;
-      overflow-x: hidden;
-      margin: 0 auto;
+  .home-content {
+    padding: 20px 20px 40px 20px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    margin: 0 auto;
+    
+    app-villain-carousel {
+      margin: 0 -20px;
+      padding: 0 20px;
+      overflow: visible !important;
     }
+  }
   
-    .page-header {
-      text-align: left;
-      margin-bottom: 40px;
-      padding: 0;
-      margin-left: 80px;
-      position: relative;
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-  
-    .page-header .header-content {
+  .page-header {
+    text-align: left;
+    margin-bottom: 40px;
+    padding: 0;
+    margin-left: 80px;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    
+    .header-content {
       max-width: none;
       margin: 0;
       width: 100%;
     }
-  
-    .page-header .page-title {
+    
+    .page-title {
       color: var(--local-accent);
       font-family: 'Orbitron', monospace;
       font-size: 2.8rem;
@@ -60,8 +65,8 @@
       text-transform: uppercase;
       word-break: break-word;
     }
-  
-    .page-header .page-subtitle {
+    
+    .page-subtitle {
       color: #ffffff;
       font-family: 'Rajdhani', sans-serif;
       font-size: 1.1rem;
@@ -71,31 +76,43 @@
       opacity: 0.9;
       word-break: break-word;
     }
+  }
   
-    @media (max-width: 768px) {
-      .home-content {
-        padding: 20px 15px 60px 15px;
-      }
+  @media (max-width: 768px) {
+    .home-content {
+      padding: 20px 15px 60px 15px;
       
-      .page-header {
-        margin-left: 0;
+      app-villain-carousel {
+        margin: 0 -15px;
+        padding: 0 15px;
       }
+    }
+    
+    .page-header {
+      margin-left: 0;
       
-      .page-header .page-title {
+      .page-title {
         font-size: 2.2rem;
       }
     }
+  }
   
-    @media (max-width: 480px) {
-      .home-content {
-        padding: 10px 10px 40px 10px;
-      }
+  @media (max-width: 480px) {
+    .home-content {
+      padding: 10px 10px 40px 10px;
       
-      .page-header .page-title {
+      app-villain-carousel {
+        margin: 0 -10px;
+        padding: 0 10px;
+      }
+    }
+    
+    .page-header {
+      .page-title {
         font-size: 1.9rem;
       }
       
-      .page-header .page-subtitle {
+      .page-subtitle {
         font-size: 1rem;
       }
     }

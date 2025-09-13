@@ -1,0 +1,491 @@
+:host {
+    display: block;
+    width: 100%;
+    
+    --local-bg: #0a0a0a;
+    --local-bg-gradient: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    --local-card-bg: rgba(10, 10, 20, 0.9);
+    --local-card-border: rgba(0, 255, 255, 0.3);
+    --local-muted: #64748b;
+    --local-text: #e2e8f0;
+    --local-text-bright: #f1f5f9;
+    --local-border: rgba(255, 255, 255, 0.1);
+    --local-border-hover: rgba(0, 150, 255, 0.5);
+    --local-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    --local-shadow-glow: 0 0 30px rgba(0, 255, 255, 0.2);
+    --local-brand: linear-gradient(45deg, #0080ff, #00a0ff);
+    --local-brand-hover: linear-gradient(45deg, #00a0ff, #0080ff);
+    --local-brand-contrast: #fff;
+    --local-accent: #00ffff;
+    --local-accent-blue: #0080ff;
+    --local-input-bg: rgba(15, 15, 30, 0.8);
+  }
+  
+  .villain-carousel {
+    width: 100%;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    min-height: 500px;
+  }
+  
+  .carousel-track {
+    width: 100%;
+    max-width: 1400px;
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+  }
+  
+  .carousel-slides {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-height: 450px;
+  }
+  
+  .carousel-slide {
+    flex: 0 0 400px;
+    max-width: 400px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.8) translateZ(0);
+    opacity: 0.6;
+    filter: blur(1px) brightness(0.7);
+    position: relative;
+  
+    &.active {
+      transform: scale(1) translateZ(0);
+      opacity: 1;
+      filter: blur(0) brightness(1);
+      z-index: 2;
+      
+      .carousel-character-card {
+        box-shadow: 
+          var(--local-shadow), 
+          0 0 50px rgba(0, 255, 255, 0.4),
+          0 0 100px rgba(0, 255, 255, 0.2);
+        border-color: var(--local-accent);
+      }
+    }
+  
+    &.prev,
+    &.next {
+      cursor: pointer;
+      
+      &:hover {
+        transform: scale(0.85) translateZ(0);
+        opacity: 0.8;
+        filter: blur(0) brightness(0.8);
+      }
+    }
+  
+    .carousel-character-card {
+      margin-bottom: 0;
+    }
+  }
+  
+  .carousel-character-card {
+    width: 100%;
+    background: var(--local-card-bg);
+    border: 2px solid var(--local-card-border);
+    border-radius: 20px;
+    box-shadow: var(--local-shadow), var(--local-shadow-glow);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    position: relative;
+    animation: cardGlow 3s ease-in-out infinite alternate;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+  
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 2px,
+        rgba(0, 255, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+  
+    .character-image {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      border-bottom: 2px solid var(--local-border);
+  
+      .character-portrait {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        filter: sepia(100%) hue-rotate(200deg) saturate(2) brightness(0.8);
+        transition: filter 0.3s ease;
+  
+        &:hover {
+          filter: sepia(100%) hue-rotate(180deg) saturate(3) brightness(1.1);
+        }
+      }
+    }
+  
+    .character-content {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+      padding: 10px 15px 15px;
+      justify-content: center;
+      text-align: center;
+  
+      .character-name {
+        font-family: 'Orbitron', monospace;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--local-text-bright);
+        margin: 0 0 6px;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        line-height: 1.2;
+      }
+  
+      .character-class {
+        color: var(--local-accent);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 0;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        font-family: 'Rajdhani', sans-serif;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  .carousel-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    padding: 0 20px;
+  }
+  
+  .carousel-nav {
+    background: rgba(0, 255, 255, 0.1);
+    border: 2px solid var(--local-accent);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    color: var(--local-accent);
+    position: static;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  
+    &:hover:not(:disabled) {
+      background: rgba(0, 255, 255, 0.2);
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+    }
+  
+    &:active {
+      transform: scale(0.95);
+    }
+  
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .carousel-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .indicator {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+  
+    .indicator-dot {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+    }
+  
+    &:hover .indicator-dot {
+      background: rgba(0, 255, 255, 0.6);
+      transform: scale(1.2);
+    }
+  
+    &.active .indicator-dot {
+      background: var(--local-accent);
+      transform: scale(1.3);
+      
+      &::after {
+        border-color: var(--local-accent);
+        animation: indicatorPulse 2s ease-in-out infinite;
+      }
+    }
+  }
+  
+  .carousel-info {
+    margin-top: 40px;
+    padding: 0 20px;
+  }
+  
+  .info-stats {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .stat-item {
+    text-align: center;
+    
+    .stat-number {
+      display: block;
+      font-family: 'Orbitron', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--local-accent);
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      margin-bottom: 8px;
+      animation: numberGlow 2s ease-in-out infinite alternate;
+    }
+    
+    .stat-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.9rem;
+      color: var(--local-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+  }
+  
+  @keyframes indicatorPulse {
+    0% { 
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% { 
+      transform: scale(1.5);
+      opacity: 0.4;
+    }
+    100% { 
+      transform: scale(1);
+      opacity: 0.8;
+    }
+  }
+  
+  @keyframes numberGlow {
+    0% { 
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+    100% { 
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    }
+  }
+  
+  @keyframes cardGlow {
+    0% { 
+      box-shadow: var(--local-shadow), 0 0 30px rgba(0, 255, 255, 0.2); 
+    }
+    100% { 
+      box-shadow: var(--local-shadow), 0 0 50px rgba(0, 255, 255, 0.4); 
+    }
+  }
+  
+  .animating .carousel-slides {
+    pointer-events: none;
+  }
+  
+  @media (max-width: 1200px) {
+    .carousel-slide {
+      flex: 0 0 350px;
+      max-width: 350px;
+    }
+  }
+  
+  @media (max-width: 968px) {
+    .carousel-slide {
+      flex: 0 0 300px;
+      max-width: 300px;
+      
+      &.prev,
+      &.next {
+        display: none;
+      }
+    }
+    
+    .carousel-slides {
+      justify-content: center;
+    }
+    
+    .info-stats {
+      gap: 40px;
+    }
+    
+    .carousel-navigation {
+      gap: 15px;
+    }
+    
+    .carousel-nav {
+      width: 45px;
+      height: 45px;
+      
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .carousel-slide {
+      flex: 0 0 280px;
+      max-width: 280px;
+    }
+  
+    .carousel-character-card {
+      min-height: 380px;
+  
+      .character-image {
+        height: 320px;
+      }
+  
+      .character-content {
+        .character-name {
+          font-size: 16px;
+        }
+  
+        .character-class {
+          font-size: 11px;
+          letter-spacing: 1px;
+        }
+      }
+    }
+    
+    .carousel-navigation {
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .carousel-nav {
+      width: 40px;
+      height: 40px;
+      
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .carousel-slide {
+      flex: 0 0 260px;
+      max-width: 260px;
+    }
+    
+    .info-stats {
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .stat-item .stat-number {
+      font-size: 2rem;
+    }
+  
+    .carousel-character-card {
+      min-height: 360px;
+  
+      .character-image {
+        height: 280px;
+      }
+  
+      .character-content {
+        padding: 8px 12px 12px;
+  
+        .character-name {
+          font-size: 14px;
+          letter-spacing: 0.5px;
+        }
+  
+        .character-class {
+          font-size: 10px;
+        }
+      }
+    }
+    
+    .carousel-navigation {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .carousel-nav {
+      width: 35px;
+      height: 35px;
+      
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
