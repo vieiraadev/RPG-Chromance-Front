@@ -1,198 +1,268 @@
+<!-- src/app/features/game/pages/game.page.html - VERSÃO COMPLETA COM LLM -->
 <app-navbar></app-navbar>
 
 <div class="game-page game-container">
-
-    <div class="game-content">
-
-        <div class="story-panel">
-            <div class="story-header">
-                <i class="fas fa-terminal"></i>
-                <h3>Interface Neural</h3>
-                <button class="btn-clear-log" (click)="clearStoryLog()">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="story-content" #storyContent>
-                <div class="story-entry system-message">
-                    <span class="timestamp">[23:47:12]</span>
-                    <span class="message-type">[SISTEMA]</span>
-                    <span class="message">Interface neural ativada. Bem-vindo ao setor 7.</span>
-                </div>
-                <div class="story-entry narrator-message">
-                    <span class="timestamp">[23:47:15]</span>
-                    <span class="message-type">[NARRADOR]</span>
-                    <span class="message">Você se encontra em um beco escuro da cidade. O som de sirenes ecoa à distância enquanto as luzes de neon piscam nas paredes molhadas. Sua respiração está pesada após a fuga dos seguranças corporativos.</span>
-                </div>
-                <div class="story-entry player-message">
-                    <span class="timestamp">[23:47:45]</span>
-                    <span class="message-type">[VOCÊ]</span>
-                    <span class="message">Examino os arredores em busca de uma saída segura.</span>
-                </div>
-                <div class="story-entry narrator-message">
-                    <span class="timestamp">[23:47:48]</span>
-                    <span class="message-type">[NARRADOR]</span>
-                    <span class="message">Ao examinar o beco, você nota três possíveis rotas: uma escada de incêndio que leva aos telhados, uma tampa de esgoto levemente entreaberta, e uma porta lateral com uma fechadura eletrônica piscando em vermelho.</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="action-panel">
-            <div class="action-header">
-                <i class="fas fa-gamepad"></i>
-                <h3>Ações Disponíveis</h3>
-            </div>
-            
-            <div class="quick-actions">
-                <button class="action-btn" (click)="performAction('examine')">
-                    <i class="fas fa-search"></i>
-                    <span>Examinar</span>
-                </button>
-                <button class="action-btn" (click)="performAction('inventory')">
-                    <i class="fas fa-backpack"></i>
-                    <span>Inventário</span>
-                </button>
-                <button class="action-btn" (click)="performAction('stats')">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Status</span>
-                </button>
-                <button class="action-btn" (click)="performAction('help')">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Ajuda</span>
-                </button>
-            </div>
-
-            <div class="contextual-actions" *ngIf="availableActions.length > 0">
-                <h4>Ações Contextuais:</h4>
-                <div class="action-grid">
-                    <button 
-                        class="context-action-btn" 
-                        *ngFor="let action of availableActions"
-                        (click)="performContextAction(action)">
-                        <i [class]="action.icon"></i>
-                        <span>{{ action.name }}</span>
-                        <small>{{ action.description }}</small>
-                    </button>
-                </div>
-            </div>
-
-            <div class="command-input-section">
-                <div class="input-header">
-                    <i class="fas fa-terminal"></i>
-                    <span>Comando Personalizado:</span>
-                </div>
-                <div class="input-container">
-                    <input 
-                        type="text" 
-                        class="command-input"
-                        placeholder="Digite sua ação... (ex: 'usar chave na porta', 'atacar inimigo')"
-                        [(ngModel)]="customCommand"
-                        (keyup.enter)="executeCustomCommand()"
-                        #commandInput>
-                        <button class="btn-send" (click)="executeCustomCommand()">
-                            <i class='bx bx-send'></i>
-                          </button>
-                          
-                </div>
-                <div class="input-suggestions" *ngIf="commandSuggestions.length > 0">
-                    <span class="suggestion-label">Sugestões:</span>
-                    <div class="suggestions-list">
-                        <button 
-                            class="suggestion-btn"
-                            *ngFor="let suggestion of commandSuggestions"
-                            (click)="applySuggestion(suggestion)">
-                            {{ suggestion }}
-                        </button>
-                    </div>
-                </div>
-
-                <div class="character-button-section">
-                    <button class="btn-character" (click)="toggleCharacterPanel()">
-                        <i class="fas fa-user-astronaut"></i>
-                        <span>{{ isCharacterPanelCollapsed ? 'Ver Personagem' : 'Ocultar Personagem' }}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="character-panel" [class.collapsed]="isCharacterPanelCollapsed">
-        <div class="panel-header">
-            <h3>
-                <i class="fas fa-user-astronaut"></i>
-                Perfil Neural
-            </h3>
-            <button class="btn-toggle" (click)="toggleCharacterPanel()">
-                <i class='bx' [ngClass]="{
-                    'bx-x': !isCharacterPanelCollapsed,
-                    'bx-chevron-right': isCharacterPanelCollapsed
-                }"></i>
-              </button>
-              
-        </div>
+  <div class="game-content">
+    <!-- Story Panel -->
+    <div class="story-panel">
+      <div class="story-header">
+        <i class="fas fa-terminal"></i>
+        <h3>Interface Neural</h3>
         
-        <div class="panel-content" *ngIf="!isCharacterPanelCollapsed">
-
-            <div class="character-avatar">
-                <div class="avatar-container">
-                    <img src="assets/images/character-avatar.jpg" alt="Avatar" class="avatar-image">
-                    <div class="avatar-overlay">
-                        <i class="fas fa-camera" (click)="changeAvatar()"></i>
-                    </div>
-                </div>
-                <div class="character-name">{{ characterName }}</div>
-                <div class="character-level">Nível {{ characterLevel }}</div>
-            </div>
-
-            <div class="attributes-section">
-                <h4><i class="fas fa-cogs"></i> Atributos</h4>
-                <div class="attribute-item" *ngFor="let attr of characterAttributes">
-                    <span class="attr-name">{{ attr.name }}:</span>
-                    <div class="attr-bar">
-                        <div class="attr-fill" [style.width.%]="attr.value"></div>
-                    </div>
-                    <span class="attr-value">{{ attr.value }}</span>
-                </div>
-            </div>
-
-            <div class="equipment-section">
-                <h4><i class="fas fa-shield-alt"></i> Equipamentos</h4>
-                <div class="equipment-grid">
-                    <div class="equipment-slot" *ngFor="let slot of equipmentSlots">
-                        <div class="slot-icon">
-                            <i [class]="slot.icon"></i>
-                        </div>
-                        <div class="slot-info" *ngIf="slot.item; else emptySlot">
-                            <span class="item-name">{{ slot.item.name }}</span>
-                            <span class="item-quality" [class]="'quality-' + slot.item.quality">{{ slot.item.quality }}</span>
-                        </div>
-                        <ng-template #emptySlot>
-                            <span class="empty-slot">Vazio</span>
-                        </ng-template>
-                    </div>
-                </div>
-            </div>
-
-            <div class="quick-inventory">
-                <h4><i class="fas fa-backpack"></i> Inventário Rápido</h4>
-                <div class="inventory-grid">
-                    <div 
-                        class="inventory-item" 
-                        *ngFor="let item of quickInventory"
-                        (click)="useItem(item)"
-                        [title]="item.description">
-                        <i [class]="item.icon"></i>
-                        <span class="item-count" *ngIf="item.count > 1">{{ item.count }}</span>
-                    </div>
-                    <div class="inventory-item empty" *ngFor="let empty of emptySlots"></div>
-                </div>
-            </div>
+        <!-- Indicador do modo LLM -->
+        <div class="mode-indicator" [class.active]="isLLMMode">
+          <i class="fas fa-robot"></i>
+          <span>{{ isLLMMode ? 'IA ATIVA' : 'IA INATIVA' }}</span>
         </div>
+
+        <button class="btn-clear-log" (click)="clearStoryLog()">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+
+      <div class="story-content" #storyContent>
+        <!-- Renderiza o log de história -->
+        <div 
+          *ngFor="let entry of storyLog" 
+          class="story-entry"
+          [ngClass]="{
+            'system-message': entry.type === 'system',
+            'narrator-message': entry.type === 'narrator',
+            'player-message': entry.type === 'player',
+            'llm-message': entry.type === 'llm'
+          }">
+          
+          <span class="timestamp">[{{ entry.timestamp }}]</span>
+          
+          <span class="message-type">
+            <ng-container [ngSwitch]="entry.type">
+              <span *ngSwitchCase="'system'">[SISTEMA]</span>
+              <span *ngSwitchCase="'narrator'">[NARRADOR]</span>
+              <span *ngSwitchCase="'player'">[VOCÊ]</span>
+              <span *ngSwitchCase="'llm'">[🤖 MESTRE IA]</span>
+            </ng-container>
+          </span>
+          
+          <span class="message">{{ entry.message }}</span>
+        </div>
+
+        <!-- Indicador de loading da LLM -->
+        <div *ngIf="llmLoading" class="story-entry llm-loading">
+          <span class="timestamp">[{{ getCurrentTimestamp() }}]</span>
+          <span class="message-type">[MESTRE IA]</span>
+          <span class="message">
+            <div class="llm-typing-indicator">
+              <span>Processando</span>
+              <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </span>
+        </div>
+      </div>
     </div>
 
-    <div class="loading-overlay" *ngIf="isLoading">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>Processando ação...</p>
+    <!-- Action Panel -->
+    <div class="action-panel">
+      <div class="action-header">
+        <i class="fas fa-gamepad"></i>
+        <h3>{{ isLLMMode ? 'Modo Assistente IA' : 'Ações Disponíveis' }}</h3>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="action-btn" (click)="performAction('examine')">
+          <i class="fas fa-search"></i>
+          <span>Examinar</span>
+        </button>
+        <button class="action-btn" (click)="performAction('inventory')">
+          <i class="fas fa-backpack"></i>
+          <span>Inventário</span>
+        </button>
+        <button class="action-btn" (click)="performAction('stats')">
+          <i class="fas fa-chart-bar"></i>
+          <span>Status</span>
+        </button>
+        <button class="action-btn" (click)="performAction('help')">
+          <i class="fas fa-question-circle"></i>
+          <span>Ajuda</span>
+        </button>
+        
+        <!-- Botão para alternar modo LLM -->
+        <button 
+          class="action-btn llm-toggle" 
+          [class.active]="isLLMMode"
+          (click)="toggleLLMMode()">
+          <i class="fas fa-robot"></i>
+          <span>{{ isLLMMode ? 'Desativar IA' : 'Ativar IA' }}</span>
+        </button>
+      </div>
+
+      <!-- Contextual Actions (só no modo normal) -->
+      <div class="contextual-actions" *ngIf="availableActions.length > 0 && !isLLMMode">
+        <h4>Ações Contextuais:</h4>
+        <div class="action-grid">
+          <button
+            class="context-action-btn"
+            *ngFor="let action of availableActions"
+            (click)="performContextAction(action)">
+            <i [class]="action.icon"></i>
+            <span>{{ action.name }}</span>
+            <small>{{ action.description }}</small>
+          </button>
         </div>
+      </div>
+
+      <!-- Ações rápidas da LLM (só no modo LLM) -->
+      <div class="llm-quick-actions" *ngIf="isLLMMode">
+        <h4>Ações Rápidas da IA:</h4>
+        <div class="llm-action-grid">
+          <button
+            class="llm-action-btn"
+            *ngFor="let suggestion of llmSuggestions"
+            (click)="quickLLMAction(suggestion)"
+            [disabled]="llmLoading">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Command Input Section -->
+      <div class="command-input-section">
+        <div class="input-header">
+          <i [class]="isLLMMode ? 'fas fa-robot' : 'fas fa-terminal'"></i>
+          <span>{{ isLLMMode ? 'Fale com o Mestre IA:' : 'Comando Personalizado:' }}</span>
+        </div>
+
+        <div class="input-container">
+          <input
+            type="text"
+            class="command-input"
+            [class.llm-mode]="isLLMMode"
+            [placeholder]="isLLMMode ? 'Digite sua pergunta ou comando para a IA...' : 'Digite sua ação... (ex: usar chave na porta, atacar inimigo)'"
+            [(ngModel)]="customCommand"
+            (keyup.enter)="executeCustomCommand()"
+            [disabled]="llmLoading"
+            #commandInput>
+          
+          <button 
+            class="btn-send" 
+            [class.llm-mode]="isLLMMode"
+            [disabled]="llmLoading || !customCommand.trim()"
+            (click)="executeCustomCommand()">
+            <i class='bx bx-send' *ngIf="!llmLoading"></i>
+            <i class='bx bx-loader-alt bx-spin' *ngIf="llmLoading"></i>
+          </button>
+        </div>
+
+        <!-- Suggestions (só no modo normal) -->
+        <div class="input-suggestions" *ngIf="!isLLMMode && commandSuggestions.length > 0">
+          <span class="suggestion-label">Sugestões:</span>
+          <div class="suggestions-list">
+            <button
+              class="suggestion-btn"
+              *ngFor="let suggestion of commandSuggestions"
+              (click)="applySuggestion(suggestion)">
+              {{ suggestion }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Character Button Section -->
+        <div class="character-button-section">
+          <button class="btn-character" (click)="toggleCharacterPanel()">
+            <i class="fas fa-user-astronaut"></i>
+            <span>{{ isCharacterPanelCollapsed ? 'Ver Personagem' : 'Ocultar Personagem' }}</span>
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Character Panel (mantido igual) -->
+  <div class="character-panel" [class.collapsed]="isCharacterPanelCollapsed">
+    <div class="panel-header">
+      <h3>
+        <i class="fas fa-user-astronaut"></i>
+        Perfil Neural
+      </h3>
+      <button class="btn-toggle" (click)="toggleCharacterPanel()">
+        <i class='bx' [ngClass]="{
+          'bx-x': !isCharacterPanelCollapsed,
+          'bx-chevron-right': isCharacterPanelCollapsed
+        }"></i>
+      </button>
+    </div>
+
+    <div class="panel-content" *ngIf="!isCharacterPanelCollapsed">
+      <!-- Character Avatar -->
+      <div class="character-avatar">
+        <div class="avatar-container">
+          <img src="assets/images/character-avatar.jpg" alt="Avatar" class="avatar-image">
+          <div class="avatar-overlay">
+            <i class="fas fa-camera" (click)="changeAvatar()"></i>
+          </div>
+        </div>
+        <div class="character-name">{{ characterName }}</div>
+        <div class="character-level">Nível {{ characterLevel }}</div>
+      </div>
+
+      <!-- Attributes Section -->
+      <div class="attributes-section">
+        <h4><i class="fas fa-cogs"></i> Atributos</h4>
+        <div class="attribute-item" *ngFor="let attr of characterAttributes">
+          <span class="attr-name">{{ attr.name }}:</span>
+          <div class="attr-bar">
+            <div class="attr-fill" [style.width.%]="attr.value"></div>
+          </div>
+          <span class="attr-value">{{ attr.value }}</span>
+        </div>
+      </div>
+
+      <!-- Equipment Section -->
+      <div class="equipment-section">
+        <h4><i class="fas fa-shield-alt"></i> Equipamentos</h4>
+        <div class="equipment-grid">
+          <div class="equipment-slot" *ngFor="let slot of equipmentSlots">
+            <div class="slot-icon">
+              <i [class]="slot.icon"></i>
+            </div>
+            <div class="slot-info" *ngIf="slot.item; else emptySlot">
+              <span class="item-name">{{ slot.item.name }}</span>
+              <span class="item-quality" [class]="'quality-' + slot.item.quality">{{ slot.item.quality }}</span>
+            </div>
+            <ng-template #emptySlot>
+              <span class="empty-slot">Vazio</span>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Inventory -->
+      <div class="quick-inventory">
+        <h4><i class="fas fa-backpack"></i> Inventário Rápido</h4>
+        <div class="inventory-grid">
+          <div
+            class="inventory-item"
+            *ngFor="let item of quickInventory"
+            (click)="useItem(item)"
+            [title]="item.description">
+            <i [class]="item.icon"></i>
+            <span class="item-count" *ngIf="item.count > 1">{{ item.count }}</span>
+          </div>
+          <div class="inventory-item empty" *ngFor="let empty of emptySlots"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Processando ação...</p>
+    </div>
+  </div>
 </div>

@@ -1,4 +1,5 @@
 <app-navbar></app-navbar>
+
 <div class="profile-content">
   <div class="page-header">
     <div class="header-content">
@@ -7,7 +8,6 @@
     </div>
   </div>
 
-  <!-- Loading inicial -->
   <div class="loading-overlay" *ngIf="isLoadingProfile">
     <div class="loading-container">
       <div class="loading-spinner"></div>
@@ -15,10 +15,8 @@
     </div>
   </div>
 
-  <!-- Conteúdo principal -->
   <div class="profile-container" *ngIf="!isLoadingProfile">
     
-    <!-- Mensagens de erro e sucesso -->
     <div class="alert alert-error" *ngIf="errorMessage">
       <i class="bx bx-error-circle"></i>
       {{ errorMessage }}
@@ -167,7 +165,6 @@
     </div>
   </div>
 
-  <!-- Loading durante salvamento -->
   <div class="loading-overlay" *ngIf="isLoading">
     <div class="loading-container">
       <div class="loading-spinner"></div>

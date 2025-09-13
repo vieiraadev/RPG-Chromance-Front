@@ -1,11 +1,13 @@
+// src/app/features/game/pages/game.page.ts - CORREÇÃO DO ERRO
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
+import { LLMService, ChatMessage } from '../../../core/services/llm.service';
 
 interface StoryEntry {
   timestamp: string;
-  type: 'system' | 'narrator' | 'player';
+  type: 'system' | 'narrator' | 'player' | 'llm';
   message: string;
 }
 
@@ -49,10 +51,13 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
   @ViewChild('storyContent') storyContent!: ElementRef;
 
   isLoading = false;
-  isCharacterPanelCollapsed = true; 
+  isCharacterPanelCollapsed = true;
+  isLLMMode = false;
+  llmLoading = false;
 
   characterName = 'Neo-Runner';
   characterLevel = 15;
+  currentCharacterId: string | undefined;
 
   storyLog: StoryEntry[] = [
     {
@@ -64,16 +69,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
       timestamp: this.getCurrentTimestamp(),
       type: 'narrator',
       message: 'Você se encontra em um beco escuro da cidade. O som de sirenes ecoa à distância enquanto as luzes de neon piscam nas paredes molhadas. Sua respiração está pesada após a fuga dos seguranças corporativos.'
-    },
-    {
-      timestamp: this.getCurrentTimestamp(),
-      type: 'player',
-      message: 'Examino os arredores em busca de uma saída segura.'
-    },
-    {
-      timestamp: this.getCurrentTimestamp(),
-      type: 'narrator',
-      message: 'Ao examinar o beco, você nota três possíveis rotas: uma escada de incêndio que leva aos telhados, uma tampa de esgoto levemente entreaberta, e uma porta lateral com uma fechadura eletrônica piscando em vermelho.'
     }
   ];
 
@@ -105,6 +100,14 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     'usar equipamento',
     'esconder-se',
     'correr'
+  ];
+
+  llmSuggestions = [
+    'Continue a história',
+    'Descreva o ambiente',
+    'O que devo fazer agora?',
+    'Crie um novo desafio',
+    'Como meu personagem se sente?'
   ];
 
   characterAttributes: CharacterAttribute[] = [
@@ -174,14 +177,19 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     }
   ];
 
-  emptySlots = new Array(8); 
-
+  emptySlots = new Array(8);
   private shouldScrollToBottom = false;
 
-  constructor() { }
+  constructor(private llmService: LLMService) { }
 
   ngOnInit() {
     this.loadGameData();
+    this.currentCharacterId = 'char-' + Math.random().toString(36).substr(2, 9);
+    
+    // Subscreve ao loading da LLM
+    this.llmService.loading$.subscribe(loading => {
+      this.llmLoading = loading;
+    });
   }
 
   ngAfterViewChecked() {
@@ -193,13 +201,13 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
 
   private loadGameData() {
     this.isLoading = true;
-    
     setTimeout(() => {
       this.isLoading = false;
     }, 1500);
   }
 
-  private getCurrentTimestamp(): string {
+  // MUDANÇA: Tornar o método público para ser acessível no template
+  getCurrentTimestamp(): string {
     const now = new Date();
     return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
   }
@@ -211,7 +219,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  private addStoryEntry(type: 'system' | 'narrator' | 'player', message: string) {
+  private addStoryEntry(type: 'system' | 'narrator' | 'player' | 'llm', message: string) {
     this.storyLog.push({
       timestamp: this.getCurrentTimestamp(),
       type,
@@ -220,6 +228,90 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     this.shouldScrollToBottom = true;
   }
 
+  // MÉTODOS DA LLM
+  toggleLLMMode() {
+    this.isLLMMode = !this.isLLMMode;
+    
+    if (this.isLLMMode) {
+      this.addStoryEntry('system', '🤖 Modo Assistente IA ativado. Digite comandos para interagir com o Mestre Virtual.');
+      this.customCommand = '';
+    } else {
+      this.addStoryEntry('system', '🎮 Modo Jogo padrão ativado. Voltando ao sistema de ações contextuais.');
+    }
+  }
+
+  async sendLLMMessage() {
+    if (!this.customCommand.trim() || this.llmLoading) {
+      return;
+    }
+
+    const message = this.customCommand.trim();
+    this.customCommand = '';
+
+    // Adiciona mensagem do jogador
+    this.addStoryEntry('player', message);
+
+    try {
+      // Envia para a LLM
+      const response = await this.llmService.sendMessage(message, this.currentCharacterId);
+
+      if (response.success && response.response) {
+        // Adiciona resposta da LLM
+        this.addStoryEntry('llm', response.response);
+        
+        // Atualiza ações baseado na resposta
+        this.updateActionsBasedOnLLMResponse(response.response);
+      } else {
+        this.addStoryEntry('system', `❌ Erro: ${response.error || 'Falha na comunicação'}`);
+      }
+
+    } catch (error) {
+      console.error('Erro ao enviar mensagem para LLM:', error);
+      this.addStoryEntry('system', '❌ Erro de conexão com o Assistente IA.');
+    }
+  }
+
+  async quickLLMAction(action: string) {
+    this.customCommand = action;
+    await this.sendLLMMessage();
+  }
+
+  private updateActionsBasedOnLLMResponse(response: string) {
+    const newActions: ContextAction[] = [];
+    
+    if (response.includes('porta') || response.includes('entrada')) {
+      newActions.push({
+        id: 'approach_door',
+        name: 'Aproximar da Porta',
+        description: 'Investigar a entrada',
+        icon: 'bx bx-door-open'
+      });
+    }
+    
+    if (response.includes('inimigo') || response.includes('ameaça')) {
+      newActions.push({
+        id: 'prepare_combat',
+        name: 'Preparar Combate',
+        description: 'Posição defensiva',
+        icon: 'bx bx-shield'
+      });
+    }
+    
+    if (response.includes('item') || response.includes('objeto')) {
+      newActions.push({
+        id: 'examine_item',
+        name: 'Examinar Item',
+        description: 'Investigar objeto',
+        icon: 'bx bx-search'
+      });
+    }
+
+    if (newActions.length > 0) {
+      this.availableActions = [...this.availableActions, ...newActions];
+    }
+  }
+
+  // MÉTODOS EXISTENTES
   performAction(action: string) {
     this.addStoryEntry('player', `Ação: ${action}`);
     
@@ -241,7 +333,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
 
   performContextAction(action: ContextAction) {
     this.addStoryEntry('player', `${action.name}: ${action.description}`);
-    
     this.isLoading = true;
     
     setTimeout(() => {
@@ -249,57 +340,13 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
       
       switch (action.id) {
         case 'climb_stairs':
-          this.addStoryEntry('narrator', 'Você escala a escada de incêndio com agilidade. Do telhado, tem uma visão panorâmica da cidade cyberpunk. Luzes neon se estendem até o horizonte.');
-          this.availableActions = [
-            {
-              id: 'jump_building',
-              name: 'Pular Prédio',
-              description: 'Saltar para o prédio vizinho',
-              icon: 'bx bx-run'
-            },
-            {
-              id: 'use_zipline',
-              name: 'Usar Tirolesa',
-              description: 'Deslizar pelos cabos',
-              icon: 'bx bx-minus'
-            }
-          ];
+          this.addStoryEntry('narrator', 'Você escala a escada de incêndio com agilidade. Do telhado, tem uma visão panorâmica da cidade cyberpunk.');
           break;
-          
         case 'check_sewer':
-          this.addStoryEntry('narrator', 'Você levanta a tampa do esgoto. Um odor forte sobe, mas também ouve vozes distantes ecoando pelos túneis. Pode ser uma rota de fuga segura.');
-          this.availableActions = [
-            {
-              id: 'enter_sewer',
-              name: 'Entrar no Esgoto',
-              description: 'Descer pelos túneis',
-              icon: 'bx bx-down-arrow-alt'
-            },
-            {
-              id: 'listen_voices',
-              name: 'Escutar Vozes',
-              description: 'Tentar identificar quem está lá',
-              icon: 'bx bx-volume-full'
-            }
-          ];
+          this.addStoryEntry('narrator', 'Você levanta a tampa do esgoto. Um odor forte sobe, mas também ouve vozes distantes ecoando pelos túneis.');
           break;
-          
         case 'hack_door':
-          this.addStoryEntry('narrator', 'Você conecta seu dispositivo de hacking na fechadura. Após alguns segundos, a luz vermelha pisca e se torna verde. A porta se abre revelando um corredor mal iluminado.');
-          this.availableActions = [
-            {
-              id: 'enter_building',
-              name: 'Entrar no Prédio',
-              description: 'Atravessar a porta',
-              icon: 'bx bx-door-open'
-            },
-            {
-              id: 'scan_corridor',
-              name: 'Escanear Corredor',
-              description: 'Usar implantes para análise',
-              icon: 'bx bx-radar'
-            }
-          ];
+          this.addStoryEntry('narrator', 'Você conecta seu dispositivo de hacking na fechadura. A porta se abre revelando um corredor mal iluminado.');
           break;
       }
     }, 2000);
@@ -307,15 +354,18 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
 
   executeCustomCommand() {
     if (this.customCommand.trim()) {
-      this.addStoryEntry('player', this.customCommand);
-      
-      this.isLoading = true;
-      
-      setTimeout(() => {
-        this.isLoading = false;
-        this.addStoryEntry('narrator', `Processando: "${this.customCommand}". O sistema analisa sua ação e calcula os resultados...`);
-        this.customCommand = '';
-      }, 1500);
+      if (this.isLLMMode) {
+        this.sendLLMMessage();
+      } else {
+        this.addStoryEntry('player', this.customCommand);
+        this.isLoading = true;
+        
+        setTimeout(() => {
+          this.isLoading = false;
+          this.addStoryEntry('narrator', `Processando: "${this.customCommand}". O sistema analisa sua ação e calcula os resultados...`);
+          this.customCommand = '';
+        }, 1500);
+      }
     }
   }
 
@@ -332,6 +382,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
       }
     ];
     this.shouldScrollToBottom = true;
+    this.llmService.clearConversation();
   }
 
   toggleCharacterPanel() {
@@ -362,7 +413,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
         this.addStoryEntry('narrator', 'Você prepara o dispositivo de hacking, pronto para quebrar sistemas de segurança.');
         break;
       case 'ammo':
-        this.addStoryEntry('narrator', 'Você recarrega sua arma. Clique metálico ecoa enquindo a munição é inserida.');
+        this.addStoryEntry('narrator', 'Você recarrega sua arma. Clique metálico ecoa enquanto a munição é inserida.');
         break;
     }
   }
