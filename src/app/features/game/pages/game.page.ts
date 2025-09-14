@@ -1,4 +1,3 @@
-// src/app/features/game/pages/game.page.ts - CORREÇÃO DO ERRO
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -52,7 +51,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
 
   isLoading = false;
   isCharacterPanelCollapsed = true;
-  isLLMMode = false;
   llmLoading = false;
 
   characterName = 'Neo-Runner';
@@ -94,13 +92,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
   ];
 
   customCommand = '';
-  commandSuggestions = [
-    'examinar área',
-    'verificar inventário',
-    'usar equipamento',
-    'esconder-se',
-    'correr'
-  ];
 
   llmSuggestions = [
     'Continue a história',
@@ -186,10 +177,11 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     this.loadGameData();
     this.currentCharacterId = 'char-' + Math.random().toString(36).substr(2, 9);
     
-    // Subscreve ao loading da LLM
     this.llmService.loading$.subscribe(loading => {
       this.llmLoading = loading;
     });
+
+    this.addStoryEntry('system', ' Mestre IA ativo. Digite comandos para interagir com o universo Chromance.');
   }
 
   ngAfterViewChecked() {
@@ -206,7 +198,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     }, 1500);
   }
 
-  // MUDANÇA: Tornar o método público para ser acessível no template
   getCurrentTimestamp(): string {
     const now = new Date();
     return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
@@ -228,18 +219,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     this.shouldScrollToBottom = true;
   }
 
-  // MÉTODOS DA LLM
-  toggleLLMMode() {
-    this.isLLMMode = !this.isLLMMode;
-    
-    if (this.isLLMMode) {
-      this.addStoryEntry('system', '🤖 Modo Assistente IA ativado. Digite comandos para interagir com o Mestre Virtual.');
-      this.customCommand = '';
-    } else {
-      this.addStoryEntry('system', '🎮 Modo Jogo padrão ativado. Voltando ao sistema de ações contextuais.');
-    }
-  }
-
   async sendLLMMessage() {
     if (!this.customCommand.trim() || this.llmLoading) {
       return;
@@ -248,26 +227,22 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     const message = this.customCommand.trim();
     this.customCommand = '';
 
-    // Adiciona mensagem do jogador
     this.addStoryEntry('player', message);
 
     try {
-      // Envia para a LLM
       const response = await this.llmService.sendMessage(message, this.currentCharacterId);
 
       if (response.success && response.response) {
-        // Adiciona resposta da LLM
         this.addStoryEntry('llm', response.response);
         
-        // Atualiza ações baseado na resposta
         this.updateActionsBasedOnLLMResponse(response.response);
       } else {
-        this.addStoryEntry('system', `❌ Erro: ${response.error || 'Falha na comunicação'}`);
+        this.addStoryEntry('system', ` Erro: ${response.error || 'Falha na comunicação'}`);
       }
 
     } catch (error) {
       console.error('Erro ao enviar mensagem para LLM:', error);
-      this.addStoryEntry('system', '❌ Erro de conexão com o Assistente IA.');
+      this.addStoryEntry('system', 'Erro de conexão com o Mestre IA.');
     }
   }
 
@@ -311,7 +286,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  // MÉTODOS EXISTENTES
   performAction(action: string) {
     this.addStoryEntry('player', `Ação: ${action}`);
     
@@ -326,7 +300,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
         this.addStoryEntry('system', 'Analisando status do personagem... Dados biométricos atualizados.');
         break;
       case 'help':
-        this.addStoryEntry('system', 'Comandos disponíveis: examinar, usar [item], mover [direção], atacar [alvo], falar [personagem]');
+        this.addStoryEntry('system', 'Digite comandos para interagir com o Mestre IA ou use os botões de ação rápida.');
         break;
     }
   }
@@ -352,20 +326,10 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     }, 2000);
   }
 
+  // Agora sempre envia para LLM
   executeCustomCommand() {
     if (this.customCommand.trim()) {
-      if (this.isLLMMode) {
-        this.sendLLMMessage();
-      } else {
-        this.addStoryEntry('player', this.customCommand);
-        this.isLoading = true;
-        
-        setTimeout(() => {
-          this.isLoading = false;
-          this.addStoryEntry('narrator', `Processando: "${this.customCommand}". O sistema analisa sua ação e calcula os resultados...`);
-          this.customCommand = '';
-        }, 1500);
-      }
+      this.sendLLMMessage();
     }
   }
 
@@ -379,6 +343,11 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
         timestamp: this.getCurrentTimestamp(),
         type: 'system',
         message: 'Log de história limpo. Interface reinicializada.'
+      },
+      {
+        timestamp: this.getCurrentTimestamp(),
+        type: 'system',
+        message: 'Mestre IA ativo. Digite comandos para interagir.'
       }
     ];
     this.shouldScrollToBottom = true;

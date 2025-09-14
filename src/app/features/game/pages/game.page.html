@@ -1,18 +1,15 @@
-<!-- src/app/features/game/pages/game.page.html - VERSÃO COMPLETA COM LLM -->
 <app-navbar></app-navbar>
 
 <div class="game-page game-container">
   <div class="game-content">
-    <!-- Story Panel -->
     <div class="story-panel">
       <div class="story-header">
         <i class="fas fa-terminal"></i>
         <h3>Interface Neural</h3>
         
-        <!-- Indicador do modo LLM -->
-        <div class="mode-indicator" [class.active]="isLLMMode">
+        <div class="mode-indicator active">
           <i class="fas fa-robot"></i>
-          <span>{{ isLLMMode ? 'IA ATIVA' : 'IA INATIVA' }}</span>
+          <span>MESTRE IA</span>
         </div>
 
         <button class="btn-clear-log" (click)="clearStoryLog()">
@@ -21,7 +18,6 @@
       </div>
 
       <div class="story-content" #storyContent>
-        <!-- Renderiza o log de história -->
         <div 
           *ngFor="let entry of storyLog" 
           class="story-entry"
@@ -39,14 +35,13 @@
               <span *ngSwitchCase="'system'">[SISTEMA]</span>
               <span *ngSwitchCase="'narrator'">[NARRADOR]</span>
               <span *ngSwitchCase="'player'">[VOCÊ]</span>
-              <span *ngSwitchCase="'llm'">[🤖 MESTRE IA]</span>
+              <span *ngSwitchCase="'llm'">[ MESTRE IA]</span>
             </ng-container>
           </span>
           
           <span class="message">{{ entry.message }}</span>
         </div>
 
-        <!-- Indicador de loading da LLM -->
         <div *ngIf="llmLoading" class="story-entry llm-loading">
           <span class="timestamp">[{{ getCurrentTimestamp() }}]</span>
           <span class="message-type">[MESTRE IA]</span>
@@ -64,14 +59,12 @@
       </div>
     </div>
 
-    <!-- Action Panel -->
     <div class="action-panel">
       <div class="action-header">
-        <i class="fas fa-gamepad"></i>
-        <h3>{{ isLLMMode ? 'Modo Assistente IA' : 'Ações Disponíveis' }}</h3>
+        <i class="fas fa-robot"></i>
+        <h3>Assistente IA Chromance</h3>
       </div>
 
-      <!-- Quick Actions -->
       <div class="quick-actions">
         <button class="action-btn" (click)="performAction('examine')">
           <i class="fas fa-search"></i>
@@ -89,19 +82,9 @@
           <i class="fas fa-question-circle"></i>
           <span>Ajuda</span>
         </button>
-        
-        <!-- Botão para alternar modo LLM -->
-        <button 
-          class="action-btn llm-toggle" 
-          [class.active]="isLLMMode"
-          (click)="toggleLLMMode()">
-          <i class="fas fa-robot"></i>
-          <span>{{ isLLMMode ? 'Desativar IA' : 'Ativar IA' }}</span>
-        </button>
       </div>
 
-      <!-- Contextual Actions (só no modo normal) -->
-      <div class="contextual-actions" *ngIf="availableActions.length > 0 && !isLLMMode">
+      <div class="contextual-actions" *ngIf="availableActions.length > 0">
         <h4>Ações Contextuais:</h4>
         <div class="action-grid">
           <button
@@ -115,8 +98,7 @@
         </div>
       </div>
 
-      <!-- Ações rápidas da LLM (só no modo LLM) -->
-      <div class="llm-quick-actions" *ngIf="isLLMMode">
+      <div class="llm-quick-actions">
         <h4>Ações Rápidas da IA:</h4>
         <div class="llm-action-grid">
           <button
@@ -129,27 +111,24 @@
         </div>
       </div>
 
-      <!-- Command Input Section -->
       <div class="command-input-section">
         <div class="input-header">
-          <i [class]="isLLMMode ? 'fas fa-robot' : 'fas fa-terminal'"></i>
-          <span>{{ isLLMMode ? 'Fale com o Mestre IA:' : 'Comando Personalizado:' }}</span>
+          <i class="fas fa-robot"></i>
+          <span>Fale com o Mestre IA:</span>
         </div>
 
         <div class="input-container">
           <input
             type="text"
-            class="command-input"
-            [class.llm-mode]="isLLMMode"
-            [placeholder]="isLLMMode ? 'Digite sua pergunta ou comando para a IA...' : 'Digite sua ação... (ex: usar chave na porta, atacar inimigo)'"
+            class="command-input llm-mode"
+            placeholder="Digite sua pergunta ou comando para a IA..."
             [(ngModel)]="customCommand"
             (keyup.enter)="executeCustomCommand()"
             [disabled]="llmLoading"
             #commandInput>
           
           <button 
-            class="btn-send" 
-            [class.llm-mode]="isLLMMode"
+            class="btn-send llm-mode"
             [disabled]="llmLoading || !customCommand.trim()"
             (click)="executeCustomCommand()">
             <i class='bx bx-send' *ngIf="!llmLoading"></i>
@@ -157,20 +136,6 @@
           </button>
         </div>
 
-        <!-- Suggestions (só no modo normal) -->
-        <div class="input-suggestions" *ngIf="!isLLMMode && commandSuggestions.length > 0">
-          <span class="suggestion-label">Sugestões:</span>
-          <div class="suggestions-list">
-            <button
-              class="suggestion-btn"
-              *ngFor="let suggestion of commandSuggestions"
-              (click)="applySuggestion(suggestion)">
-              {{ suggestion }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Character Button Section -->
         <div class="character-button-section">
           <button class="btn-character" (click)="toggleCharacterPanel()">
             <i class="fas fa-user-astronaut"></i>
@@ -181,7 +146,6 @@
     </div>
   </div>
 
-  <!-- Character Panel (mantido igual) -->
   <div class="character-panel" [class.collapsed]="isCharacterPanelCollapsed">
     <div class="panel-header">
       <h3>
@@ -197,7 +161,6 @@
     </div>
 
     <div class="panel-content" *ngIf="!isCharacterPanelCollapsed">
-      <!-- Character Avatar -->
       <div class="character-avatar">
         <div class="avatar-container">
           <img src="assets/images/character-avatar.jpg" alt="Avatar" class="avatar-image">
@@ -209,7 +172,6 @@
         <div class="character-level">Nível {{ characterLevel }}</div>
       </div>
 
-      <!-- Attributes Section -->
       <div class="attributes-section">
         <h4><i class="fas fa-cogs"></i> Atributos</h4>
         <div class="attribute-item" *ngFor="let attr of characterAttributes">
@@ -221,7 +183,6 @@
         </div>
       </div>
 
-      <!-- Equipment Section -->
       <div class="equipment-section">
         <h4><i class="fas fa-shield-alt"></i> Equipamentos</h4>
         <div class="equipment-grid">
@@ -240,7 +201,6 @@
         </div>
       </div>
 
-      <!-- Quick Inventory -->
       <div class="quick-inventory">
         <h4><i class="fas fa-backpack"></i> Inventário Rápido</h4>
         <div class="inventory-grid">
@@ -258,7 +218,6 @@
     </div>
   </div>
 
-  <!-- Loading Overlay -->
   <div class="loading-overlay" *ngIf="isLoading">
     <div class="loading-content">
       <div class="loading-spinner"></div>

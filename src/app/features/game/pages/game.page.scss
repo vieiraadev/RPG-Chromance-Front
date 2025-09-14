@@ -1,4 +1,3 @@
-// game.page.scss - ARQUIVO COMPLETO COM PADRÃO AZUL
 .game-page {
   --bg: #0a0a0a;
   --card-bg: rgba(10, 10, 20, 0.9);
@@ -28,22 +27,18 @@
   --primary-blue-border: rgba(0, 128, 255, 0.3);
   --primary-blue-glow: rgba(0, 128, 255, 0.2);
   
-  // Novas variáveis para LLM (mantendo magenta para diferenciação)
+  // Variáveis para LLM
   --llm-accent: #ff00ff;
   --llm-bg: rgba(255, 0, 255, 0.1);
   --llm-border: rgba(255, 0, 255, 0.3);
 }
 
 /* REGRAS ESPECÍFICAS PARA FORÇAR AZUL NOS ELEMENTOS DA LLM */
-/* Aplicar depois de todas as outras regras para garantir precedência */
-
-/* Título das Ações Rápidas da IA */
 .llm-quick-actions h4,
 .action-panel .llm-quick-actions h4 {
   color: #0080ff !important;
 }
 
-/* Botões das Ações Rápidas da IA */
 .llm-action-btn,
 .llm-quick-actions .llm-action-btn,
 .action-panel .llm-quick-actions .llm-action-btn,
@@ -61,13 +56,11 @@
   box-shadow: 0 3px 10px rgba(0, 128, 255, 0.2) !important;
 }
 
-/* Ícone do robô */
 .fa-robot,
 i.fa-robot {
   color: #0080ff !important;
 }
 
-/* Campo de input da IA */
 .command-input.llm-mode,
 input.llm-mode {
   border-color: rgba(0, 128, 255, 0.3) !important;
@@ -80,7 +73,6 @@ input.llm-mode:focus {
   box-shadow: 0 0 15px rgba(0, 128, 255, 0.2) !important;
 }
 
-/* Botão de envio da IA */
 .btn-send.llm-mode,
 button.llm-mode {
   background: rgba(0, 128, 255, 0.1) !important;
@@ -94,7 +86,6 @@ button.llm-mode:hover:not(:disabled) {
   box-shadow: 0 5px 15px rgba(0, 128, 255, 0.2) !important;
 }
 
-/* Mensagens da LLM */
 .story-entry.llm-message {
   border-left-color: #0080ff !important;
   background: rgba(0, 128, 255, 0.03) !important;
@@ -102,17 +93,12 @@ button.llm-mode:hover:not(:disabled) {
 
 .story-entry.llm-message .message-type {
   color: #0080ff !important;
-  background: rgba(0, 128, 255, 0.1) !important;
-  border-color: #0080ff !important;
 }
 
 .story-entry.llm-message .message {
   color: #0080ff !important;
-  background: rgba(0, 128, 255, 0.05) !important;
-  border-left-color: #0080ff !important;
 }
 
-/* Loading da LLM */
 .llm-typing-indicator {
   color: #0080ff !important;
 }
@@ -182,7 +168,6 @@ body:has(.sidebar:hover) .game-page.game-container {
       letter-spacing: 1px;
     }
 
-    // Indicador do modo LLM
     .mode-indicator {
       display: flex;
       align-items: center;
@@ -293,31 +278,19 @@ body:has(.sidebar:hover) .game-page.game-container {
         }
       }
 
-      // Novo estilo para mensagens da LLM
       &.llm-message {
         border-left: 3px solid var(--llm-accent);
         background: rgba(255, 0, 255, 0.05);
         
         .message-type {
           color: var(--llm-accent);
-          background: rgba(255, 0, 255, 0.1);
-          border: 1px solid var(--llm-accent);
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-size: 10px;
         }
 
         .message {
           color: var(--llm-accent);
-          background: rgba(255, 0, 255, 0.05);
-          padding: 8px;
-          border-left: 3px solid var(--llm-accent);
-          margin-left: 8px;
-          border-radius: 0 4px 4px 0;
         }
       }
 
-      // Loading da LLM
       &.llm-loading {
         .llm-typing-indicator {
           display: flex;
@@ -433,36 +406,6 @@ body:has(.sidebar:hover) .game-page.game-container {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px var(--primary-blue-glow);
       }
-
-      // Botão toggle LLM
-      &.llm-toggle {
-        background: rgba(255, 0, 255, 0.05);
-        border: 1px solid var(--llm-border);
-        color: var(--llm-accent);
-        transition: all 0.3s ease;
-
-        i {
-          color: var(--llm-accent);
-        }
-
-        &:hover {
-          background: rgba(255, 0, 255, 0.1);
-          border-color: var(--llm-accent);
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(255, 0, 255, 0.2);
-        }
-
-        &.active {
-          background: rgba(0, 255, 0, 0.1);
-          border-color: #00ff40;
-          color: #00ff40;
-          box-shadow: 0 0 15px rgba(0, 255, 64, 0.3);
-
-          i {
-            color: #00ff40;
-          }
-        }
-      }
     }
   }
 
@@ -521,7 +464,6 @@ body:has(.sidebar:hover) .game-page.game-container {
     }
   }
 
-  // Ações rápidas da LLM
   .llm-quick-actions {
     margin: 16px 0;
 
@@ -583,7 +525,6 @@ body:has(.sidebar:hover) .game-page.game-container {
           color: var(--llm-accent);
         }
 
-        // Quando LLM está ativa
         &.fa-robot.llm-active {
           color: var(--primary-blue);
         }
@@ -596,7 +537,6 @@ body:has(.sidebar:hover) .game-page.game-container {
         font-weight: 500;
         transition: all 0.3s ease;
 
-        // Quando LLM está ativa
         &.llm-active {
           color: var(--primary-blue);
         }
@@ -629,7 +569,6 @@ body:has(.sidebar:hover) .game-page.game-container {
           background: rgba(0, 128, 255, 0.05);
         }
 
-        // Input no modo LLM
         &.llm-mode {
           border-color: var(--llm-border);
           background: rgba(255, 0, 255, 0.05);
@@ -640,7 +579,7 @@ body:has(.sidebar:hover) .game-page.game-container {
           }
 
           &::placeholder {
-            color: rgba(255, 0, 255, 0.6);
+            color: #0080ff;
           }
         }
       }
@@ -669,7 +608,6 @@ body:has(.sidebar:hover) .game-page.game-container {
           cursor: not-allowed;
         }
 
-        // Botão no modo LLM - agora em azul
         &.llm-mode {
           background: var(--primary-blue-bg);
           border-color: var(--primary-blue);
@@ -681,46 +619,8 @@ body:has(.sidebar:hover) .game-page.game-container {
           }
         }
 
-        // Animação de loading
         .bx-loader-alt.bx-spin {
           animation: spin 1s linear infinite;
-        }
-      }
-    }
-
-    .input-suggestions {
-      margin-top: 10px;
-
-      .suggestion-label {
-        color: var(--text);
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 0.85rem;
-        font-weight: 500;
-      }
-
-      .suggestions-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-top: 5px;
-
-        .suggestion-btn {
-          background: var(--primary-blue-bg);
-          border: 1px solid var(--primary-blue-border);
-          border-radius: 15px;
-          padding: 5px 10px;
-          color: var(--text);
-          font-family: 'Rajdhani', sans-serif;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:hover {
-            background: rgba(0, 128, 255, 0.15);
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-            transform: translateY(-1px);
-          }
         }
       }
     }
@@ -1246,7 +1146,6 @@ body:has(.sidebar:hover) .game-page.game-container {
       grid-template-columns: 1fr;
     }
 
-    // Responsivo para ações da LLM
     .llm-quick-actions {
       .llm-action-grid {
         grid-template-columns: 1fr;
@@ -1275,7 +1174,7 @@ body:has(.sidebar:hover) .game-page.game-container {
     .story-header {
       .mode-indicator {
         span {
-          display: none; // Esconde texto no mobile, só mostra ícone
+          display: none;
         }
       }
     }
@@ -1292,7 +1191,6 @@ body:has(.sidebar:hover) .game-page.game-container {
     padding: 15px;
   }
 
-  // Ajustes específicos da LLM para mobile
   .llm-quick-actions {
     h4 {
       font-size: 13px;
