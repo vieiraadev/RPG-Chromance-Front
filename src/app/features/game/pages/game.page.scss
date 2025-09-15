@@ -1,23 +1,110 @@
 .game-page {
   --bg: #0a0a0a;
   --card-bg: rgba(10, 10, 20, 0.9);
-  --card-border: rgba(0, 255, 255, 0.3);
+  --card-border: rgba(0, 120, 255, 0.3);
   --muted: #64748b;
   --text: #e2e8f0;
   --text-bright: #f1f5f9;
   --border: rgba(255, 255, 255, 0.1);
   --border-hover: rgba(0, 150, 255, 0.5);
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-  --shadow-glow: 0 0 30px rgba(0, 255, 255, 0.2);
+  --shadow-glow: 0 0 30px rgba(0, 120, 255, 0.2);
   --brand: linear-gradient(45deg, #0080ff, #00a0ff);
   --brand-hover: linear-gradient(45deg, #00a0ff, #0080ff);
   --brand-contrast: #fff;
-  --accent: #00ffff;
+  --accent: #0080ff;
   --accent-blue: #0080ff;
   --input-bg: rgba(15, 15, 30, 0.8);
-  --danger: #ff0066;
-  --success: #00ff88;
-  --warning: #ffaa00;
+  --danger: #ff4757;
+  --success: #2ed573;
+  --warning: #ffa502;
+  
+  // Variáveis padronizadas com azul
+  --primary-blue: #0080ff;
+  --primary-blue-light: #3399ff;
+  --primary-blue-dark: #0066cc;
+  --primary-blue-bg: rgba(0, 128, 255, 0.1);
+  --primary-blue-border: rgba(0, 128, 255, 0.3);
+  --primary-blue-glow: rgba(0, 128, 255, 0.2);
+  
+  // Variáveis para LLM
+  --llm-accent: #ff00ff;
+  --llm-bg: rgba(255, 0, 255, 0.1);
+  --llm-border: rgba(255, 0, 255, 0.3);
+}
+
+/* REGRAS ESPECÍFICAS PARA FORÇAR AZUL NOS ELEMENTOS DA LLM */
+.llm-quick-actions h4,
+.action-panel .llm-quick-actions h4 {
+  color: #0080ff !important;
+}
+
+.llm-action-btn,
+.llm-quick-actions .llm-action-btn,
+.action-panel .llm-quick-actions .llm-action-btn,
+.game-container .action-panel .llm-quick-actions .llm-action-btn {
+  background: rgba(0, 128, 255, 0.1) !important;
+  border-color: rgba(0, 128, 255, 0.3) !important;
+  color: #0080ff !important;
+}
+
+.llm-action-btn:hover:not(:disabled),
+.llm-quick-actions .llm-action-btn:hover:not(:disabled),
+.action-panel .llm-quick-actions .llm-action-btn:hover:not(:disabled) {
+  background: rgba(0, 128, 255, 0.15) !important;
+  border-color: #0080ff !important;
+  box-shadow: 0 3px 10px rgba(0, 128, 255, 0.2) !important;
+}
+
+.fa-robot,
+i.fa-robot {
+  color: #0080ff !important;
+}
+
+.command-input.llm-mode,
+input.llm-mode {
+  border-color: rgba(0, 128, 255, 0.3) !important;
+  background: rgba(0, 128, 255, 0.05) !important;
+}
+
+.command-input.llm-mode:focus,
+input.llm-mode:focus {
+  border-color: #0080ff !important;
+  box-shadow: 0 0 15px rgba(0, 128, 255, 0.2) !important;
+}
+
+.btn-send.llm-mode,
+button.llm-mode {
+  background: rgba(0, 128, 255, 0.1) !important;
+  border-color: #0080ff !important;
+  color: #0080ff !important;
+}
+
+.btn-send.llm-mode:hover:not(:disabled),
+button.llm-mode:hover:not(:disabled) {
+  background: rgba(0, 128, 255, 0.15) !important;
+  box-shadow: 0 5px 15px rgba(0, 128, 255, 0.2) !important;
+}
+
+.story-entry.llm-message {
+  border-left-color: #0080ff !important;
+  background: rgba(0, 128, 255, 0.03) !important;
+}
+
+.story-entry.llm-message .message-type {
+  color: #0080ff !important;
+}
+
+.story-entry.llm-message .message {
+  color: #0080ff !important;
+}
+
+.llm-typing-indicator {
+  color: #0080ff !important;
+}
+
+.llm-typing-indicator .dots span {
+  background: #0080ff !important;
 }
 
 .game-page.game-container {
@@ -50,10 +137,10 @@ body:has(.sidebar:hover) .game-page.game-container {
 .story-panel {
   flex: 2;
   background: var(--card-bg);
-  border: 2px solid var(--card-border);
+  border: 2px solid var(--primary-blue-border);
   border-radius: 15px;
   backdrop-filter: blur(20px);
-  box-shadow: var(--shadow), var(--shadow-glow);
+  box-shadow: var(--shadow), 0 0 30px var(--primary-blue-glow);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -63,11 +150,11 @@ body:has(.sidebar:hover) .game-page.game-container {
     align-items: center;
     gap: 10px;
     padding: 15px 20px;
-    background: rgba(0, 255, 255, 0.05);
-    border-bottom: 1px solid var(--border);
+    background: var(--primary-blue-bg);
+    border-bottom: 1px solid var(--primary-blue-border);
 
     i {
-      color: var(--accent);
+      color: var(--primary-blue);
       font-size: 1.2rem;
     }
 
@@ -79,6 +166,32 @@ body:has(.sidebar:hover) .game-page.game-container {
       flex: 1;
       text-transform: uppercase;
       letter-spacing: 1px;
+    }
+
+    .mode-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #ff0040;
+      color: #ff0040;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+
+      &.active {
+        background: rgba(0, 255, 0, 0.2);
+        border-color: #00ff40;
+        color: #00ff40;
+        box-shadow: 0 0 10px rgba(0, 255, 64, 0.2);
+      }
+
+      i {
+        font-size: 12px;
+      }
     }
 
     .btn-clear-log {
@@ -93,7 +206,7 @@ body:has(.sidebar:hover) .game-page.game-container {
       &:hover {
         border-color: var(--danger);
         color: var(--danger);
-        background: rgba(255, 0, 102, 0.1);
+        background: rgba(255, 71, 87, 0.1);
       }
     }
   }
@@ -140,7 +253,7 @@ body:has(.sidebar:hover) .game-page.game-container {
 
       &.system-message {
         border-left: 3px solid var(--warning);
-        background: rgba(255, 170, 0, 0.03);
+        background: rgba(255, 165, 2, 0.03);
         
         .message-type {
           color: var(--warning);
@@ -148,33 +261,87 @@ body:has(.sidebar:hover) .game-page.game-container {
       }
 
       &.narrator-message {
-        border-left: 3px solid var(--accent);
-        background: rgba(0, 255, 255, 0.03);
+        border-left: 3px solid var(--primary-blue);
+        background: var(--primary-blue-bg);
         
         .message-type {
-          color: var(--accent);
+          color: var(--primary-blue);
         }
       }
 
       &.player-message {
         border-left: 3px solid var(--success);
-        background: rgba(0, 255, 136, 0.03);
+        background: rgba(46, 213, 115, 0.03);
         
         .message-type {
           color: var(--success);
+        }
+      }
+
+      &.llm-message {
+        border-left: 3px solid var(--llm-accent);
+        background: rgba(255, 0, 255, 0.05);
+        
+        .message-type {
+          color: var(--llm-accent);
+        }
+
+        .message {
+          color: var(--llm-accent);
+        }
+      }
+
+      &.llm-loading {
+        .llm-typing-indicator {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--llm-accent);
+
+          .dots {
+            display: flex;
+            gap: 4px;
+
+            span {
+              width: 6px;
+              height: 6px;
+              background: var(--llm-accent);
+              border-radius: 50%;
+              animation: llm-pulse 1.4s infinite;
+
+              &:nth-child(2) {
+                animation-delay: 0.2s;
+              }
+
+              &:nth-child(3) {
+                animation-delay: 0.4s;
+              }
+            }
+          }
         }
       }
     }
   }
 }
 
+@keyframes llm-pulse {
+  0%, 60%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  30% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
 .action-panel {
   flex: 1;
   background: var(--card-bg);
-  border: 2px solid var(--card-border);
+  border: 2px solid var(--primary-blue-border);
   border-radius: 15px;
   backdrop-filter: blur(20px);
-  box-shadow: var(--shadow), var(--shadow-glow);
+  box-shadow: var(--shadow), 0 0 30px var(--primary-blue-glow);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -187,10 +354,10 @@ body:has(.sidebar:hover) .game-page.game-container {
     align-items: center;
     gap: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--primary-blue-border);
 
     i {
-      color: var(--accent);
+      color: var(--primary-blue);
       font-size: 1.2rem;
     }
 
@@ -210,8 +377,8 @@ body:has(.sidebar:hover) .game-page.game-container {
     gap: 10px;
 
     .action-btn {
-      background: rgba(0, 255, 255, 0.05);
-      border: 1px solid var(--border);
+      background: var(--primary-blue-bg);
+      border: 1px solid var(--primary-blue-border);
       border-radius: 8px;
       padding: 12px;
       color: var(--text);
@@ -224,7 +391,7 @@ body:has(.sidebar:hover) .game-page.game-container {
       gap: 5px;
 
       i {
-        color: var(--accent);
+        color: var(--primary-blue);
         font-size: 1.5rem;
       }
 
@@ -234,10 +401,10 @@ body:has(.sidebar:hover) .game-page.game-container {
       }
 
       &:hover {
-        background: rgba(0, 255, 255, 0.1);
-        border-color: var(--accent);
+        background: rgba(0, 128, 255, 0.15);
+        border-color: var(--primary-blue);
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        box-shadow: 0 5px 15px var(--primary-blue-glow);
       }
     }
   }
@@ -257,8 +424,8 @@ body:has(.sidebar:hover) .game-page.game-container {
       gap: 8px;
 
       .context-action-btn {
-        background: rgba(0, 128, 255, 0.05);
-        border: 1px solid var(--accent-blue);
+        background: var(--primary-blue-bg);
+        border: 1px solid var(--primary-blue-border);
         border-radius: 8px;
         padding: 12px;
         color: var(--text);
@@ -271,7 +438,7 @@ body:has(.sidebar:hover) .game-page.game-container {
         gap: 10px;
 
         i {
-          color: var(--accent-blue);
+          color: var(--primary-blue);
           font-size: 1.2rem;
           min-width: 20px;
         }
@@ -288,9 +455,55 @@ body:has(.sidebar:hover) .game-page.game-container {
         }
 
         &:hover {
-          background: rgba(0, 128, 255, 0.1);
-          border-color: var(--accent-blue);
+          background: rgba(0, 128, 255, 0.15);
+          border-color: var(--primary-blue);
           transform: translateX(5px);
+          box-shadow: 0 3px 10px var(--primary-blue-glow);
+        }
+      }
+    }
+  }
+
+  .llm-quick-actions {
+    margin: 16px 0;
+
+    h4 {
+      color: var(--llm-accent);
+      margin-bottom: 12px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Rajdhani', sans-serif;
+      text-transform: uppercase;
+    }
+
+    .llm-action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+
+      .llm-action-btn {
+        background: var(--llm-bg);
+        border: 1px solid var(--llm-border);
+        color: var(--llm-accent);
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: 'Rajdhani', sans-serif;
+        transition: all 0.3s ease;
+
+        &:hover:not(:disabled) {
+          background: rgba(255, 0, 255, 0.15);
+          border-color: var(--llm-accent);
+          transform: translateY(-1px);
+          box-shadow: 0 3px 10px rgba(255, 0, 255, 0.2);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       }
     }
@@ -304,8 +517,17 @@ body:has(.sidebar:hover) .game-page.game-container {
       margin-bottom: 10px;
 
       i {
-        color: var(--accent);
+        color: var(--primary-blue);
         font-size: 1rem;
+        transition: all 0.3s ease;
+
+        &.fa-robot {
+          color: var(--llm-accent);
+        }
+
+        &.fa-robot.llm-active {
+          color: var(--primary-blue);
+        }
       }
 
       span {
@@ -313,6 +535,11 @@ body:has(.sidebar:hover) .game-page.game-container {
         font-family: 'Rajdhani', sans-serif;
         font-size: 0.9rem;
         font-weight: 500;
+        transition: all 0.3s ease;
+
+        &.llm-active {
+          color: var(--primary-blue);
+        }
       }
     }
 
@@ -323,7 +550,7 @@ body:has(.sidebar:hover) .game-page.game-container {
       .command-input {
         flex: 1;
         background: var(--input-bg);
-        border: 1px solid var(--border);
+        border: 1px solid var(--primary-blue-border);
         border-radius: 8px;
         padding: 12px 15px;
         color: var(--text-bright);
@@ -337,14 +564,29 @@ body:has(.sidebar:hover) .game-page.game-container {
 
         &:focus {
           outline: none;
-          border-color: var(--accent);
-          box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+          border-color: var(--primary-blue);
+          box-shadow: 0 0 15px var(--primary-blue-glow);
+          background: rgba(0, 128, 255, 0.05);
+        }
+
+        &.llm-mode {
+          border-color: var(--llm-border);
+          background: rgba(255, 0, 255, 0.05);
+          
+          &:focus {
+            border-color: var(--llm-accent);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+          }
+
+          &::placeholder {
+            color: #0080ff;
+          }
         }
       }
 
       .btn-send {
         background: var(--brand);
-        border: 1px solid var(--accent);
+        border: 1px solid var(--primary-blue);
         border-radius: 8px;
         padding: 12px 15px;
         color: var(--brand-contrast);
@@ -355,49 +597,42 @@ body:has(.sidebar:hover) .game-page.game-container {
           font-size: 1rem;
         }
 
-        &:hover {
+        &:hover:not(:disabled) {
           background: var(--brand-hover);
           transform: scale(1.05);
-          box-shadow: 0 5px 15px rgba(0, 128, 255, 0.3);
+          box-shadow: 0 5px 15px var(--primary-blue-glow);
         }
-      }
-    }
 
-    .input-suggestions {
-      margin-top: 10px;
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
 
-      .suggestion-label {
-        color: var(--text);
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 0.85rem;
-        font-weight: 500;
-      }
+        &.llm-mode {
+          background: var(--primary-blue-bg);
+          border-color: var(--primary-blue);
+          color: var(--primary-blue);
 
-      .suggestions-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-top: 5px;
-
-        .suggestion-btn {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid var(--border);
-          border-radius: 15px;
-          padding: 5px 10px;
-          color: var(--text);
-          font-family: 'Rajdhani', sans-serif;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: var(--accent);
-            color: var(--accent);
+          &:hover:not(:disabled) {
+            background: rgba(0, 128, 255, 0.15);
+            box-shadow: 0 5px 15px var(--primary-blue-glow);
           }
         }
+
+        .bx-loader-alt.bx-spin {
+          animation: spin 1s linear infinite;
+        }
       }
     }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -409,8 +644,8 @@ body:has(.sidebar:hover) .game-page.game-container {
   .btn-character {
     width: 100%;
     padding: 12px 20px;
-    background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
-    border: 2px solid var(--accent);
+    background: linear-gradient(45deg, var(--primary-blue-bg), rgba(0, 160, 255, 0.1));
+    border: 2px solid var(--primary-blue);
     border-radius: 10px;
     color: var(--text-bright);
     font-family: 'Rajdhani', sans-serif;
@@ -426,20 +661,20 @@ body:has(.sidebar:hover) .game-page.game-container {
     letter-spacing: 1px;
 
     i {
-      color: var(--accent);
+      color: var(--primary-blue);
       font-size: 1.2rem;
-      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      text-shadow: 0 0 10px var(--primary-blue-glow);
     }
 
     &:hover {
-      background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 128, 255, 0.2));
-      border-color: var(--accent);
+      background: linear-gradient(45deg, rgba(0, 128, 255, 0.2), rgba(0, 160, 255, 0.2));
+      border-color: var(--primary-blue-light);
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+      box-shadow: 0 8px 25px var(--primary-blue-glow);
       
       i {
         transform: scale(1.1);
-        text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        text-shadow: 0 0 15px rgba(0, 128, 255, 0.7);
       }
     }
 
@@ -456,9 +691,9 @@ body:has(.sidebar:hover) .game-page.game-container {
   width: 350px;
   height: 100vh;
   background: var(--card-bg);
-  border-left: 2px solid var(--card-border);
+  border-left: 2px solid var(--primary-blue-border);
   backdrop-filter: blur(20px);
-  box-shadow: var(--shadow), var(--shadow-glow);
+  box-shadow: var(--shadow), 0 0 30px var(--primary-blue-glow);
   z-index: 1000;
   transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow-y: auto;
@@ -472,8 +707,8 @@ body:has(.sidebar:hover) .game-page.game-container {
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    background: rgba(0, 255, 255, 0.05);
-    border-bottom: 1px solid var(--border);
+    background: var(--primary-blue-bg);
+    border-bottom: 1px solid var(--primary-blue-border);
 
     h3 {
       color: var(--text-bright);
@@ -487,13 +722,13 @@ body:has(.sidebar:hover) .game-page.game-container {
       letter-spacing: 1px;
 
       i {
-        color: var(--accent);
+        color: var(--primary-blue);
       }
     }
 
     .btn-toggle {
       background: transparent;
-      border: 1px solid var(--border);
+      border: 1px solid var(--primary-blue-border);
       border-radius: 50%;
       width: 35px;
       height: 35px;
@@ -505,9 +740,9 @@ body:has(.sidebar:hover) .game-page.game-container {
       justify-content: center;
 
       &:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-        background: rgba(0, 255, 255, 0.1);
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+        background: var(--primary-blue-bg);
       }
     }
   }
@@ -525,13 +760,13 @@ body:has(.sidebar:hover) .game-page.game-container {
         height: 100px;
         margin: 0 auto 15px;
         border-radius: 50%;
-        border: 3px solid var(--accent);
+        border: 3px solid var(--primary-blue);
         overflow: hidden;
         cursor: pointer;
         transition: all 0.3s ease;
 
         &:hover {
-          box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+          box-shadow: 0 0 20px var(--primary-blue-glow);
           transform: scale(1.05);
 
           .avatar-overlay {
@@ -559,7 +794,7 @@ body:has(.sidebar:hover) .game-page.game-container {
           transition: all 0.3s ease;
 
           i {
-            color: var(--accent);
+            color: var(--primary-blue);
             font-size: 1.5rem;
           }
         }
@@ -574,7 +809,7 @@ body:has(.sidebar:hover) .game-page.game-container {
       }
 
       .character-level {
-        color: var(--accent);
+        color: var(--primary-blue);
         font-family: 'Rajdhani', sans-serif;
         font-size: 1rem;
         font-weight: 500;
@@ -596,7 +831,7 @@ body:has(.sidebar:hover) .game-page.game-container {
         letter-spacing: 0.5px;
 
         i {
-          color: var(--accent);
+          color: var(--primary-blue);
         }
       }
 
@@ -619,14 +854,14 @@ body:has(.sidebar:hover) .game-page.game-container {
           background: rgba(255, 255, 255, 0.1);
           border-radius: 3px;
           overflow: hidden;
-          border: 1px solid var(--border);
+          border: 1px solid var(--primary-blue-border);
 
           .attr-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--accent-blue));
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-blue-light));
             border-radius: 2px;
             transition: width 0.3s ease;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 8px var(--primary-blue-glow);
           }
         }
 
@@ -655,7 +890,7 @@ body:has(.sidebar:hover) .game-page.game-container {
         letter-spacing: 0.5px;
 
         i {
-          color: var(--accent);
+          color: var(--primary-blue);
         }
       }
 
@@ -666,7 +901,7 @@ body:has(.sidebar:hover) .game-page.game-container {
 
         .equipment-slot {
           background: rgba(255, 255, 255, 0.03);
-          border: 1px solid var(--border);
+          border: 1px solid var(--primary-blue-border);
           border-radius: 8px;
           padding: 10px;
           display: flex;
@@ -676,8 +911,8 @@ body:has(.sidebar:hover) .game-page.game-container {
           cursor: pointer;
 
           &:hover {
-            background: rgba(0, 255, 255, 0.05);
-            border-color: var(--card-border);
+            background: var(--primary-blue-bg);
+            border-color: var(--primary-blue);
           }
 
           .slot-icon {
@@ -686,11 +921,11 @@ body:has(.sidebar:hover) .game-page.game-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 255, 255, 0.1);
+            background: var(--primary-blue-bg);
             border-radius: 5px;
 
             i {
-              color: var(--accent);
+              color: var(--primary-blue);
               font-size: 1.2rem;
             }
           }
@@ -744,7 +979,7 @@ body:has(.sidebar:hover) .game-page.game-container {
         letter-spacing: 0.5px;
 
         i {
-          color: var(--accent);
+          color: var(--primary-blue);
         }
       }
 
@@ -756,7 +991,7 @@ body:has(.sidebar:hover) .game-page.game-container {
         .inventory-item {
           aspect-ratio: 1;
           background: rgba(255, 255, 255, 0.03);
-          border: 1px solid var(--border);
+          border: 1px solid var(--primary-blue-border);
           border-radius: 8px;
           display: flex;
           align-items: center;
@@ -766,8 +1001,8 @@ body:has(.sidebar:hover) .game-page.game-container {
           transition: all 0.3s ease;
 
           &:hover:not(.empty) {
-            background: rgba(0, 255, 255, 0.05);
-            border-color: var(--accent);
+            background: var(--primary-blue-bg);
+            border-color: var(--primary-blue);
             transform: scale(1.05);
           }
 
@@ -776,7 +1011,7 @@ body:has(.sidebar:hover) .game-page.game-container {
           }
 
           i {
-            color: var(--accent);
+            color: var(--primary-blue);
             font-size: 1.5rem;
           }
 
@@ -784,7 +1019,7 @@ body:has(.sidebar:hover) .game-page.game-container {
             position: absolute;
             bottom: 2px;
             right: 4px;
-            background: var(--accent);
+            background: var(--primary-blue);
             color: #000;
             font-family: 'Rajdhani', sans-serif;
             font-size: 0.7rem;
@@ -821,24 +1056,20 @@ body:has(.sidebar:hover) .game-page.game-container {
       height: 60px;
       border: 3px solid var(--border);
       border-radius: 50%;
-      border-top-color: var(--accent);
+      border-top-color: var(--primary-blue);
       animation: spin 1s ease-in-out infinite;
       margin: 0 auto 20px;
     }
 
     p {
-      color: var(--accent);
+      color: var(--primary-blue);
       font-family: 'Rajdhani', sans-serif;
       font-size: 1.2rem;
       margin: 0;
-      text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      text-shadow: 0 0 15px var(--primary-blue-glow);
       animation: pulse 2s ease-in-out infinite;
     }
   }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
@@ -846,6 +1077,7 @@ body:has(.sidebar:hover) .game-page.game-container {
   50% { opacity: 1; }
 }
 
+// Responsivo
 @media (max-width: 1400px) {
   .game-content {
     .story-panel {
@@ -913,6 +1145,17 @@ body:has(.sidebar:hover) .game-page.game-container {
     .quick-actions {
       grid-template-columns: 1fr;
     }
+
+    .llm-quick-actions {
+      .llm-action-grid {
+        grid-template-columns: 1fr;
+        
+        .llm-action-btn {
+          font-size: 11px;
+          padding: 6px 10px;
+        }
+      }
+    }
   }
   
   .story-panel {
@@ -927,6 +1170,14 @@ body:has(.sidebar:hover) .game-page.game-container {
         }
       }
     }
+
+    .story-header {
+      .mode-indicator {
+        span {
+          display: none;
+        }
+      }
+    }
   }
 }
 
@@ -938,5 +1189,20 @@ body:has(.sidebar:hover) .game-page.game-container {
   .action-panel,
   .story-panel {
     padding: 15px;
+  }
+
+  .llm-quick-actions {
+    h4 {
+      font-size: 13px;
+    }
+  }
+
+  .story-panel {
+    .story-header {
+      .mode-indicator {
+        padding: 3px 6px;
+        font-size: 10px;
+      }
+    }
   }
 }
