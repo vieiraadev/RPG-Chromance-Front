@@ -1,4 +1,5 @@
 <app-navbar></app-navbar>
+
 <div class="home-content">
   <div class="page-header">
     <div class="header-content">
@@ -9,5 +10,36 @@
       <p class="page-subtitle">Explore as profundezas do submundo digital</p>
     </div>
   </div>
+
   <app-villain-carousel></app-villain-carousel>
+  
+  <div class="selected-character-section" *ngIf="!isLoading">
+    <div class="section-header">
+      <h2 class="section-title">Personagem Selecionado:</h2>
+    </div>
+    
+    <div class="selected-character-container" *ngIf="selectedCharacter; else noCharacterSelected">
+      <app-character-card
+        [character]="selectedCharacter"
+        [showActions]="false"
+        (editClicked)="onEditSelectedCharacter()"
+        (deleteClicked)="onDeleteSelectedCharacter()"
+        (characterSelected)="onSelectCharacter()">
+      </app-character-card>
+    </div>
+
+    <ng-template #noCharacterSelected>
+      <div class="no-character-selected">
+        <div class="no-character-content">
+          <i class='bx bx-bolt no-character-icon'></i>
+          <h3>Nenhum personagem selecionado</h3>
+          <p>Selecione um personagem para começar sua jornada!</p>
+          <button class="btn-select-character" (click)="onSelectCharacter()">
+            Selecionar Personagem
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
 </div>

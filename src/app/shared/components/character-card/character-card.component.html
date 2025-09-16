@@ -112,8 +112,12 @@
     <button class="btn-action danger" (click)="onDelete()">
       Deletar
     </button>
-    <button class="btn-action select" (click)="onSelect()">
-      Selecionar
+    <button 
+      [class]="selectButtonClass" 
+      (click)="onSelect()"
+      [disabled]="isSelecting"
+      *ngIf="showSelectButton">
+      {{ selectButtonText }}
     </button>
   </div>
 </div>

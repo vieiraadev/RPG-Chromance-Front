@@ -466,3 +466,49 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+.character-actions {
+  .btn-action {
+    
+    &.selected {
+      background: linear-gradient(45deg, #2563eb, #3b82f6);
+      border-color: #2563eb;
+      color: white;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+      
+      &:hover {
+        background: linear-gradient(45deg, #1d4ed8, #2563eb);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+    
+    &.select {
+      background: var(--local-brand);
+      border-color: var(--local-accent);
+      color: var(--local-brand-contrast);
+      
+      &:hover {
+        background: var(--local-brand-hover);
+        transform: translateY(-2px);
+      }
+      
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+        pointer-events: none;
+        
+        &:hover {
+          transform: none;
+          background: var(--local-brand);
+        }
+      }
+    }
+  }
+}
