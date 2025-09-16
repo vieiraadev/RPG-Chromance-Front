@@ -1,0 +1,242 @@
+:host {
+    display: block;
+    width: 100%;
+    
+    --local-bg: #0a0a0a;
+    --local-card-bg: rgba(10, 10, 20, 0.9);
+    --local-card-border: rgba(0, 255, 255, 0.3);
+    --local-muted: #64748b;
+    --local-text: #e2e8f0;
+    --local-text-bright: #f1f5f9;
+    --local-border: rgba(255, 255, 255, 0.1);
+    --local-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    --local-shadow-glow: 0 0 30px rgba(0, 255, 255, 0.2);
+    --local-accent: #00ffff;
+    --local-accent-blue: #0080ff;
+  }
+  
+  .location-gallery {
+    width: 100%;
+    margin: 40px 0;
+    position: relative;
+  }
+  
+  .gallery-header {
+    text-align: left;
+    margin-bottom: 40px;
+    margin-left: 80px;
+    
+    .gallery-title {
+      color: var(--local-accent);
+      font-family: 'Orbitron', monospace;
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin: 0 0 5px 0;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      word-break: break-word;
+    }
+  
+    .gallery-subtitle {
+      color: #ffffff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin: 0;
+      letter-spacing: 1px;
+      opacity: 0.9;
+      word-break: break-word;
+    }
+  }
+  
+  .gallery-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px 80px 20px 0px;
+    min-height: 500px;
+    margin-top: -30px;
+  }
+  
+  .gallery-locations {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    gap: 70px; 
+    position: relative;
+    min-height: 450px;
+    width: 100%; 
+  }
+  
+  .gallery-location-card {
+    flex: 1 1 360px; 
+    max-width: 480px;
+    min-width: 320px;
+    background: var(--local-card-bg);
+    border: 2px solid var(--local-card-border);
+    border-radius: 20px;
+    box-shadow: var(--local-shadow), var(--local-shadow-glow);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    position: relative;
+    animation: cardGlow 3s ease-in-out infinite alternate;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 2px,
+        rgba(0, 255, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+  
+    &:hover {
+      transform: scale(1.05) translateZ(0);
+      box-shadow: 
+        var(--local-shadow), 
+        0 0 50px rgba(0, 255, 255, 0.4),
+        0 0 100px rgba(0, 255, 255, 0.2);
+      border-color: var(--local-accent);
+    }
+  }
+  
+  .location-image {
+    position: relative;
+    height: 350px;
+    overflow: hidden;
+    border-bottom: 2px solid var(--local-border);
+  
+    .location-portrait {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: sepia(100%) hue-rotate(200deg) saturate(2) brightness(0.8);
+      transition: filter 0.3s ease;
+  
+      &:hover {
+        filter: sepia(100%) hue-rotate(180deg) saturate(3) brightness(1.1);
+      }
+    }
+  }
+  
+  .location-content {
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  
+    .location-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--local-text-bright);
+      margin: 0 0 6px;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+  
+    .location-subtitle {
+      color: var(--local-accent);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 0;
+      text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+      font-family: 'Rajdhani', sans-serif;
+      line-height: 1.2;
+    }
+  }
+  
+  @keyframes cardGlow {
+    0% { 
+      box-shadow: var(--local-shadow), 0 0 30px rgba(0, 255, 255, 0.2); 
+    }
+    100% { 
+      box-shadow: var(--local-shadow), 0 0 50px rgba(0, 255, 255, 0.4); 
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .gallery-header {
+      margin-left: 0;
+      
+      .gallery-title {
+        font-size: 2.2rem;
+      }
+    }
+    
+    .gallery-container {
+      padding: 20px 15px;
+    }
+  
+    .gallery-locations {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px; 
+    }
+  
+    .gallery-location-card {
+      flex: 0 0 320px; 
+      max-width: 320px;
+    }
+  
+    .location-image {
+      height: 300px; 
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .gallery-header {
+      .gallery-title {
+        font-size: 1.9rem;
+      }
+      
+      .gallery-subtitle {
+        font-size: 1rem;
+      }
+    }
+    
+    .gallery-container {
+      padding: 20px 10px;
+    }
+  
+    .gallery-location-card {
+      flex: 0 0 280px; 
+      max-width: 280px;
+    }
+  
+    .location-image {
+      height: 250px;
+    }
+  
+    .location-content {
+      padding: 15px;
+  
+      .location-name {
+        font-size: 16px;
+        letter-spacing: 0.5px;
+      }
+  
+      .location-subtitle {
+        font-size: 11px;
+      }
+    }
+  }

@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
 import { VillainCarouselComponent } from '@app/shared/components/villain-carousel/villain-carousel.component';
 import { CharacterCardComponent, Character } from '@app/shared/components/character-card/character-card.component';
+import { LocationGalleryComponent } from '@app/shared/components/location-gallery/location-gallery.component';
 import { AuthService, UserOut } from '@app/core/services/auth.service';
 import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
 
@@ -15,7 +16,8 @@ import { CharacterService, CharacterResponse } from '@app/core/services/characte
     CommonModule, 
     NavbarComponent, 
     VillainCarouselComponent,
-    CharacterCardComponent
+    CharacterCardComponent,
+    LocationGalleryComponent,
   ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss']

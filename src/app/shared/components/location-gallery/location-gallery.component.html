@@ -1,0 +1,37 @@
+<div class="location-gallery">
+    <div class="gallery-header">
+      <h2 class="gallery-title">Mapa Chromance</h2>
+    </div>
+    
+    <div class="gallery-container">
+      <div class="gallery-track">
+        <div class="gallery-locations">
+          <div 
+            *ngFor="let location of gameLocations"
+            class="gallery-location-card">
+            
+            <div class="location-image">
+              <img
+                *ngIf="hasValidImage(location.imageUrl); else fallbackImage"
+                [src]="location.imageUrl"
+                [alt]="location.name"
+                class="location-portrait"
+              />
+              <ng-template #fallbackImage>
+                <img
+                  src="assets/images/default-location.jpg"
+                  [alt]="location.name"
+                  class="location-portrait"
+                />
+              </ng-template>
+            </div>
+  
+            <div class="location-content">
+              <h3 class="location-name">{{ location.name }}</h3>
+              <p class="location-subtitle">{{ location.subtitle | uppercase }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
