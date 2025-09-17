@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../config/environment';
 
 export interface Reward {
@@ -22,7 +23,7 @@ export interface Campaign {
   is_locked: boolean;
   created_at?: string;
   updated_at?: string;
-  
+  user_id?: string;
   status?: 'in_progress' | 'completed' | 'cancelled' | null;
   active_character_id?: string | null;
   active_character_name?: string | null;
@@ -54,18 +55,26 @@ export interface StartCampaignRequest {
 })
 export class CampaignService {
   private apiUrl = `${environment.apiBaseUrl}/api/campaigns`;
-
+  
   constructor(private http: HttpClient) {}
-
   
   getCampaigns(): Observable<CampaignListResponse> {
-    return this.http.get<CampaignListResponse>(`${this.apiUrl}/`);
+    return this.http.get<CampaignListResponse>(`${this.apiUrl}/`).pipe(
+      catchError((error) => {
+        if (error.status === 404 || error.error?.detail?.includes('não encontrada')) {
+          return this.seedCampaigns().pipe(
+            switchMap(() => this.http.get<CampaignListResponse>(`${this.apiUrl}/`))
+          );
+        }
+        return throwError(() => error);
+      })
+    );
   }
-
+  
   getCampaignById(campaignId: string): Observable<Campaign> {
     return this.http.get<Campaign>(`${this.apiUrl}/${campaignId}`);
   }
-
+  
   seedCampaigns(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/seed`, {});
   }
@@ -73,7 +82,7 @@ export class CampaignService {
   getActiveCampaignStatus(): Observable<ActiveCampaignStatus> {
     return this.http.get<ActiveCampaignStatus>(`${this.apiUrl}/active/status`);
   }
-
+  
   startCampaign(characterId: string, campaignId: string, characterName?: string): Observable<any> {
     const request: StartCampaignRequest = {
       character_id: characterId,
@@ -87,7 +96,7 @@ export class CampaignService {
   cancelCampaign(campaignId: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${campaignId}/cancel`);
   }
-
+  
   completeChapter(campaignId: string, characterId: string, chapterCompleted: number): Observable<any> {
     const request = {
       character_id: characterId,
@@ -95,5 +104,9 @@ export class CampaignService {
     };
     
     return this.http.put<any>(`${this.apiUrl}/${campaignId}/complete-chapter`, request);
+  }
+  
+  isUserAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
   }
 }
