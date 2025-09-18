@@ -1,20 +1,14 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
-import { LLMService, ChatMessage } from '../../../core/services/llm.service';
+import { LLMService, ChatMessage, ContextualAction } from '../../../core/services/llm.service';
 
 interface StoryEntry {
   timestamp: string;
   type: 'system' | 'narrator' | 'player' | 'llm';
   message: string;
-}
-
-interface ContextAction {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
 }
 
 interface CharacterAttribute {
@@ -46,7 +40,7 @@ interface InventoryItem {
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss']
 })
-export class GamePageComponent implements OnInit, AfterViewChecked {
+export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('storyContent') storyContent!: ElementRef;
 
   isLoading = false;
@@ -56,6 +50,8 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
   characterName = 'Neo-Runner';
   characterLevel = 15;
   currentCharacterId: string | undefined;
+
+  private subscriptions: Subscription[] = [];
 
   storyLog: StoryEntry[] = [
     {
@@ -70,26 +66,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     }
   ];
 
-  availableActions: ContextAction[] = [
-    {
-      id: 'climb_stairs',
-      name: 'Subir Escada',
-      description: 'Escalar até o telhado',
-      icon: 'bx bx-up-arrow-alt'
-    },
-    {
-      id: 'check_sewer',
-      name: 'Verificar Esgoto',
-      description: 'Investigar a tampa',
-      icon: 'bx bx-search-alt'
-    },
-    {
-      id: 'hack_door',
-      name: 'Hackear Porta',
-      description: 'Tentar quebrar a segurança',
-      icon: 'bx bx-lock-open'
-    }
-  ];
+  availableActions: ContextualAction[] = [];
 
   customCommand = '';
 
@@ -177,11 +154,24 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     this.loadGameData();
     this.currentCharacterId = 'char-' + Math.random().toString(36).substr(2, 9);
     
-    this.llmService.loading$.subscribe(loading => {
+    const loadingSub = this.llmService.loading$.subscribe(loading => {
       this.llmLoading = loading;
     });
+    this.subscriptions.push(loadingSub);
 
-    this.addStoryEntry('system', ' Mestre IA ativo. Digite comandos para interagir com o universo Chromance.');
+    const actionsSub = this.llmService.contextualActions$.subscribe(actions => {
+      this.availableActions = actions;
+      if (actions.length > 0) {
+        this.addStoryEntry('system', `${actions.length} novas ações contextuais disponíveis.`);
+      }
+    });
+    this.subscriptions.push(actionsSub);
+
+    this.addStoryEntry('system', 'Mestre IA ativo. Digite comandos para interagir com o universo Chromance.');
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   ngAfterViewChecked() {
@@ -230,14 +220,13 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     this.addStoryEntry('player', message);
 
     try {
-      const response = await this.llmService.sendMessage(message, this.currentCharacterId);
+      const response = await this.llmService.sendMessage(message, this.currentCharacterId, true);
 
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
         
-        this.updateActionsBasedOnLLMResponse(response.response);
       } else {
-        this.addStoryEntry('system', ` Erro: ${response.error || 'Falha na comunicação'}`);
+        this.addStoryEntry('system', `Erro: ${response.error || 'Falha na comunicação'}`);
       }
 
     } catch (error) {
@@ -251,38 +240,23 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     await this.sendLLMMessage();
   }
 
-  private updateActionsBasedOnLLMResponse(response: string) {
-    const newActions: ContextAction[] = [];
+  async performContextAction(action: ContextualAction) {
+    this.addStoryEntry('player', `${action.name}: ${action.description}`);
+    this.isLoading = true;
     
-    if (response.includes('porta') || response.includes('entrada')) {
-      newActions.push({
-        id: 'approach_door',
-        name: 'Aproximar da Porta',
-        description: 'Investigar a entrada',
-        icon: 'bx bx-door-open'
-      });
-    }
-    
-    if (response.includes('inimigo') || response.includes('ameaça')) {
-      newActions.push({
-        id: 'prepare_combat',
-        name: 'Preparar Combate',
-        description: 'Posição defensiva',
-        icon: 'bx bx-shield'
-      });
-    }
-    
-    if (response.includes('item') || response.includes('objeto')) {
-      newActions.push({
-        id: 'examine_item',
-        name: 'Examinar Item',
-        description: 'Investigar objeto',
-        icon: 'bx bx-search'
-      });
-    }
-
-    if (newActions.length > 0) {
-      this.availableActions = [...this.availableActions, ...newActions];
+    try {
+      const response = await this.llmService.executeContextualAction(action, this.currentCharacterId);
+      
+      if (response.success && response.response) {
+        this.addStoryEntry('llm', response.response);
+      } else {
+        this.addStoryEntry('system', `Erro ao executar ação: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('Erro ao executar ação contextual:', error);
+      this.addStoryEntry('system', 'Erro ao processar ação.');
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -300,33 +274,11 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
         this.addStoryEntry('system', 'Analisando status do personagem... Dados biométricos atualizados.');
         break;
       case 'help':
-        this.addStoryEntry('system', 'Digite comandos para interagir com o Mestre IA ou use os botões de ação rápida.');
+        this.addStoryEntry('system', 'Digite comandos para interagir com o Mestre IA ou use os botões de ação rápida. As ações contextuais são geradas dinamicamente pela IA baseadas na situação atual.');
         break;
     }
   }
 
-  performContextAction(action: ContextAction) {
-    this.addStoryEntry('player', `${action.name}: ${action.description}`);
-    this.isLoading = true;
-    
-    setTimeout(() => {
-      this.isLoading = false;
-      
-      switch (action.id) {
-        case 'climb_stairs':
-          this.addStoryEntry('narrator', 'Você escala a escada de incêndio com agilidade. Do telhado, tem uma visão panorâmica da cidade cyberpunk.');
-          break;
-        case 'check_sewer':
-          this.addStoryEntry('narrator', 'Você levanta a tampa do esgoto. Um odor forte sobe, mas também ouve vozes distantes ecoando pelos túneis.');
-          break;
-        case 'hack_door':
-          this.addStoryEntry('narrator', 'Você conecta seu dispositivo de hacking na fechadura. A porta se abre revelando um corredor mal iluminado.');
-          break;
-      }
-    }, 2000);
-  }
-
-  // Agora sempre envia para LLM
   executeCustomCommand() {
     if (this.customCommand.trim()) {
       this.sendLLMMessage();
@@ -368,6 +320,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
     this.addStoryEntry('system', 'Função de alteração de avatar ainda não implementada.');
   }
 
+
   useItem(item: InventoryItem) {
     this.addStoryEntry('player', `Usar: ${item.description}`);
     
@@ -385,5 +338,27 @@ export class GamePageComponent implements OnInit, AfterViewChecked {
         this.addStoryEntry('narrator', 'Você recarrega sua arma. Clique metálico ecoa enquanto a munição é inserida.');
         break;
     }
+  }
+
+
+  getActionsByPriority(): ContextualAction[] {
+    return this.llmService.getActionsSortedByPriority();
+  }
+
+  getActionsByCategory(category: string): ContextualAction[] {
+    return this.llmService.getActionsByCategory(category);
+  }
+
+  getCategoryColor(category: string): string {
+    const colors: { [key: string]: string } = {
+      'combat': '#ff4757',
+      'stealth': '#2f3542',
+      'social': '#5352ed',
+      'exploration': '#ff6348',
+      'magic': '#a55eea',
+      'tech': '#26d0ce',
+      'general': '#747d8c'
+    };
+    return colors[category] || colors['general'];
   }
 }

@@ -85,16 +85,59 @@
       </div>
 
       <div class="contextual-actions" *ngIf="availableActions.length > 0">
-        <h4>Ações Contextuais:</h4>
+        <div class="contextual-header">
+          <h4>
+            <i class="fas fa-magic"></i>
+            Ações Contextuais da IA
+          </h4>
+        </div>
+        
         <div class="action-grid">
           <button
             class="context-action-btn"
-            *ngFor="let action of availableActions"
-            (click)="performContextAction(action)">
-            <i [class]="action.icon"></i>
-            <span>{{ action.name }}</span>
-            <small>{{ action.description }}</small>
+            *ngFor="let action of getActionsByPriority()"
+            (click)="performContextAction(action)"
+            [disabled]="llmLoading"
+            [style.border-left-color]="getCategoryColor(action.category)"
+            [ngClass]="'priority-' + action.priority">
+            
+            <div class="action-content">
+              <span class="action-name">{{ action.name }}</span>
+              <small class="action-description">{{ action.description }}</small>
+              
+              <div class="action-meta">
+                <span class="action-category">{{ action.category }}</span>
+                <div class="priority-dots">
+                  <span 
+                    class="priority-dot" 
+                    *ngFor="let dot of [].constructor(action.priority); let i = index"
+                    [class.active]="i < action.priority">
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="action-arrow">
+              <i class="bx bx-right-arrow-alt"></i>
+            </div>
           </button>
+        </div>
+        
+        <div class="category-summary" *ngIf="availableActions.length > 3">
+          <span class="category-badge" *ngFor="let category of ['combat', 'stealth', 'social', 'exploration', 'tech', 'magic']">
+            <ng-container *ngIf="getActionsByCategory(category).length > 0">
+              <i class="category-icon" 
+                 [ngClass]="{
+                   'bx bx-sword': category === 'combat',
+                   'bx bx-hide': category === 'stealth', 
+                   'bx bx-chat': category === 'social',
+                   'bx bx-search': category === 'exploration',
+                   'bx bx-chip': category === 'tech',
+                   'bx bx-magic-wand': category === 'magic'
+                 }"></i>
+              {{ getActionsByCategory(category).length }}
+            </ng-container>
+          </span>
         </div>
       </div>
 

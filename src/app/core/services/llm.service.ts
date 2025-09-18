@@ -1,4 +1,3 @@
-// src/app/core/services/llm.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
@@ -10,15 +9,26 @@ export interface ChatMessage {
   timestamp?: Date;
 }
 
+export interface ContextualAction {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  priority: number;
+  category: string;
+}
+
 export interface LLMChatRequest {
   message: string;
   character_id?: string;
   conversation_history?: ChatMessage[];
+  generate_actions?: boolean;
 }
 
 export interface LLMChatResponse {
   success: boolean;
   response?: string;
+  contextual_actions?: ContextualAction[];
   error?: string;
   usage?: any;
 }
@@ -33,27 +43,25 @@ export interface CharacterSuggestionRequest {
 export class LLMService {
   private apiUrl = `${environment.apiBaseUrl}/api/llm`;
   
-  // Estado do chat atual
   private conversationSubject = new BehaviorSubject<ChatMessage[]>([]);
   public conversation$ = this.conversationSubject.asObservable();
+
+  private contextualActionsSubject = new BehaviorSubject<ContextualAction[]>([]);
+  public contextualActions$ = this.contextualActionsSubject.asObservable();
   
-  // Estado de loading
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Envia mensagem para a LLM
-   */
   async sendMessage(
     message: string, 
-    characterId?: string
+    characterId?: string,
+    generateActions: boolean = true
   ): Promise<LLMChatResponse> {
     try {
       this.loadingSubject.next(true);
       
-      // Adiciona mensagem do usuário ao histórico
       const userMessage: ChatMessage = {
         role: 'user',
         content: message,
@@ -66,7 +74,8 @@ export class LLMService {
       const request: LLMChatRequest = {
         message,
         character_id: characterId,
-        conversation_history: currentConversation
+        conversation_history: currentConversation,
+        generate_actions: generateActions
       };
 
       const response = await this.http.post<LLMChatResponse>(
@@ -75,7 +84,6 @@ export class LLMService {
       ).toPromise();
 
       if (response?.success && response.response) {
-        // Adiciona resposta da LLM ao histórico
         const assistantMessage: ChatMessage = {
           role: 'assistant',
           content: response.response,
@@ -83,14 +91,17 @@ export class LLMService {
         };
         
         this.conversationSubject.next([...this.conversationSubject.value, assistantMessage]);
+        
+        if (response.contextual_actions && response.contextual_actions.length > 0) {
+          this.contextualActionsSubject.next(response.contextual_actions);
+        }
       }
 
       return response!;
       
     } catch (error: any) {
       console.error('Erro ao enviar mensagem:', error);
-      
-      // Trata diferentes tipos de erro
+
       let errorMessage = 'Erro ao comunicar com a LLM';
       
       if (error?.error?.detail) {
@@ -101,16 +112,19 @@ export class LLMService {
       
       return {
         success: false,
-        error: errorMessage
+        error: errorMessage,
+        contextual_actions: []
       };
     } finally {
       this.loadingSubject.next(false);
     }
   }
 
-  /**
-   * Solicita sugestão para personagem
-   */
+  async executeContextualAction(action: ContextualAction, characterId?: string): Promise<LLMChatResponse> {
+    const actionMessage = `Executar ação: "${action.name}" - ${action.description}`;
+    return this.sendMessage(actionMessage, characterId, true);
+  }
+
   async suggestCharacter(partialData: any): Promise<LLMChatResponse> {
     try {
       this.loadingSubject.next(true);
@@ -130,16 +144,14 @@ export class LLMService {
       console.error('Erro ao solicitar sugestão:', error);
       return {
         success: false,
-        error: 'Erro ao gerar sugestão'
+        error: 'Erro ao gerar sugestão',
+        contextual_actions: []
       };
     } finally {
       this.loadingSubject.next(false);
     }
   }
 
-  /**
-   * Verifica se a LLM está disponível
-   */
   async checkHealth(): Promise<boolean> {
     try {
       const response = await this.http.get<any>(`${this.apiUrl}/health`).toPromise();
@@ -150,31 +162,48 @@ export class LLMService {
     }
   }
 
-  /**
-   * Limpa a conversa atual
-   */
   clearConversation(): void {
     this.conversationSubject.next([]);
+    this.contextualActionsSubject.next([]);
   }
 
-  /**
-   * Obtém a conversa atual
-   */
   getCurrentConversation(): ChatMessage[] {
     return this.conversationSubject.value;
   }
 
-  /**
-   * Define uma nova conversa
-   */
+  getCurrentContextualActions(): ContextualAction[] {
+    return this.contextualActionsSubject.value;
+  }
+
   setConversation(messages: ChatMessage[]): void {
     this.conversationSubject.next(messages);
   }
 
-  /**
-   * Verifica se está carregando
-   */
+  setContextualActions(actions: ContextualAction[]): void {
+    this.contextualActionsSubject.next(actions);
+  }
+
   isLoading(): boolean {
     return this.loadingSubject.value;
+  }
+
+  addCustomAction(action: ContextualAction): void {
+    const currentActions = this.contextualActionsSubject.value;
+    this.contextualActionsSubject.next([...currentActions, action]);
+  }
+
+  removeAction(actionId: string): void {
+    const currentActions = this.contextualActionsSubject.value;
+    const filteredActions = currentActions.filter(action => action.id !== actionId);
+    this.contextualActionsSubject.next(filteredActions);
+  }
+
+
+  getActionsSortedByPriority(): ContextualAction[] {
+    return this.getCurrentContextualActions().sort((a, b) => b.priority - a.priority);
+  }
+
+  getActionsByCategory(category: string): ContextualAction[] {
+    return this.getCurrentContextualActions().filter(action => action.category === category);
   }
 }
