@@ -206,13 +206,19 @@
     <div class="panel-content" *ngIf="!isCharacterPanelCollapsed">
       <div class="character-avatar">
         <div class="avatar-container">
-          <img src="assets/images/character-avatar.jpg" alt="Avatar" class="avatar-image">
+          <img [src]="displayCharacterImage" [alt]="displayCharacterName" class="avatar-image">
           <div class="avatar-overlay">
             <i class="fas fa-camera" (click)="changeAvatar()"></i>
           </div>
         </div>
-        <div class="character-name">{{ characterName }}</div>
-        <div class="character-level">Nível {{ characterLevel }}</div>
+        <div class="character-name">{{ displayCharacterName }}</div>
+        <div class="character-level">{{ displayCharacterClass }} - {{ displayCharacterRace }}</div>
+        <div class="character-description" *ngIf="displayCharacterDescription && displayCharacterDescription !== 'Personagem padrão'">
+          {{ displayCharacterDescription }}
+        </div>
+        <div class="campaign-info" *ngIf="activeCampaign">
+          <small class="campaign-name">{{ activeCampaign.title }}</small>
+        </div>
       </div>
 
       <div class="attributes-section">
@@ -220,9 +226,9 @@
         <div class="attribute-item" *ngFor="let attr of characterAttributes">
           <span class="attr-name">{{ attr.name }}:</span>
           <div class="attr-bar">
-            <div class="attr-fill" [style.width.%]="attr.value"></div>
+            <div class="attr-fill" [style.width.%]="(attr.value / attr.max) * 100"></div>
           </div>
-          <span class="attr-value">{{ attr.value }}</span>
+          <span class="attr-value">{{ attr.value }}/{{ attr.max }}</span>
         </div>
       </div>
 

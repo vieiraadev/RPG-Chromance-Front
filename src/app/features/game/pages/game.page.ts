@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
 import { LLMService, ChatMessage, ContextualAction } from '../../../core/services/llm.service';
+import { CampaignService, Campaign } from '../../../core/services/campaign.service';
+import { CharacterService, CharacterResponse } from '../../../core/services/character.service';
 
 interface StoryEntry {
   timestamp: string;
@@ -47,8 +49,11 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   isCharacterPanelCollapsed = true;
   llmLoading = false;
 
-  characterName = 'Neo-Runner';
-  characterLevel = 15;
+  activeCharacter: CharacterResponse | null = null;
+  activeCampaign: Campaign | null = null;
+  
+  characterName = 'Personagem';
+  characterLevel = 1;
   currentCharacterId: string | undefined;
 
   private subscriptions: Subscription[] = [];
@@ -69,7 +74,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   availableActions: ContextualAction[] = [];
 
   customCommand = '';
-
   llmSuggestions = [
     'Continue a história',
     'Descreva o ambiente',
@@ -78,14 +82,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     'Como meu personagem se sente?'
   ];
 
-  characterAttributes: CharacterAttribute[] = [
-    { name: 'Força', value: 75, max: 100 },
-    { name: 'Agilidade', value: 90, max: 100 },
-    { name: 'Intelecto', value: 85, max: 100 },
-    { name: 'Carisma', value: 60, max: 100 },
-    { name: 'Tecnologia', value: 95, max: 100 },
-    { name: 'Combate', value: 80, max: 100 }
-  ];
+  characterAttributes: CharacterAttribute[] = [];
 
   equipmentSlots: EquipmentSlot[] = [
     {
@@ -148,11 +145,14 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   emptySlots = new Array(8);
   private shouldScrollToBottom = false;
 
-  constructor(private llmService: LLMService) { }
+  constructor(
+    private llmService: LLMService,
+    private campaignService: CampaignService,
+    private characterService: CharacterService
+  ) {}
 
   ngOnInit() {
     this.loadGameData();
-    this.currentCharacterId = 'char-' + Math.random().toString(36).substr(2, 9);
     
     const loadingSub = this.llmService.loading$.subscribe(loading => {
       this.llmLoading = loading;
@@ -181,11 +181,114 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
-  private loadGameData() {
+  private async loadGameData() {
     this.isLoading = true;
-    setTimeout(() => {
+    
+    try {
+      const activeCampaignStatus = await this.campaignService.getActiveCampaignStatus().toPromise();
+      
+      if (activeCampaignStatus && activeCampaignStatus.has_active_campaign && activeCampaignStatus.active_campaign) {
+        this.activeCampaign = activeCampaignStatus.active_campaign;
+        
+        if (this.activeCampaign.active_character_id) {
+          try {
+            const character = await this.characterService.getCharacter(this.activeCampaign.active_character_id).toPromise();
+            
+            if (character) {
+              this.activeCharacter = character;
+              this.updateCharacterDisplay(character);
+              this.currentCharacterId = character._id;
+              
+              this.addStoryEntry('system', `Personagem carregado: ${character.name} (${character.raca} ${character.classe})`);
+              this.addStoryEntry('system', `Campanha ativa: ${this.activeCampaign.title}`);
+            }
+          } catch (characterError) {
+            console.error('Erro ao carregar personagem ativo:', characterError);
+            this.addStoryEntry('system', 'Erro ao carregar dados do personagem. Usando dados padrão.');
+          }
+        } else {
+          this.addStoryEntry('system', `Campanha ${this.activeCampaign.title} ativa, mas sem personagem definido.`);
+        }
+      } else {
+        try {
+          const character = await this.characterService.getSelectedCharacter().toPromise();
+          if (character) {
+            this.activeCharacter = character;
+            this.updateCharacterDisplay(character);
+            this.currentCharacterId = character._id;
+            this.addStoryEntry('system', `Personagem selecionado carregado: ${character.name}`);
+          } else {
+            this.addStoryEntry('system', 'Nenhuma campanha ativa ou personagem selecionado encontrado.');
+          }
+        } catch (selectedError) {
+          console.error('Erro ao carregar personagem selecionado:', selectedError);
+          this.addStoryEntry('system', 'Nenhum personagem encontrado. Usando dados padrão.');
+        }
+      }
+      
+    } catch (error) {
+      console.error('Erro ao carregar dados do jogo:', error);
+      this.addStoryEntry('system', 'Erro ao carregar dados. Usando configurações padrão.');
+    } finally {
       this.isLoading = false;
-    }, 1500);
+    }
+  }
+
+  private updateCharacterDisplay(character: CharacterResponse) {
+    this.characterName = character.name;
+    this.characterLevel = 1;
+
+    if (character.atributos) {
+      this.characterAttributes = [
+        { 
+          name: 'Vida', 
+          value: Math.min(character.atributos.vida || 20, 20), 
+          max: 20 
+        },
+        { 
+          name: 'Energia', 
+          value: Math.min(character.atributos.energia || 20, 20), 
+          max: 20 
+        },
+        { 
+          name: 'Força', 
+          value: Math.min(character.atributos.forca || 10, 20), 
+          max: 20 
+        },
+        { 
+          name: 'Inteligência', 
+          value: Math.min(character.atributos.inteligencia || 10, 20), 
+          max: 20 
+        }
+      ];
+    } else {
+      this.characterAttributes = [
+        { name: 'Vida', value: 20, max: 20 },
+        { name: 'Energia', value: 20, max: 20 },
+        { name: 'Força', value: 10, max: 20 },
+        { name: 'Inteligência', value: 10, max: 20 }
+      ];
+    }
+  }
+
+  get displayCharacterName(): string {
+    return this.activeCharacter?.name || this.characterName;
+  }
+
+  get displayCharacterClass(): string {
+    return this.activeCharacter?.classe || 'Aventureiro';
+  }
+
+  get displayCharacterRace(): string {
+    return this.activeCharacter?.raca || 'Humano';
+  }
+
+  get displayCharacterDescription(): string {
+    return this.activeCharacter?.descricao || 'Personagem padrão';
+  }
+
+  get displayCharacterImage(): string {
+    return this.activeCharacter?.imageUrl || 'assets/images/character-avatar.jpg';
   }
 
   getCurrentTimestamp(): string {
@@ -224,7 +327,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
-        
       } else {
         this.addStoryEntry('system', `Erro: ${response.error || 'Falha na comunicação'}`);
       }
@@ -320,7 +422,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.addStoryEntry('system', 'Função de alteração de avatar ainda não implementada.');
   }
 
-
   useItem(item: InventoryItem) {
     this.addStoryEntry('player', `Usar: ${item.description}`);
     
@@ -339,7 +440,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
         break;
     }
   }
-
 
   getActionsByPriority(): ContextualAction[] {
     return this.llmService.getActionsSortedByPriority();

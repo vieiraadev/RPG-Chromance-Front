@@ -751,8 +751,8 @@ body:has(.sidebar:hover) .game-page.game-container {
 
       .avatar-container {
         position: relative;
-        width: 100px;
-        height: 100px;
+        width: 180px;
+        height: 180px;
         margin: 0 auto 15px;
         border-radius: 50%;
         border: 3px solid var(--primary-blue);
@@ -1072,7 +1072,6 @@ body:has(.sidebar:hover) .game-page.game-container {
   50% { opacity: 1; }
 }
 
-// Responsivo
 @media (max-width: 1400px) {
   .game-content {
     .story-panel {
@@ -1327,7 +1326,6 @@ body:has(.sidebar:hover) .game-page.game-container {
   transform: translateX(4px);
 }
 
-/* Resumo das categorias */
 .category-summary {
   display: flex;
   flex-wrap: wrap;
@@ -1353,7 +1351,29 @@ body:has(.sidebar:hover) .game-page.game-container {
   }
 }
 
-/* Animação de pulse suave */
+.character-description {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+.campaign-info {
+  margin-top: 8px;
+  text-align: center;
+  
+  .campaign-name {
+    font-size: 0.7rem;
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+}
+
 @keyframes pulse {
   0%, 100% { 
     opacity: 1; 
@@ -1365,7 +1385,6 @@ body:has(.sidebar:hover) .game-page.game-container {
   }
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
   .contextual-header {
     flex-direction: column;
@@ -1388,5 +1407,11 @@ body:has(.sidebar:hover) .game-page.game-container {
   
   .category-summary {
     justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .character-description {
+    font-size: 0.75rem;
   }
 }
