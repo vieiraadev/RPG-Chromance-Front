@@ -58,18 +58,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  storyLog: StoryEntry[] = [
-    {
-      timestamp: this.getCurrentTimestamp(),
-      type: 'system',
-      message: 'Interface neural ativada. Bem-vindo ao setor 7.'
-    },
-    {
-      timestamp: this.getCurrentTimestamp(),
-      type: 'narrator',
-      message: 'Você se encontra em um beco escuro da cidade. O som de sirenes ecoa à distância enquanto as luzes de neon piscam nas paredes molhadas. Sua respiração está pesada após a fuga dos seguranças corporativos.'
-    }
-  ];
+  storyLog: StoryEntry[] = [];
 
   availableActions: ContextualAction[] = [];
 
@@ -153,7 +142,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnInit() {
     this.loadGameData();
-    
+
     const loadingSub = this.llmService.loading$.subscribe(loading => {
       this.llmLoading = loading;
     });
@@ -166,8 +155,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       }
     });
     this.subscriptions.push(actionsSub);
-
-    this.addStoryEntry('system', 'Mestre IA ativo. Digite comandos para interagir com o universo Chromance.');
   }
 
   ngOnDestroy() {
@@ -190,6 +177,8 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       if (activeCampaignStatus && activeCampaignStatus.has_active_campaign && activeCampaignStatus.active_campaign) {
         this.activeCampaign = activeCampaignStatus.active_campaign;
         
+        this.addDefaultStoryMessages();
+        
         if (this.activeCampaign.active_character_id) {
           try {
             const character = await this.characterService.getCharacter(this.activeCampaign.active_character_id).toPromise();
@@ -200,7 +189,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
               this.currentCharacterId = character._id;
               
               this.addStoryEntry('system', `Personagem carregado: ${character.name} (${character.raca} ${character.classe})`);
-              this.addStoryEntry('system', `Campanha ativa: ${this.activeCampaign.title}`);
             }
           } catch (characterError) {
             console.error('Erro ao carregar personagem ativo:', characterError);
@@ -210,6 +198,8 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
           this.addStoryEntry('system', `Campanha ${this.activeCampaign.title} ativa, mas sem personagem definido.`);
         }
       } else {
+        this.addDefaultStoryMessages();
+        
         try {
           const character = await this.characterService.getSelectedCharacter().toPromise();
           if (character) {
@@ -228,16 +218,59 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       
     } catch (error) {
       console.error('Erro ao carregar dados do jogo:', error);
+      this.addDefaultStoryMessages();
       this.addStoryEntry('system', 'Erro ao carregar dados. Usando configurações padrão.');
     } finally {
       this.isLoading = false;
     }
   }
 
+  private addDefaultStoryMessages() {
+    if (this.activeCampaign) {
+      const chapterMessages = this.getChapterMessages(this.activeCampaign.title);
+      
+      this.addStoryEntry('system', chapterMessages.system);
+      this.addStoryEntry('narrator', chapterMessages.narrator);
+    } else {
+      this.addStoryEntry('system', 'Interface neural ativada. Bem-vindo ao setor 7.');
+      this.addStoryEntry('narrator', 'Você se encontra em um beco escuro da cidade. O som de sirenes ecoa à distância enquanto as luzes de neon piscam nas paredes molhadas. Sua respiração está pesada após a fuga dos seguranças corporativos.');
+    }
+  }
+
+  private getChapterMessages(campaignTitle: string): { system: string; narrator: string } {
+    const title = campaignTitle.toLowerCase();
+    
+    if (title.includes('cubo') && title.includes('sombras')) {
+      return {
+        system: 'Interface neural ativada. Conectando com a catedral em ruínas...',
+        narrator: 'CAPÍTULO 1: O CUBO DAS SOMBRAS. Você se encontra nas profundezas de uma catedral em ruínas onde energia sombria pulsa entre as pedras antigas. OBJETIVO: Encontrar a Relíquia Perdida - um cubo pulsante de poder ancestral escondido nos destroços sagrados. Os sussurros das paredes indicam que você não está sozinho aqui.'
+      };
+    }
+    
+    if ((title.includes('laboratório') || title.includes('laboratorio')) && title.includes('cristais')) {
+      return {
+        system: 'Interface neural ativada. Infiltração no complexo científico iniciada...',
+        narrator: 'CAPÍTULO 2: LABORATÓRIO DE CRISTAIS ARCANOS. Você infiltra um laboratório subterrâneo onde cristais instáveis emanam energia perigosa em recipientes de contenção. OBJETIVO: Roubar os dados dos experimentos proibidos e escapar antes que os sistemas de segurança detectem sua presença. O ar vibra com magia e tecnologia entrelaçadas.'
+      };
+    }
+    
+    if (title.includes('coliseu') && title.includes('neon')) {
+      return {
+        system: 'Interface neural ativada. Entrando na zona de combate urbana...',
+        narrator: 'CAPÍTULO 3: COLISEU DE NEON. Você está nas ruas de uma cidade subterrânea iluminada por luzes vibrantes, onde o rugido da multidão ecoa do grande Coliseu. OBJETIVO: Sobreviver às batalhas da arena e derrotar o campeão cibernético para ganhar sua liberdade. Gladiadores se preparam ao seu redor enquanto o cheiro de ozônio preenche o ar.'
+      };
+    }
+    
+    return {
+      system: `Interface neural ativada. Conectando com ${campaignTitle}...`,
+      narrator: `Você inicia sua jornada em ${campaignTitle}. O ar está carregado de possibilidades enquanto você se prepara para enfrentar os desafios que aguardam. Sua determinação será testada neste mundo onde tecnologia e humanidade se entrelaçam de formas inesperadas.`
+    };
+  }
+
   private updateCharacterDisplay(character: CharacterResponse) {
     this.characterName = character.name;
     this.characterLevel = 1;
-
+    
     if (character.atributos) {
       this.characterAttributes = [
         { 
@@ -392,18 +425,8 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   clearStoryLog() {
-    this.storyLog = [
-      {
-        timestamp: this.getCurrentTimestamp(),
-        type: 'system',
-        message: 'Log de história limpo. Interface reinicializada.'
-      },
-      {
-        timestamp: this.getCurrentTimestamp(),
-        type: 'system',
-        message: 'Mestre IA ativo. Digite comandos para interagir.'
-      }
-    ];
+    this.storyLog = [];
+    this.addDefaultStoryMessages();
     this.shouldScrollToBottom = true;
     this.llmService.clearConversation();
   }
