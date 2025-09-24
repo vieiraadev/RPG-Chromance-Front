@@ -64,11 +64,9 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   customCommand = '';
   llmSuggestions = [
-    'Continue a história',
+    'Quem sou eu? ',
     'Descreva o ambiente',
     'O que devo fazer agora?',
-    'Crie um novo desafio',
-    'Como meu personagem se sente?'
   ];
 
   characterAttributes: CharacterAttribute[] = [];
