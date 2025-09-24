@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
-import { LLMService, ChatMessage, ContextualAction } from '../../../core/services/llm.service';
+import { LLMService, ChatMessage, ContextualAction, ProgressionInfo } from '../../../core/services/llm.service';
 import { CampaignService, Campaign } from '../../../core/services/campaign.service';
 import { CharacterService, CharacterResponse } from '../../../core/services/character.service';
 
@@ -59,7 +59,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   storyLog: StoryEntry[] = [];
-
   availableActions: ContextualAction[] = [];
 
   customCommand = '';
@@ -70,6 +69,12 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   ];
 
   characterAttributes: CharacterAttribute[] = [];
+
+  currentInteractionCount = 1;
+  maxInteractions = 10;
+  currentPhase: 'introduction' | 'development' | 'resolution' = 'introduction';
+  progressPercentage = 10;
+  currentProgression: ProgressionInfo | null = null;
 
   equipmentSlots: EquipmentSlot[] = [
     {
@@ -140,6 +145,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnInit() {
     this.loadGameData();
+    this.resetProgressionForNewChapter();
 
     const loadingSub = this.llmService.loading$.subscribe(loading => {
       this.llmLoading = loading;
@@ -153,6 +159,14 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       }
     });
     this.subscriptions.push(actionsSub);
+
+    const progressionSub = this.llmService.progression$.subscribe(progression => {
+      this.currentProgression = progression;
+      if (progression) {
+        this.updateProgressionFromServer(progression);
+      }
+    });
+    this.subscriptions.push(progressionSub);
   }
 
   ngOnDestroy() {
@@ -163,6 +177,59 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     if (this.shouldScrollToBottom) {
       this.scrollToBottom();
       this.shouldScrollToBottom = false;
+    }
+  }
+
+  resetProgressionForNewChapter() {
+    this.currentInteractionCount = 1;
+    this.updateProgressionState();
+    this.addStoryEntry('system', `Nova progressão de capítulo iniciada (1/10 interações)`);
+  }
+
+  updateProgressionState() {
+    this.progressPercentage = (this.currentInteractionCount / this.maxInteractions) * 100;
+    
+    if (this.currentInteractionCount <= 3) {
+      this.currentPhase = 'introduction';
+    } else if (this.currentInteractionCount <= 7) {
+      this.currentPhase = 'development';
+    } else {
+      this.currentPhase = 'resolution';
+    }
+  }
+
+  updateProgressionFromServer(progression: ProgressionInfo) {
+    this.currentInteractionCount = progression.interaction_count;
+    this.maxInteractions = progression.max_interactions;
+    this.currentPhase = progression.current_phase;
+    this.progressPercentage = progression.progress_percentage;
+  }
+
+  getPhaseDisplayName(): string {
+    return this.llmService.getPhaseDisplayName(this.currentPhase);
+  }
+
+  getPhaseColor(): string {
+    return this.llmService.getPhaseColor(this.currentPhase);
+  }
+
+  shouldShowFinalRewardHint(): boolean {
+    return this.llmService.shouldShowFinalRewardHint(this.currentInteractionCount);
+  }
+
+  async resetChapterProgression() {
+    try {
+      const success = await this.llmService.resetChapterProgression();
+      if (success) {
+        this.resetProgressionForNewChapter();
+        this.clearStoryLog();
+        this.addStoryEntry('system', 'Capítulo reiniciado. Nova progressão narrativa iniciada.');
+      } else {
+        this.addStoryEntry('system', 'Erro ao reiniciar capítulo. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro ao resetar progressão:', error);
+      this.addStoryEntry('system', 'Erro ao reiniciar capítulo.');
     }
   }
 
@@ -353,11 +420,35 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
     this.addStoryEntry('player', message);
 
+    this.addStoryEntry('system', 
+      `Interação ${this.currentInteractionCount}/10 | Fase: ${this.getPhaseDisplayName()}${
+        this.shouldShowFinalRewardHint() ? ' | ZONA DE RECOMPENSA!' : ''
+      }`
+    );
+
     try {
-      const response = await this.llmService.sendMessage(message, this.currentCharacterId, true);
+      const response = await this.llmService.sendMessageWithProgression(
+        message, 
+        this.currentCharacterId, 
+        true, 
+        this.currentInteractionCount
+      );
 
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
+        
+        this.currentInteractionCount++;
+        this.updateProgressionState();
+
+        if (this.currentInteractionCount > this.maxInteractions) {
+          this.addStoryEntry('system', 'Capítulo concluído! Progressão resetada para novo ciclo.');
+          this.resetProgressionForNewChapter();
+        }
+        
+        if (response.progression) {
+          this.handleProgressionInfo(response.progression);
+        }
+        
       } else {
         this.addStoryEntry('system', `Erro: ${response.error || 'Falha na comunicação'}`);
       }
@@ -368,6 +459,14 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
+  handleProgressionInfo(progression: ProgressionInfo) {
+    console.log('Informações de progressão:', progression);
+    
+    if (progression.should_provide_reward) {
+      this.addStoryEntry('system', 'O Mestre IA está preparando recompensas finais...');
+    }
+  }
+
   async quickLLMAction(action: string) {
     this.customCommand = action;
     await this.sendLLMMessage();
@@ -375,13 +474,31 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   async performContextAction(action: ContextualAction) {
     this.addStoryEntry('player', `${action.name}: ${action.description}`);
+    
+    this.addStoryEntry('system', 
+      `Interação ${this.currentInteractionCount}/10 | Fase: ${this.getPhaseDisplayName()}`
+    );
+    
     this.isLoading = true;
     
     try {
-      const response = await this.llmService.executeContextualAction(action, this.currentCharacterId);
+      const response = await this.llmService.executeContextualActionWithProgression(
+        action, 
+        this.currentCharacterId, 
+        this.currentInteractionCount
+      );
       
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
+
+        this.currentInteractionCount++;
+        this.updateProgressionState();
+        
+        if (this.currentInteractionCount > this.maxInteractions) {
+          this.addStoryEntry('system', '🎉 Capítulo concluído! Progressão resetada para novo ciclo.');
+          this.resetProgressionForNewChapter();
+        }
+        
       } else {
         this.addStoryEntry('system', `Erro ao executar ação: ${response.error}`);
       }

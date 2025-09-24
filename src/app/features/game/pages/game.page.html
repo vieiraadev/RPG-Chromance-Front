@@ -60,6 +60,35 @@
         <h3>Assistente IA Chromance</h3>
       </div>
 
+      <div class="chapter-progression-indicator">
+        <div class="progression-header">
+          <div class="phase-info">
+            <span class="phase-name" [style.color]="getPhaseColor()">
+              {{ getPhaseDisplayName() }}
+            </span>
+            <span class="interaction-count">
+              {{ currentInteractionCount }}/{{ maxInteractions }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="progression-bar">
+          <div class="progression-fill" 
+               [style.width.%]="progressPercentage"
+               [style.background-color]="getPhaseColor()">
+          </div>
+          <div class="progression-milestones">
+          </div>
+        </div>
+        
+        <div class="progression-hints" *ngIf="shouldShowFinalRewardHint()">
+          <div class="reward-hint">
+            <i class="fas fa-gift"></i>
+            <span>Zona de Recompensa Final!</span>
+          </div>
+        </div>
+      </div>
+
       <div class="quick-actions">
         <button class="action-btn" (click)="performAction('examine')">
           <i class="fas fa-search"></i>

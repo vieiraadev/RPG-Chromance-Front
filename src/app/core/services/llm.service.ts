@@ -23,6 +23,7 @@ export interface LLMChatRequest {
   character_id?: string;
   conversation_history?: ChatMessage[];
   generate_actions?: boolean;
+  interaction_count?: number; 
 }
 
 export interface LLMChatResponse {
@@ -31,10 +32,20 @@ export interface LLMChatResponse {
   contextual_actions?: ContextualAction[];
   error?: string;
   usage?: any;
+  progression?: ProgressionInfo;
 }
 
 export interface CharacterSuggestionRequest {
   partial_data: any;
+}
+
+export interface ProgressionInfo {
+  interaction_count: number;
+  max_interactions: number;
+  current_phase: 'introduction' | 'development' | 'resolution';
+  chapter: number;
+  should_provide_reward: boolean;
+  progress_percentage: number;
 }
 
 @Injectable({
@@ -52,12 +63,24 @@ export class LLMService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
+  private progressionSubject = new BehaviorSubject<ProgressionInfo | null>(null);
+  public progression$ = this.progressionSubject.asObservable();
+
   constructor(private http: HttpClient) {}
 
   async sendMessage(
     message: string, 
     characterId?: string,
     generateActions: boolean = true
+  ): Promise<LLMChatResponse> {
+    return this.sendMessageWithProgression(message, characterId, generateActions, 1);
+  }
+
+  async sendMessageWithProgression(
+    message: string, 
+    characterId?: string,
+    generateActions: boolean = true,
+    interactionCount: number = 1
   ): Promise<LLMChatResponse> {
     try {
       this.loadingSubject.next(true);
@@ -75,7 +98,8 @@ export class LLMService {
         message,
         character_id: characterId,
         conversation_history: currentConversation,
-        generate_actions: generateActions
+        generate_actions: generateActions,
+        interaction_count: interactionCount 
       };
 
       const response = await this.http.post<LLMChatResponse>(
@@ -94,6 +118,10 @@ export class LLMService {
         
         if (response.contextual_actions && response.contextual_actions.length > 0) {
           this.contextualActionsSubject.next(response.contextual_actions);
+        }
+
+        if (response.progression) {
+          this.progressionSubject.next(response.progression);
         }
       }
 
@@ -123,6 +151,15 @@ export class LLMService {
   async executeContextualAction(action: ContextualAction, characterId?: string): Promise<LLMChatResponse> {
     const actionMessage = `Executar ação: "${action.name}" - ${action.description}`;
     return this.sendMessage(actionMessage, characterId, true);
+  }
+
+  async executeContextualActionWithProgression(
+    action: ContextualAction, 
+    characterId?: string, 
+    interactionCount: number = 1
+  ): Promise<LLMChatResponse> {
+    const actionMessage = `Executar ação: "${action.name}" - ${action.description}`;
+    return this.sendMessageWithProgression(actionMessage, characterId, true, interactionCount);
   }
 
   async suggestCharacter(partialData: any): Promise<LLMChatResponse> {
@@ -162,9 +199,27 @@ export class LLMService {
     }
   }
 
+  async resetChapterProgression(): Promise<boolean> {
+    try {
+      const response = await this.http.post<any>(`${this.apiUrl}/reset-progression`, {}).toPromise();
+      
+      if (response?.success) {
+        this.clearConversation();
+        this.progressionSubject.next(null);
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Erro ao resetar progressão:', error);
+      return false;
+    }
+  }
+
   clearConversation(): void {
     this.conversationSubject.next([]);
     this.contextualActionsSubject.next([]);
+    this.progressionSubject.next(null);
   }
 
   getCurrentConversation(): ChatMessage[] {
@@ -175,12 +230,20 @@ export class LLMService {
     return this.contextualActionsSubject.value;
   }
 
+  getCurrentProgression(): ProgressionInfo | null {
+    return this.progressionSubject.value;
+  }
+
   setConversation(messages: ChatMessage[]): void {
     this.conversationSubject.next(messages);
   }
 
   setContextualActions(actions: ContextualAction[]): void {
     this.contextualActionsSubject.next(actions);
+  }
+
+  setProgression(progression: ProgressionInfo | null): void {
+    this.progressionSubject.next(progression);
   }
 
   isLoading(): boolean {
@@ -198,12 +261,33 @@ export class LLMService {
     this.contextualActionsSubject.next(filteredActions);
   }
 
-
   getActionsSortedByPriority(): ContextualAction[] {
     return this.getCurrentContextualActions().sort((a, b) => b.priority - a.priority);
   }
 
   getActionsByCategory(category: string): ContextualAction[] {
     return this.getCurrentContextualActions().filter(action => action.category === category);
+  }
+
+  getPhaseDisplayName(phase: string): string {
+    switch (phase) {
+      case 'introduction': return 'EXPLORAÇÃO';
+      case 'development': return 'DESENVOLVIMENTO';  
+      case 'resolution': return 'CLÍMAX';
+      default: return 'FASE DESCONHECIDA';
+    }
+  }
+
+  getPhaseColor(phase: string): string {
+    switch (phase) {
+      case 'introduction': return '#00d4ff'; 
+      case 'development': return '#0080ff'; 
+      case 'resolution': return '#0066cc';    
+      default: return '#747d8c';
+    }
+  }
+
+  shouldShowFinalRewardHint(interactionCount: number): boolean {
+    return interactionCount >= 8;
   }
 }
