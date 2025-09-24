@@ -24,9 +24,6 @@
   --primary-blue-bg: rgba(0, 128, 255, 0.1);
   --primary-blue-border: rgba(0, 128, 255, 0.3);
   --primary-blue-glow: rgba(0, 128, 255, 0.2);
-  --llm-accent: #ff00ff;
-  --llm-bg: rgba(255, 0, 255, 0.1);
-  --llm-border: rgba(255, 0, 255, 0.3);
 }
 
 .llm-quick-actions h4,
@@ -91,7 +88,7 @@ button.llm-mode:hover:not(:disabled) {
 }
 
 .story-entry.llm-message .message {
-  color: #0080ff !important;
+  color: #fff !important;
 }
 
 .llm-typing-indicator {
@@ -139,6 +136,9 @@ body:has(.sidebar:hover) .game-page.game-container {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: calc(100vh - 140px);
+  min-height: 500px;
+  max-height: calc(100vh - 140px);
 
   .story-header {
     display: flex;
@@ -147,6 +147,7 @@ body:has(.sidebar:hover) .game-page.game-container {
     padding: 15px 20px;
     background: var(--primary-blue-bg);
     border-bottom: 1px solid var(--primary-blue-border);
+    flex-shrink: 0;
 
     i {
       color: var(--primary-blue);
@@ -209,9 +210,33 @@ body:has(.sidebar:hover) .game-page.game-container {
   .story-content {
     flex: 1;
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: auto; 
+    overflow-x: hidden;
     font-family: 'Rajdhani', sans-serif;
     line-height: 1.6;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-blue) transparent;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--primary-blue), var(--primary-blue-light));
+      border-radius: 4px;
+      border: 1px solid var(--primary-blue-border);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, var(--primary-blue-light), var(--primary-blue));
+      box-shadow: 0 0 8px var(--primary-blue-glow);
+    }
 
     .story-entry {
       margin-bottom: 15px;
@@ -273,16 +298,17 @@ body:has(.sidebar:hover) .game-page.game-container {
         }
       }
 
+
       &.llm-message {
-        border-left: 3px solid var(--llm-accent);
-        background: rgba(255, 0, 255, 0.05);
+        border-left: 3px solid #0080ff;
+        background: rgba(0, 128, 255, 0.03);
         
         .message-type {
-          color: var(--llm-accent);
+          color: var(--text);
         }
 
         .message {
-          color: var(--llm-accent);
+          color: var(--text);
         }
       }
 
