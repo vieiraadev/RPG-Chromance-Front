@@ -6,15 +6,10 @@
       <div class="story-header">
         <i class="fas fa-terminal"></i>
         <h3>Interface Neural</h3>
-        
-        <div class="mode-indicator active">
-          <i class="fas fa-robot"></i>
-          <span>MESTRE IA</span>
-        </div>
 
         <button class="btn-clear-log" (click)="clearStoryLog()">
-          <i class="fas fa-trash"></i>
-        </button>
+          <i class="bx bx-trash"></i>
+        </button>        
       </div>
 
       <div class="story-content" #storyContent>
@@ -106,7 +101,6 @@
               <small class="action-description">{{ action.description }}</small>
               
               <div class="action-meta">
-                <span class="action-category">{{ action.category }}</span>
                 <div class="priority-dots">
                   <span 
                     class="priority-dot" 
@@ -124,20 +118,6 @@
         </div>
         
         <div class="category-summary" *ngIf="availableActions.length > 3">
-          <span class="category-badge" *ngFor="let category of ['combat', 'stealth', 'social', 'exploration', 'tech', 'magic']">
-            <ng-container *ngIf="getActionsByCategory(category).length > 0">
-              <i class="category-icon" 
-                 [ngClass]="{
-                   'bx bx-sword': category === 'combat',
-                   'bx bx-hide': category === 'stealth', 
-                   'bx bx-chat': category === 'social',
-                   'bx bx-search': category === 'exploration',
-                   'bx bx-chip': category === 'tech',
-                   'bx bx-magic-wand': category === 'magic'
-                 }"></i>
-              {{ getActionsByCategory(category).length }}
-            </ng-container>
-          </span>
         </div>
       </div>
 
