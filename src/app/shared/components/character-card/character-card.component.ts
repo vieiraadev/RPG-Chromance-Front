@@ -9,6 +9,21 @@ export interface CharacterAttributes {
   inteligencia: number;
 }
 
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  chapter: number;
+  campaign_id: string;
+  obtained_at: string;
+  metadata: {
+    power?: string;
+    rarity?: string;
+    effect?: string;
+  };
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -18,6 +33,7 @@ export interface Character {
   atributos: CharacterAttributes;
   imageUrl: string;
   is_selected?: boolean;
+  inventory?: InventoryItem[];
 }
 
 @Component({
@@ -35,10 +51,23 @@ export class CharacterCardComponent implements OnInit {
   @Output() editClicked = new EventEmitter<Character>();
   @Output() deleteClicked = new EventEmitter<Character>();
   @Output() characterSelected = new EventEmitter<Character>();
-  
+
   hasValidImage = false;
   formattedName = '';
   isSelecting = false;
+
+  itemIcons: { [key: string]: string } = {
+    'cubo_sombras': 'bx-cube-alt',
+    'cristal_arcano': 'bx-diamond',
+    'cinturao_campeao': 'bx-medal'
+  };
+
+  rarityColors: { [key: string]: string } = {
+    'Lendário': '#00D9FF',    
+    'Épico': '#0080FF',     
+    'Raro': '#0052CC',        
+    'Comum': '#003D7A'        
+  };
 
   constructor(private characterService: CharacterService) {}
 
@@ -64,6 +93,16 @@ export class CharacterCardComponent implements OnInit {
     }
   }
 
+  getItemIcon(item: InventoryItem): string {
+    const itemIdPrefix = item.id.split('_').slice(0, 2).join('_');
+    return this.itemIcons[itemIdPrefix] || 'bx-package';
+  }
+
+  getItemRarityColor(item: InventoryItem): string {
+    const rarity = item.metadata?.rarity || 'Comum';
+    return this.rarityColors[rarity] || this.rarityColors['Comum'];
+  }
+
   onEdit(): void {
     this.editClicked.emit(this.character);
   }
@@ -81,7 +120,6 @@ export class CharacterCardComponent implements OnInit {
     }
 
     this.isSelecting = true;
-    
     this.characterService.selectCharacter(this.character.id).subscribe({
       next: (selectedCharacter) => {
         this.characterSelected.emit(this.character);

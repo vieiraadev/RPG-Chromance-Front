@@ -11,6 +11,21 @@ export interface CharacterAttributes {
   inteligencia: number;
 }
 
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  chapter: number;
+  campaign_id: string;
+  obtained_at: string;
+  metadata: {
+    power?: string;
+    rarity?: string;
+    effect?: string;
+  };
+}
+
 export interface CharacterCreate {
   name: string;
   raca: string;
@@ -28,6 +43,7 @@ export interface CharacterResponse {
   classe: string;
   descricao: string;
   atributos: CharacterAttributes;
+  inventory?: InventoryItem[]; 
   imageUrl: string;
   user_id?: string;
   is_selected?: boolean;
@@ -49,7 +65,6 @@ export interface CharacterListResponse {
 })
 export class CharacterService {
   private apiUrl = `${environment.apiBaseUrl}/api/characters`;
-  
   private selectedCharacterSubject = new BehaviorSubject<CharacterResponse | null>(null);
   public selectedCharacter$ = this.selectedCharacterSubject.asObservable();
 
@@ -62,9 +77,13 @@ export class CharacterService {
   listCharacters(): Observable<CharacterListResponse> {
     return this.http.get<CharacterListResponse>(this.apiUrl).pipe(
       tap(response => {
+        console.log('Characters from API:', response);
         response.characters.forEach(character => {
           if (character.is_selected === undefined) {
             character.is_selected = false;
+          }
+          if (!character.inventory) {
+            character.inventory = [];
           }
         });
       })
@@ -72,7 +91,14 @@ export class CharacterService {
   }
 
   getCharacter(id: string): Observable<CharacterResponse> {
-    return this.http.get<CharacterResponse>(`${this.apiUrl}/${id}`);
+    return this.http.get<CharacterResponse>(`${this.apiUrl}/${id}`).pipe(
+      tap(character => {
+        console.log('Single character from API:', character);
+        if (!character.inventory) {
+          character.inventory = [];
+        }
+      })
+    );
   }
 
   updateCharacter(id: string, character: Partial<CharacterCreate>): Observable<CharacterResponse> {
@@ -101,6 +127,10 @@ export class CharacterService {
         this.selectedCharacterSubject.next(selectedCharacter);
       })
     );
+  }
+
+  getCharacterInventory(characterId: string): Observable<InventoryItem[]> {
+    return this.http.get<InventoryItem[]>(`${this.apiUrl}/${characterId}/inventory`);
   }
 
   clearSelectedCharacter(): void {

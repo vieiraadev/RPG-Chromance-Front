@@ -44,7 +44,12 @@ export class CharactersPageComponent implements OnInit {
     
     this.characterService.listCharacters().subscribe({
       next: (response) => {
+        console.log('Raw response from API:', response);
+        
         this.characters = response.characters.map(char => this.convertToFrontendFormat(char));
+        
+        console.log('Characters after conversion:', this.characters);
+        
         this.isLoading = false;
         console.log(`${this.characters.length} personagens carregados do banco`);
       },
@@ -66,6 +71,7 @@ export class CharactersPageComponent implements OnInit {
       classe: backendChar.classe,
       descricao: backendChar.descricao || '',
       atributos: backendChar.atributos,
+      inventory: backendChar.inventory || [],
       imageUrl: backendChar.imageUrl,
       is_selected: backendChar.is_selected || false  
     };
@@ -80,6 +86,7 @@ export class CharactersPageComponent implements OnInit {
         classe: 'Guerreiro',
         descricao: 'Um humano forte e disciplinado, treinado em batalhas corpo a corpo e liderança em campo de guerra.',
         atributos: { vida: 16, energia: 12, forca: 14, inteligencia: 10 },
+        inventory: [],
         imageUrl: 'assets/images/card-image1.jpg',
         is_selected: false 
       },
@@ -90,6 +97,7 @@ export class CharactersPageComponent implements OnInit {
         classe: 'Guerreira',
         descricao: 'Uma combatente implacável das ruas neon da cidade.',
         atributos: { vida: 14, energia: 16, forca: 10, inteligencia: 12 },
+        inventory: [],
         imageUrl: 'assets/images/card-image2.jpg',
         is_selected: false  
       }
@@ -150,6 +158,7 @@ export class CharactersPageComponent implements OnInit {
       classe: newCharacter.classe,
       descricao: newCharacter.descricao || '',
       atributos: newCharacter.atributos,
+      inventory: newCharacter.inventory || [],
       imageUrl: newCharacter.imageUrl,
       is_selected: newCharacter.is_selected || false
     };

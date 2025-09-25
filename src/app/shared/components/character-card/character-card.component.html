@@ -102,6 +102,40 @@
         <div class="stat-label">Descrição</div>
         <div class="description-text">{{ character.descricao }}</div>
       </div>
+
+      <div class="stat-group inventory-section">
+        <div class="stat-label">
+          <i class='bx bx-package'></i> Inventário
+          <span class="inventory-count" *ngIf="character.inventory && character.inventory.length > 0">
+            ({{ character.inventory.length }})
+          </span>
+        </div>
+        
+        <div class="inventory-container" *ngIf="character.inventory && character.inventory.length > 0; else emptyInventory">
+          <div 
+            class="inventory-item" 
+            *ngFor="let item of character.inventory"
+            [title]="item.name + ' - ' + item.description">
+            <div class="item-icon-wrapper" [style.border-color]="getItemRarityColor(item)">
+              <i class='bx' [ngClass]="getItemIcon(item)" [style.color]="getItemRarityColor(item)"></i>
+              <div class="item-glow" [style.background]="getItemRarityColor(item)"></div>
+            </div>
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-rarity" [style.color]="getItemRarityColor(item)">
+                {{ item.metadata.rarity }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyInventory>
+          <div class="empty-inventory">
+            <i class='bx bx-package'></i>
+            <p>Nenhum item coletado</p>
+          </div>
+        </ng-template>
+      </div>
     </div>
   </div>
   
