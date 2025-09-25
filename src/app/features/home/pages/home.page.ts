@@ -13,8 +13,8 @@ import { CharacterService, CharacterResponse } from '@app/core/services/characte
   selector: 'app-home',
   standalone: true,
   imports: [
-    CommonModule, 
-    NavbarComponent, 
+    CommonModule,
+    NavbarComponent,
     VillainCarouselComponent,
     CharacterCardComponent,
     LocationGalleryComponent,
@@ -26,7 +26,6 @@ export class HomePageComponent implements OnInit, OnDestroy {
   userName: string = 'Jogador';
   isLoading: boolean = true;
   selectedCharacter: Character | null = null;
-  
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -68,6 +67,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
       const sub = this.characterService.getSelectedCharacter().subscribe({
         next: (character: CharacterResponse) => {
           this.selectedCharacter = this.mapToCharacter(character);
+          console.log('Personagem selecionado carregado:', this.selectedCharacter);
         },
         error: (error) => {
           console.log('Nenhum personagem selecionado:', error);
@@ -95,7 +95,9 @@ export class HomePageComponent implements OnInit, OnDestroy {
       classe: characterResponse.classe,
       descricao: characterResponse.descricao,
       atributos: characterResponse.atributos,
-      imageUrl: characterResponse.imageUrl
+      inventory: characterResponse.inventory || [], 
+      imageUrl: characterResponse.imageUrl,
+      is_selected: characterResponse.is_selected || false 
     };
   }
 

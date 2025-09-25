@@ -79,7 +79,9 @@ export class SelectCharacterModalComponent implements OnInit, OnChanges {
       classe: char.classe || 'Classe não informada', 
       descricao: char.descricao || '',
       atributos: char.atributos || { vida: 10, energia: 10, forca: 10, inteligencia: 10 },
-      imageUrl: char.imageUrl || 'assets/images/default-avatar.png'
+      inventory: char.inventory || [], 
+      imageUrl: char.imageUrl || 'assets/images/default-avatar.png',
+      is_selected: char.is_selected || false 
     };
   }
 
