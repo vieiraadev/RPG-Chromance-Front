@@ -242,7 +242,11 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       if (activeCampaignStatus && activeCampaignStatus.has_active_campaign && activeCampaignStatus.active_campaign) {
         this.activeCampaign = activeCampaignStatus.active_campaign;
         
-        this.addDefaultStoryMessages();
+        await this.loadCampaignHistoryFromChroma(this.activeCampaign.campaign_id);
+        
+        if (this.storyLog.length === 0) {
+          this.addDefaultStoryMessages();
+        }
         
         if (this.activeCampaign.active_character_id) {
           try {
@@ -253,14 +257,18 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
               this.updateCharacterDisplay(character);
               this.currentCharacterId = character._id;
               
-              this.addStoryEntry('system', `Personagem carregado: ${character.name} (${character.raca} ${character.classe})`);
+              if (this.storyLog.length === 0) {
+                this.addStoryEntry('system', `Personagem carregado: ${character.name} (${character.raca} ${character.classe})`);
+              }
             }
           } catch (characterError) {
             console.error('Erro ao carregar personagem ativo:', characterError);
             this.addStoryEntry('system', 'Erro ao carregar dados do personagem. Usando dados padrão.');
           }
         } else {
-          this.addStoryEntry('system', `Campanha ${this.activeCampaign.title} ativa, mas sem personagem definido.`);
+          if (this.storyLog.length === 0) {
+            this.addStoryEntry('system', `Campanha ${this.activeCampaign.title} ativa, mas sem personagem definido.`);
+          }
         }
       } else {
         this.addDefaultStoryMessages();
@@ -301,6 +309,53 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.addStoryEntry('narrator', 'Você se encontra em um beco escuro da cidade. O som de sirenes ecoa à distância enquanto as luzes de neon piscam nas paredes molhadas. Sua respiração está pesada após a fuga dos seguranças corporativos.');
     }
   }
+
+private async loadCampaignHistoryFromChroma(campaignId: string) {
+  try {
+    console.log(`Carregando histórico do ChromaDB para campanha: ${campaignId}`);
+    
+    const result = await this.llmService.loadCampaignHistory(campaignId);
+    
+    if (result.success && result.history.length > 0) {
+      console.log(`${result.history.length} mensagens carregadas do histórico`);
+      
+      this.storyLog = [];
+      
+      this.addStoryEntry('system', `Histórico carregado: ${result.history.length} interações anteriores recuperadas`);
+      
+      result.history.forEach((msg: any) => {
+        if (msg.role === 'user') {
+          this.addStoryEntry('player', msg.content);
+        } else if (msg.role === 'assistant') {
+          this.addStoryEntry('llm', msg.content);
+        }
+      });
+      
+      if (result.lastInteraction > 0) {
+        this.currentInteractionCount = result.lastInteraction + 1;
+        this.updateProgressionState();
+        
+        this.addStoryEntry('system', 
+          `Continuando do ponto anterior - Interação ${this.currentInteractionCount}/${this.maxInteractions}`
+        );
+      }
+      
+      const conversationHistory = result.history.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content,
+        timestamp: new Date(msg.timestamp)
+      }));
+      this.llmService.setConversation(conversationHistory);
+      
+    } else {
+      console.log('Nenhum histórico encontrado no ChromaDB para esta campanha');
+    }
+    
+  } catch (error) {
+    console.error('Erro ao carregar histórico do ChromaDB:', error);
+    this.addStoryEntry('system', 'Não foi possível carregar histórico anterior. Iniciando nova sessão.');
+  }
+}
 
   private getChapterMessages(campaignTitle: string): { system: string; narrator: string } {
     const title = campaignTitle.toLowerCase();
@@ -539,11 +594,35 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.customCommand = suggestion;
   }
 
-  clearStoryLog() {
+  async clearStoryLog() {
+    if (!confirm('Deseja realmente limpar todo o histórico desta campanha? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+  
     this.storyLog = [];
+    this.llmService.clearConversation();
+
+    if (this.activeCampaign?.campaign_id) {
+      try {
+        this.addStoryEntry('system', 'Limpando histórico...');
+        
+        const success = await this.llmService.clearCampaignHistory(this.activeCampaign.campaign_id);
+        
+        if (success) {
+          this.addStoryEntry('system', 'Histórico limpo com sucesso!');
+        } else {
+          this.addStoryEntry('system', 'Não foi possível limpar o histórico do ChromaDB.');
+        }
+      } catch (error) {
+        console.error('Erro ao limpar ChromaDB:', error);
+        this.addStoryEntry('system', 'Erro ao limpar histórico do ChromaDB.');
+      }
+    }
+    
     this.addDefaultStoryMessages();
     this.shouldScrollToBottom = true;
-    this.llmService.clearConversation();
+    
+    this.resetProgressionForNewChapter();
   }
 
   toggleCharacterPanel() {

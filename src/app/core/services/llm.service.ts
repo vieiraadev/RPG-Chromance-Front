@@ -290,4 +290,51 @@ export class LLMService {
   shouldShowFinalRewardHint(interactionCount: number): boolean {
     return interactionCount >= 8;
   }
+
+async loadCampaignHistory(campaignId: string): Promise<{success: boolean, history: any[], lastInteraction: number}> {
+  try {
+    const response = await this.http.get<any>(
+      `${this.apiUrl}/chroma/campaign/${campaignId}/full-context`
+    ).toPromise();
+    
+    if (response?.success && response.conversation_history) {
+      return {
+        success: true,
+        history: response.conversation_history,
+        lastInteraction: response.last_interaction || 0
+      };
+    }
+    
+    return { success: false, history: [], lastInteraction: 0 };
+  } catch (error) {
+    console.error('Erro ao carregar histórico do ChromaDB:', error);
+    return { success: false, history: [], lastInteraction: 0 };
+  }
+}
+
+async checkChromaHealth(): Promise<boolean> {
+  try {
+    const response = await this.http.get<any>(
+      `${this.apiUrl}/chroma/health`
+    ).toPromise();
+    return response?.success || false;
+  } catch (error) {
+    console.error('Erro no health check do ChromaDB:', error);
+    return false;
+  }
+}
+
+async clearCampaignHistory(campaignId: string): Promise<boolean> {
+  try {
+    const response = await this.http.delete<any>(
+      `${this.apiUrl}/chroma/campaign/${campaignId}`
+    ).toPromise();
+    
+    return response?.success || false;
+  } catch (error) {
+    console.error('Erro ao limpar histórico do ChromaDB:', error);
+    return false;
+  }
+}
+
 }

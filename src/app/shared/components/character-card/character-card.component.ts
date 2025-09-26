@@ -64,7 +64,7 @@ export class CharacterCardComponent implements OnInit {
 
   rarityColors: { [key: string]: string } = {
     'Lendário': '#00D9FF',    
-    'Épico': '#0080FF',     
+    'Épico': '#00D9FF',     
     'Raro': '#0052CC',        
     'Comum': '#003D7A'        
   };

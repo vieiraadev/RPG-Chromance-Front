@@ -5,6 +5,7 @@ import { SelectCharacterModalComponent } from '@app/shared/components/select-cha
 import { Character } from '@app/shared/components/character-card/character-card.component';
 import { Router } from '@angular/router';
 import { CampaignService, Campaign, ActiveCampaignStatus } from '@app/core/services/campaign.service';
+import { LLMService } from '@app/core/services/llm.service';
 
 @Component({
   selector: 'app-campaigns',
@@ -29,7 +30,8 @@ export class CampaignsComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private campaignService: CampaignService
+    private campaignService: CampaignService,
+    private llmService: LLMService
   ) {}
 
   ngOnInit(): void {
@@ -213,11 +215,26 @@ export class CampaignsComponent implements OnInit {
     const activeCampaign = this.activeCampaignStatus.active_campaign;
     if (!activeCampaign) return;
 
-    if (confirm(`Deseja encerrar a campanha ativa "${activeCampaign.title}"? O progresso será perdido.`)) {
+    if (confirm(`Deseja encerrar a campanha ativa "${activeCampaign.title}"? O progresso e histórico serão perdidos.`)) {
       this.campaignService.cancelCampaign(activeCampaign.campaign_id).subscribe({
-        next: (response) => {
+        next: async (response) => {
           console.log('Campanha cancelada:', response);
-          alert('Campanha encerrada com sucesso!');
+          
+          try {
+            const chromaCleared = await this.llmService.clearCampaignHistory(activeCampaign.campaign_id);
+            
+            if (chromaCleared) {
+              console.log('Histórico do ChromaDB limpo com sucesso');
+              alert('Campanha e histórico encerrados com sucesso!');
+            } else {
+              console.warn('Campanha encerrada, mas houve problema ao limpar histórico');
+              alert('Campanha encerrada com sucesso!');
+            }
+          } catch (error) {
+            console.error('Erro ao limpar histórico do ChromaDB:', error);
+            alert('Campanha encerrada com sucesso!');
+          }
+          
           this.loadActiveCampaignStatus();
           this.loadCampaigns();
         },
