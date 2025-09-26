@@ -1,0 +1,21 @@
+<div class="confirmation-overlay" *ngIf="currentConfirmation" (click)="cancel()">
+    <div class="confirmation-modal" [ngClass]="getTypeClass()" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ currentConfirmation.title }}</h3>
+        <button class="close-btn" (click)="cancel()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <p>{{ currentConfirmation.message }}</p>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cancel()">
+          {{ currentConfirmation.cancelText || 'Cancelar' }}
+        </button>
+        <button class="btn-confirm" (click)="confirm()">
+          {{ currentConfirmation.confirmText || 'Confirmar' }}
+        </button>
+      </div>
+    </div>
+  </div>

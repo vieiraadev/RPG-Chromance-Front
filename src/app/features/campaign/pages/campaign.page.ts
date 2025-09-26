@@ -6,6 +6,8 @@ import { Character } from '@app/shared/components/character-card/character-card.
 import { Router } from '@angular/router';
 import { CampaignService, Campaign, ActiveCampaignStatus } from '@app/core/services/campaign.service';
 import { LLMService } from '@app/core/services/llm.service';
+import { NotificationService } from '@app/core/services/notification.service';
+import { ConfirmationService } from '@app/core/services/confirmation.service';
 
 @Component({
   selector: 'app-campaigns',
@@ -21,7 +23,6 @@ export class CampaignsComponent implements OnInit {
   showDetail: boolean = false;
   showCharacterModal: boolean = false;
   campaignToStart: Campaign | null = null;
-  errorMessage: string = '';
 
   activeCampaignStatus: ActiveCampaignStatus = {
     has_active_campaign: false,
@@ -31,7 +32,9 @@ export class CampaignsComponent implements OnInit {
   constructor(
     private router: Router,
     private campaignService: CampaignService,
-    private llmService: LLMService
+    private llmService: LLMService,
+    private notification: NotificationService,
+    private confirmation: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +44,6 @@ export class CampaignsComponent implements OnInit {
 
   private loadCampaigns(): void {
     this.isLoading = true;
-    this.errorMessage = '';
     
     this.campaignService.getCampaigns().subscribe({
       next: (response) => {
@@ -53,9 +55,8 @@ export class CampaignsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar campanhas:', error);
-        this.errorMessage = 'Erro ao carregar campanhas. Tente novamente mais tarde.';
+        this.notification.error('Erro ao carregar campanhas. Tente novamente mais tarde.');
         this.isLoading = false;
-        
         this.loadMockCampaigns();
       }
     });
@@ -65,16 +66,16 @@ export class CampaignsComponent implements OnInit {
     this.campaignService.getActiveCampaignStatus().subscribe({
       next: (status) => {
         this.activeCampaignStatus = status;
-        console.log('Status campanha ativa:', status);
       },
       error: (err) => {
         console.error('Erro ao carregar status da campanha ativa:', err);
+        this.notification.error('Erro ao verificar status da campanha ativa');
       }
     });
   }
 
   private loadMockCampaigns(): void {
-    console.warn('Usando dados mockados como fallback');
+    this.notification.warning('Usando dados de exemplo');
     
     this.campaigns = [
       {
@@ -178,19 +179,18 @@ export class CampaignsComponent implements OnInit {
       const activeCampaign = this.activeCampaignStatus.active_campaign;
       if (activeCampaign?.campaign_id === campaign.campaign_id) {
         this.continueCampaign(activeCampaign);
+      } else {
+        this.notification.warning(`Esta campanha está ocupada por ${activeCampaign?.active_character_name || 'outro personagem'}`);
       }
     }
   }
 
   private startNewCampaign(campaign: Campaign): void {
-    console.log('Iniciando nova campanha:', campaign);
     this.campaignToStart = campaign;
     this.showCharacterModal = true;
   }
 
   private continueCampaign(campaign: Campaign): void {
-    console.log('Continuando campanha:', campaign);
-    
     const navigationData = {
       campaignId: campaign.campaign_id,
       campaignTitle: campaign.title,
@@ -201,6 +201,8 @@ export class CampaignsComponent implements OnInit {
     };
 
     localStorage.setItem('gameData', JSON.stringify(navigationData));
+    
+    this.notification.info(`Continuando campanha: ${campaign.title}`);
     
     this.router.navigate(['/game'], {
       queryParams: {
@@ -215,35 +217,39 @@ export class CampaignsComponent implements OnInit {
     const activeCampaign = this.activeCampaignStatus.active_campaign;
     if (!activeCampaign) return;
 
-    if (confirm(`Deseja encerrar a campanha ativa "${activeCampaign.title}"? O progresso e histórico serão perdidos.`)) {
-      this.campaignService.cancelCampaign(activeCampaign.campaign_id).subscribe({
-        next: async (response) => {
-          console.log('Campanha cancelada:', response);
-          
-          try {
-            const chromaCleared = await this.llmService.clearCampaignHistory(activeCampaign.campaign_id);
-            
-            if (chromaCleared) {
-              console.log('Histórico do ChromaDB limpo com sucesso');
-              alert('Campanha e histórico encerrados com sucesso!');
-            } else {
-              console.warn('Campanha encerrada, mas houve problema ao limpar histórico');
-              alert('Campanha encerrada com sucesso!');
+    this.confirmation.confirm({
+      title: 'Encerrar Campanha',
+      message: `Deseja encerrar a campanha ativa "${activeCampaign.title}"? O progresso e histórico serão perdidos.`,
+      confirmText: 'Encerrar',
+      cancelText: 'Cancelar',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.campaignService.cancelCampaign(activeCampaign.campaign_id).subscribe({
+          next: async (response) => {
+            try {
+              const chromaCleared = await this.llmService.clearCampaignHistory(activeCampaign.campaign_id);
+              
+              if (chromaCleared) {
+                this.notification.success('Campanha e histórico encerrados com sucesso!');
+              } else {
+                this.notification.warning('Campanha encerrada, mas houve problema ao limpar histórico');
+              }
+            } catch (error) {
+              console.error('Erro ao limpar histórico do ChromaDB:', error);
+              this.notification.success('Campanha encerrada com sucesso!');
             }
-          } catch (error) {
-            console.error('Erro ao limpar histórico do ChromaDB:', error);
-            alert('Campanha encerrada com sucesso!');
+            
+            this.loadActiveCampaignStatus();
+            this.loadCampaigns();
+          },
+          error: (err) => {
+            console.error('Erro ao cancelar campanha:', err);
+            this.notification.error('Erro ao encerrar campanha');
           }
-          
-          this.loadActiveCampaignStatus();
-          this.loadCampaigns();
-        },
-        error: (err) => {
-          console.error('Erro ao cancelar campanha:', err);
-          alert('Erro ao encerrar campanha.');
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   openCampaign(campaignId: string): void {
@@ -256,7 +262,7 @@ export class CampaignsComponent implements OnInit {
         this.showDetail = true;
       }, 100);
     } else if (campaign && campaign.is_locked) {
-      this.showLockedMessage();
+      this.notification.warning('Esta campanha está bloqueada. Complete as campanhas anteriores para desbloqueá-la.');
     }
   }
 
@@ -271,23 +277,16 @@ export class CampaignsComponent implements OnInit {
   startCampaign(campaign?: Campaign): void {
     const campaignToStart = campaign || this.selectedCampaign;
     
-    console.log('startCampaign chamado com:', campaignToStart);
-    
     if (campaignToStart) {
       this.campaignToStart = campaignToStart;
       this.showCharacterModal = true;
-      console.log('Modal deveria abrir. showCharacterModal:', this.showCharacterModal);
     } else {
-      console.error('Nenhuma campanha disponível para iniciar');
+      this.notification.error('Nenhuma campanha disponível para iniciar');
     }
   }
 
   onCharacterSelected(character: Character): void {
-    console.log('Personagem selecionado:', character);
-    console.log('Dados da campanha:', this.campaignToStart);
-    
     const campaignId = this.campaignToStart?.campaign_id || this.campaignToStart?.id;
-    console.log('Campaign ID a ser usado:', campaignId);
     
     if (this.campaignToStart && campaignId) {
       const navigationData = {
@@ -305,6 +304,8 @@ export class CampaignsComponent implements OnInit {
 
       localStorage.setItem('gameData', JSON.stringify(navigationData));
       
+      this.notification.success(`Iniciando campanha com ${character.name}!`);
+      
       this.router.navigate(['/game'], {
         queryParams: {
           campaign: campaignId,
@@ -312,21 +313,13 @@ export class CampaignsComponent implements OnInit {
         }
       });
     } else {
-      console.error('Dados da campanha incompletos:', {
-        campaignToStart: this.campaignToStart,
-        campaignId: campaignId
-      });
-      alert('Erro: Dados da campanha não foram encontrados. Tente novamente.');
+      this.notification.error('Dados da campanha não foram encontrados. Tente novamente.');
     }
   }
 
   onCloseCharacterModal(): void {
     this.showCharacterModal = false;
     this.campaignToStart = null;
-  }
-
-  private showLockedMessage(): void {
-    console.log('Esta campanha está bloqueada. Complete as campanhas anteriores para desbloqueá-la.');
   }
 
   getRewardIconClass(icon: string): string {
@@ -340,17 +333,26 @@ export class CampaignsComponent implements OnInit {
   }
 
   seedCampaigns(): void {
-    if (confirm('Isso irá resetar todas as campanhas. Deseja continuar?')) {
-      this.campaignService.seedCampaigns().subscribe({
-        next: (campaigns) => {
-          console.log('Campanhas populadas com sucesso:', campaigns);
-          this.loadCampaigns();
-          this.loadActiveCampaignStatus(); 
-        },
-        error: (error) => {
-          console.error('Erro ao popular campanhas:', error);
-        }
-      });
-    }
+    this.confirmation.confirm({
+      title: 'Resetar Campanhas',
+      message: 'Isso irá resetar todas as campanhas. Deseja continuar?',
+      confirmText: 'Resetar',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.campaignService.seedCampaigns().subscribe({
+          next: (campaigns) => {
+            this.notification.success('Campanhas populadas com sucesso!');
+            this.loadCampaigns();
+            this.loadActiveCampaignStatus(); 
+          },
+          error: (error) => {
+            console.error('Erro ao popular campanhas:', error);
+            this.notification.error('Erro ao popular campanhas');
+          }
+        });
+      }
+    });
   }
 }
