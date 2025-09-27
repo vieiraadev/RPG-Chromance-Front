@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NavbarComponent } from '@shared/components/navbar/navbar.component';
 import { AuthService, UserOut } from '@core/services/auth.service';
 import { ApiService } from '@core/api/api.service';
+import { NotificationService } from '@core/services/notification.service';
+import { ConfirmationService } from '@core/services/confirmation.service';
 
 interface UserProfile {
   id: string;
@@ -29,6 +31,12 @@ interface UpdateProfileRequest {
   styleUrls: ['./profile.page.scss']
 })
 export class ProfilePageComponent implements OnInit {
+  private authService = inject(AuthService);
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+  private notification = inject(NotificationService);
+  private confirmation = inject(ConfirmationService);
+
   userProfile: UserProfile = {
     id: '',
     name: '',
@@ -51,14 +59,6 @@ export class ProfilePageComponent implements OnInit {
   showPassword: boolean = false;
   isLoading: boolean = false;
   isLoadingProfile: boolean = true;
-  errorMessage: string = '';
-  successMessage: string = '';
-
-  constructor(
-    private authService: AuthService,
-    private apiService: ApiService,
-    private router: Router
-  ) { }
 
   ngOnInit() {
     this.loadUserProfile();
@@ -66,7 +66,6 @@ export class ProfilePageComponent implements OnInit {
 
   loadUserProfile() {
     this.isLoadingProfile = true;
-    this.errorMessage = '';
   
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/auth/login']);
@@ -98,8 +97,7 @@ export class ProfilePageComponent implements OnInit {
           return;
         }
   
-        this.errorMessage = 'Erro ao carregar dados do perfil. Tente novamente.';
-        
+        this.notification.error('Erro ao carregar dados do perfil. Tente novamente.');
         this.loadMockData();
         this.isLoadingProfile = false;
       }
@@ -107,6 +105,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   private loadMockData() {
+    this.notification.warning('Usando dados de exemplo');
     this.userProfile = {
       id: 'mock-id',
       name: 'Usuário Teste',
@@ -134,8 +133,6 @@ export class ProfilePageComponent implements OnInit {
       this.saveProfile();
     } else {
       this.isEditing = true;
-      this.errorMessage = '';
-      this.successMessage = '';
     }
   }
 
@@ -145,8 +142,6 @@ export class ProfilePageComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     const updateData: UpdateProfileRequest = {
       nome: this.userProfile.name.trim(),
@@ -162,7 +157,7 @@ export class ProfilePageComponent implements OnInit {
         this.originalProfile = { ...this.userProfile };
         this.isEditing = false;
         this.showPassword = false;
-        this.successMessage = 'Perfil atualizado com sucesso!';
+        this.notification.success('Perfil atualizado com sucesso!');
 
         this.userProfile.password = '';
 
@@ -182,11 +177,11 @@ export class ProfilePageComponent implements OnInit {
         }
 
         if (error.status === 400) {
-          this.errorMessage = error.error?.detail || 'Dados inválidos. Verifique as informações.';
+          this.notification.error(error.error?.detail || 'Dados inválidos. Verifique as informações.');
         } else if (error.status === 409) {
-          this.errorMessage = 'Este email já está sendo usado por outro usuário.';
+          this.notification.error('Este email já está sendo usado por outro usuário.');
         } else {
-          this.errorMessage = 'Erro ao salvar perfil. Tente novamente.';
+          this.notification.error('Erro ao salvar perfil. Tente novamente.');
         }
 
         this.isLoading = false;
@@ -195,19 +190,41 @@ export class ProfilePageComponent implements OnInit {
   }
 
   cancelEdit() {
-    this.userProfile = { ...this.originalProfile };
-    this.isEditing = false;
-    this.showPassword = false;
-    this.errorMessage = '';
-    this.successMessage = '';
+    if (this.hasChanges()) {
+      this.confirmation.confirm({
+        title: 'Descartar Alterações',
+        message: 'Você tem alterações não salvas. Deseja descartar?',
+        confirmText: 'Descartar',
+        cancelText: 'Continuar Editando',
+        type: 'warning'
+      }).subscribe(confirmed => {
+        if (confirmed) {
+          this.userProfile = { ...this.originalProfile };
+          this.isEditing = false;
+          this.showPassword = false;
+          this.notification.info('Alterações descartadas');
+        }
+      });
+    } else {
+      this.userProfile = { ...this.originalProfile };
+      this.isEditing = false;
+      this.showPassword = false;
+    }
   }
-
+  
+  private hasChanges(): boolean {
+    const nameChanged = this.userProfile.name !== this.originalProfile.name;
+    const emailChanged = this.userProfile.email !== this.originalProfile.email;
+    const passwordChanged = !!(this.userProfile.password && this.userProfile.password.trim().length > 0);
+    
+    return nameChanged || emailChanged || passwordChanged;
+  }
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
   changeAvatar() {
-    console.log('Função de alterar avatar será implementada em breve...');
+    this.notification.info('Função de alterar avatar será implementada em breve');
   }
 
   getMemberSince(): string {
@@ -243,31 +260,29 @@ export class ProfilePageComponent implements OnInit {
   }
 
   private validateForm(): boolean {
-    this.errorMessage = '';
-
     if (!this.userProfile.name.trim()) {
-      this.errorMessage = 'Nome é obrigatório';
+      this.notification.warning('Nome é obrigatório');
       return false;
     }
 
     if (this.userProfile.name.trim().length < 2) {
-      this.errorMessage = 'Nome deve ter pelo menos 2 caracteres';
+      this.notification.warning('Nome deve ter pelo menos 2 caracteres');
       return false;
     }
 
     if (!this.userProfile.email.trim()) {
-      this.errorMessage = 'Email é obrigatório';
+      this.notification.warning('Email é obrigatório');
       return false;
     }
 
     if (!this.isValidEmail(this.userProfile.email)) {
-      this.errorMessage = 'Email inválido';
+      this.notification.warning('Email inválido');
       return false;
     }
 
     if (this.userProfile.password && this.userProfile.password.trim()) {
       if (this.userProfile.password.length < 6) {
-        this.errorMessage = 'Senha deve ter pelo menos 6 caracteres';
+        this.notification.warning('Senha deve ter pelo menos 6 caracteres');
         return false;
       }
     }
@@ -281,14 +296,18 @@ export class ProfilePageComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
-  }
-
-  private clearMessages(delay: number = 5000) {
-    setTimeout(() => {
-      this.errorMessage = '';
-      this.successMessage = '';
-    }, delay);
+    this.confirmation.confirm({
+      title: 'Sair da Conta',
+      message: 'Deseja realmente sair da sua conta?',
+      confirmText: 'Sair',
+      cancelText: 'Cancelar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.authService.logout();
+        this.notification.info('Você saiu da sua conta');
+        this.router.navigate(['/auth/login']);
+      }
+    });
   }
 }
