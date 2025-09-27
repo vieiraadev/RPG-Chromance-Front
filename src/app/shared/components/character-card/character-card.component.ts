@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CharacterService } from '@app/core/services/character.service';
+import { ConfirmationService } from '@app/core/services/confirmation.service';
+import { NotificationService } from '@app/core/services/notification.service';
 
 export interface CharacterAttributes {
   vida: number;
@@ -52,6 +54,10 @@ export class CharacterCardComponent implements OnInit {
   @Output() deleteClicked = new EventEmitter<Character>();
   @Output() characterSelected = new EventEmitter<Character>();
 
+  private characterService = inject(CharacterService);
+  private confirmation = inject(ConfirmationService);
+  private notification = inject(NotificationService);
+
   hasValidImage = false;
   formattedName = '';
   isSelecting = false;
@@ -63,13 +69,11 @@ export class CharacterCardComponent implements OnInit {
   };
 
   rarityColors: { [key: string]: string } = {
-    'Lendário': '#00D9FF',    
-    'Épico': '#00D9FF',     
-    'Raro': '#0052CC',        
-    'Comum': '#003D7A'        
+    'Lendário': '#00D9FF',
+    'Épico': '#00D9FF',
+    'Raro': '#0052CC',
+    'Comum': '#003D7A'
   };
-
-  constructor(private characterService: CharacterService) {}
 
   ngOnInit() {
     this.checkImage();
@@ -108,9 +112,18 @@ export class CharacterCardComponent implements OnInit {
   }
 
   onDelete(): void {
-    if (confirm(`Tem certeza que deseja deletar ${this.character.name}?`)) {
-      this.deleteClicked.emit(this.character);
-    }
+    this.confirmation.confirm({
+      title: 'Excluir Personagem',
+      message: `Tem certeza que deseja excluir ${this.character.name}? Esta ação não pode ser desfeita.`,
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      type: 'danger'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.deleteClicked.emit(this.character);
+        this.notification.success(`${this.character.name} foi excluído com sucesso`);
+      }
+    });
   }
 
   onSelect(): void {
@@ -123,12 +136,13 @@ export class CharacterCardComponent implements OnInit {
     this.characterService.selectCharacter(this.character.id).subscribe({
       next: (selectedCharacter) => {
         this.characterSelected.emit(this.character);
+        this.notification.success(`${this.character.name} foi selecionado`);
         this.isSelecting = false;
       },
       error: (error) => {
         console.error('Erro ao selecionar personagem:', error);
+        this.notification.error('Erro ao selecionar personagem. Tente novamente.');
         this.isSelecting = false;
-        alert('Erro ao selecionar personagem. Tente novamente.');
       }
     });
   }
