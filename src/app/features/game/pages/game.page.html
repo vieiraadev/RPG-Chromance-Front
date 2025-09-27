@@ -1,5 +1,12 @@
 <app-navbar></app-navbar>
 
+<app-loader 
+  *ngIf="isInitialLoading"
+  message="Inicializando Interface Neural..."
+  size="large"
+  [overlay]="true">
+</app-loader>
+
 <div class="game-page game-container">
   <div class="game-content">
     <div class="story-panel">
@@ -276,10 +283,10 @@
     </div>
   </div>
 
-  <div class="loading-overlay" *ngIf="isLoading">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <p>Processando ação...</p>
-    </div>
-  </div>
+<app-loader 
+  *ngIf="isLoading"
+  message="Processando ação..."
+  size="large"
+  [overlay]="true">
+</app-loader>
 </div>

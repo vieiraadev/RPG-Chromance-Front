@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
+import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { LLMService, ChatMessage, ContextualAction, ProgressionInfo } from '../../../core/services/llm.service';
 import { CampaignService, Campaign } from '../../../core/services/campaign.service';
 import { CharacterService, CharacterResponse } from '../../../core/services/character.service';
+import { NotificationService } from '@app/core/services/notification.service';
+import { ConfirmationService } from '@app/core/services/confirmation.service';
 
 interface StoryEntry {
   timestamp: string;
@@ -38,7 +41,7 @@ interface InventoryItem {
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, LoaderComponent],
   templateUrl: './game.page.html',
   styleUrls: ['./game.page.scss']
 })
@@ -46,6 +49,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('storyContent') storyContent!: ElementRef;
 
   isLoading = false;
+  isInitialLoading = true;
   isCharacterPanelCollapsed = true;
   llmLoading = false;
 
@@ -140,26 +144,30 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   constructor(
     private llmService: LLMService,
     private campaignService: CampaignService,
-    private characterService: CharacterService
+    private characterService: CharacterService,
+    private notification: NotificationService,
+    private confirmation: ConfirmationService
   ) {}
 
   ngOnInit() {
-    this.loadGameData();
-    this.resetProgressionForNewChapter();
-
+    setTimeout(() => {
+      this.isInitialLoading = false;
+      this.loadGameData();
+    }, 4000);
+  
     const loadingSub = this.llmService.loading$.subscribe(loading => {
       this.llmLoading = loading;
     });
     this.subscriptions.push(loadingSub);
-
+  
     const actionsSub = this.llmService.contextualActions$.subscribe(actions => {
       this.availableActions = actions;
-      if (actions.length > 0) {
+      if (actions.length > 0 && !this.isInitialLoading) {
         this.addStoryEntry('system', `${actions.length} novas ações contextuais disponíveis.`);
       }
     });
     this.subscriptions.push(actionsSub);
-
+  
     const progressionSub = this.llmService.progression$.subscribe(progression => {
       this.currentProgression = progression;
       if (progression) {
@@ -235,6 +243,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   private async loadGameData() {
     this.isLoading = true;
+    this.resetProgressionForNewChapter();
     
     try {
       const activeCampaignStatus = await this.campaignService.getActiveCampaignStatus().toPromise();
@@ -260,9 +269,11 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
               if (this.storyLog.length === 0) {
                 this.addStoryEntry('system', `Personagem carregado: ${character.name} (${character.raca} ${character.classe})`);
               }
+              this.notification.info(`Bem-vindo, ${character.name}!`);
             }
           } catch (characterError) {
             console.error('Erro ao carregar personagem ativo:', characterError);
+            this.notification.error('Erro ao carregar dados do personagem.');
             this.addStoryEntry('system', 'Erro ao carregar dados do personagem. Usando dados padrão.');
           }
         } else {
@@ -280,12 +291,15 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
             this.updateCharacterDisplay(character);
             this.currentCharacterId = character._id;
             this.addStoryEntry('system', `Personagem selecionado carregado: ${character.name}`);
+            this.notification.warning('Nenhuma campanha ativa. Usando personagem selecionado.');
           } else {
             this.addStoryEntry('system', 'Nenhuma campanha ativa ou personagem selecionado encontrado.');
+            this.notification.warning('Nenhuma campanha ativa ou personagem selecionado encontrado.');
           }
         } catch (selectedError) {
           console.error('Erro ao carregar personagem selecionado:', selectedError);
           this.addStoryEntry('system', 'Nenhum personagem encontrado. Usando dados padrão.');
+          this.notification.error('Nenhum personagem encontrado.');
         }
       }
       
@@ -293,6 +307,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       console.error('Erro ao carregar dados do jogo:', error);
       this.addDefaultStoryMessages();
       this.addStoryEntry('system', 'Erro ao carregar dados. Usando configurações padrão.');
+      this.notification.error('Erro ao carregar dados do jogo.');
     } finally {
       this.isLoading = false;
     }
@@ -469,18 +484,18 @@ private async loadCampaignHistoryFromChroma(campaignId: string) {
     if (!this.customCommand.trim() || this.llmLoading) {
       return;
     }
-
+  
     const message = this.customCommand.trim();
     this.customCommand = '';
-
+  
     this.addStoryEntry('player', message);
-
+  
     this.addStoryEntry('system', 
       `Interação ${this.currentInteractionCount}/10 | Fase: ${this.getPhaseDisplayName()}${
         this.shouldShowFinalRewardHint() ? ' | ZONA DE RECOMPENSA!' : ''
       }`
     );
-
+  
     try {
       const response = await this.llmService.sendMessageWithProgression(
         message, 
@@ -488,14 +503,15 @@ private async loadCampaignHistoryFromChroma(campaignId: string) {
         true, 
         this.currentInteractionCount
       );
-
+  
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
         
         this.currentInteractionCount++;
         this.updateProgressionState();
-
+  
         if (this.currentInteractionCount > this.maxInteractions) {
+          this.notification.success('Capítulo concluído!');
           this.addStoryEntry('system', 'Capítulo concluído! Progressão resetada para novo ciclo.');
           this.resetProgressionForNewChapter();
         }
@@ -505,11 +521,13 @@ private async loadCampaignHistoryFromChroma(campaignId: string) {
         }
         
       } else {
+        this.notification.error(response.error || 'Falha na comunicação com o Mestre IA');
         this.addStoryEntry('system', `Erro: ${response.error || 'Falha na comunicação'}`);
       }
-
+  
     } catch (error) {
       console.error('Erro ao enviar mensagem para LLM:', error);
+      this.notification.error('Erro de conexão com o Mestre IA.');
       this.addStoryEntry('system', 'Erro de conexão com o Mestre IA.');
     }
   }
@@ -595,34 +613,39 @@ private async loadCampaignHistoryFromChroma(campaignId: string) {
   }
 
   async clearStoryLog() {
-    if (!confirm('Deseja realmente limpar todo o histórico desta campanha? Esta ação não pode ser desfeita.')) {
-      return;
-    }
+    this.confirmation.confirm({
+      title: 'Limpar Histórico',
+      message: 'Deseja realmente limpar todo o histórico desta campanha? Esta ação não pode ser desfeita.',
+      confirmText: 'Limpar',
+      cancelText: 'Cancelar',
+      type: 'warning'
+    }).subscribe(async (confirmed) => {
+      if (confirmed) {
+        this.storyLog = [];
+        this.llmService.clearConversation();
   
-    this.storyLog = [];
-    this.llmService.clearConversation();
-
-    if (this.activeCampaign?.campaign_id) {
-      try {
-        this.addStoryEntry('system', 'Limpando histórico...');
-        
-        const success = await this.llmService.clearCampaignHistory(this.activeCampaign.campaign_id);
-        
-        if (success) {
-          this.addStoryEntry('system', 'Histórico limpo com sucesso!');
-        } else {
-          this.addStoryEntry('system', 'Não foi possível limpar o histórico do ChromaDB.');
+        if (this.activeCampaign?.campaign_id) {
+          try {
+            this.addStoryEntry('system', 'Limpando histórico...');
+            
+            const success = await this.llmService.clearCampaignHistory(this.activeCampaign.campaign_id);
+            
+            if (success) {
+              this.notification.success('Histórico limpo com sucesso!');
+            } else {
+              this.notification.warning('Não foi possível limpar o histórico do ChromaDB.');
+            }
+          } catch (error) {
+            console.error('Erro ao limpar ChromaDB:', error);
+            this.notification.error('Erro ao limpar histórico do ChromaDB.');
+          }
         }
-      } catch (error) {
-        console.error('Erro ao limpar ChromaDB:', error);
-        this.addStoryEntry('system', 'Erro ao limpar histórico do ChromaDB.');
+        
+        this.addDefaultStoryMessages();
+        this.shouldScrollToBottom = true;
+        this.resetProgressionForNewChapter();
       }
-    }
-    
-    this.addDefaultStoryMessages();
-    this.shouldScrollToBottom = true;
-    
-    this.resetProgressionForNewChapter();
+    });
   }
 
   toggleCharacterPanel() {

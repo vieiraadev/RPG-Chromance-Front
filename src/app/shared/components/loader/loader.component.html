@@ -1,0 +1,23 @@
+<div class="loader-wrapper" [class.overlay]="overlay">
+    <div class="loader-container" [attr.data-size]="size">
+      <div class="cyber-loader">
+        <div class="loader-core">
+          <div class="hexagon"></div>
+          <div class="hexagon"></div>
+          <div class="hexagon"></div>
+        </div>
+        <div class="loader-ring"></div>
+        <div class="loader-ring-outer"></div>
+        <div class="data-stream">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <p class="loader-message">{{ message }}</p>
+      <div class="loader-bar">
+        <div class="loader-bar-fill"></div>
+      </div>
+    </div>
+  </div>
