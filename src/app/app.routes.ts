@@ -2,7 +2,14 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: '', redirectTo: 'landing', pathMatch: 'full' },
+  
+  // Landing Page
+  {
+    path: 'landing',
+    loadComponent: () =>
+      import('@features/landing/pages/landing.page').then(m => m.LandingPage),
+  },
 
   // Auth
   {
@@ -64,5 +71,6 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
 
-  { path: '**', redirectTo: 'auth/login' },
+  // Wildcard - redireciona para landing se rota não existir
+  { path: '**', redirectTo: 'landing' },
 ];

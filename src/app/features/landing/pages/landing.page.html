@@ -1,0 +1,121 @@
+<div class="linhas-fundo">
+  @for (linha of linhas; track $index) {
+    <div class="linha"></div>
+  }
+</div>
+<div 
+  id="telaEntrada" 
+  class="container-entrada"
+  [class.tela-saindo]="isExiting"
+>
+  <div class="icones-topo">
+    @for (icone of icones; track icone.classe) {
+      <div 
+        class="icone-container" 
+        [attr.data-tooltip]="icone.tooltip"
+        (click)="onIconeClick(icone)"
+        role="button"
+        [attr.aria-label]="'Ativar ' + icone.tooltip"
+        tabindex="0"
+        (keydown.enter)="onIconeClick(icone)"
+        (keydown.space)="onIconeClick(icone)"
+      >
+        <i [class]="'bx ' + icone.classe" aria-hidden="true"></i>
+      </div>
+    }
+  </div>
+  <h1 class="titulo-principal" role="banner">
+    <div class="primeira-linha">
+      @for (palavra of primeiraLinha; track $index) {
+        <span 
+          class="palavra" 
+          [style.animation-delay.s]="0.9 + ($index * 0.2)"
+        >
+          {{ palavra }}
+        </span>
+      }
+    </div>
+    <div class="segunda-linha">
+      @for (palavra of segundaLinha; track $index) {
+        <span 
+          class="palavra titulo-destaque" 
+          [style.animation-delay.s]="1.7 + ($index * 0.2)"
+        >
+          {{ palavra }}
+        </span>
+      }
+    </div>
+  </h1>
+  <div 
+    class="url-site"
+    role="textbox"
+    [attr.aria-label]="'URL do sistema: ' + urlSite"
+    (click)="copiarUrl()"
+    tabindex="0"
+    (keydown.enter)="copiarUrl()"
+  >
+    <i class="bx bx-chip" aria-hidden="true"></i>
+    <span class="url-digitacao">{{ urlSite }}</span>
+  </div>
+  @if (!sistemaCarregado) {
+    <div 
+      class="sistema-carregamento"
+      role="status"
+      [attr.aria-label]="'Carregando sistema: ' + progressoCarregamento + '%'"
+    >
+      <div class="loading-text" role="status" aria-live="polite">
+        <span>{{ textoCarregamento }}</span>
+        <span class="cursor-loading" aria-hidden="true">_</span>
+      </div>
+      <div class="progress-container">
+        <div 
+          class="progress-bar"
+          role="progressbar"
+          [attr.aria-valuenow]="progressoCarregamento"
+          [attr.aria-valuemin]="0"
+          [attr.aria-valuemax]="100"
+          [attr.aria-label]="'Progresso do carregamento: ' + progressoCarregamento + '%'"
+        >
+          <div 
+            class="progress-fill" 
+            [style.width.%]="progressoCarregamento"
+          ></div>
+        </div>
+        <div class="progress-percentage" aria-hidden="true">
+          {{ progressoCarregamento }}%
+        </div>
+      </div>
+      <div 
+        class="current-message"
+        role="status"
+        aria-live="polite"
+        [attr.aria-label]="'Status: ' + mensagemAtual"
+      >
+        <span class="message-prefix" aria-hidden="true">&gt;&gt;</span>
+        <span class="message-text">{{ mensagemAtual }}</span>
+      </div>
+    </div>
+  }
+  @if (sistemaCarregado) {
+    <button 
+      class="botao-entrar" 
+      id="botaoEntrar"
+      type="button"
+      (click)="entrarJogo()"
+      [attr.aria-label]="'Entrar no jogo ' + segundaLinha[0]"
+      [disabled]="isExiting"
+    >
+      <i class="bx bx-log-in" aria-hidden="true"></i>
+      <span>Acessar Chromance</span>
+    </button>
+  }
+</div>
+@if (false) {
+  <div class="debug-info" style="position: fixed; top: 10px; left: 10px; color: #00ffff; font-family: monospace; font-size: 12px; z-index: 9999;">
+    <div>Status: {{ statusSistema }}</div>
+    <div>Progresso: {{ progressoCarregamento }}%</div>
+    <div>Carregado: {{ sistemaCarregado ? 'Sim' : 'Não' }}</div>
+    <div>Saindo: {{ isExiting ? 'Sim' : 'Não' }}</div>
+    <div>Mensagem: {{ mensagemAtual || 'Aguardando...' }}</div>
+  </div>
+}
