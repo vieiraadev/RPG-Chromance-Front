@@ -2,11 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-interface Icone {
-  classe: string;
-  tooltip: string;
-}
-
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -15,29 +10,20 @@ interface Icone {
   styleUrls: ['./landing.page.scss'],
 })
 export class LandingPage implements OnInit, OnDestroy {
-  
   isExiting = false;
   sistemaCarregado = false;
   progressoCarregamento = 0;
   textoCarregamento = 'Iniciando sistema Chromance...';
   mensagemAtual = '';
-  
-  icones: Icone[] = [
-    { classe: 'bx-brain', tooltip: 'Neural Interface' },
-    { classe: 'bx-chip', tooltip: 'Cybernetic Core' },
-    { classe: 'bx-shield-alt-2', tooltip: 'Firewall System' }
-  ];
-  
   primeiraLinha: string[] = ['BEM-VINDOS', 'AO', 'RPG'];
   segundaLinha: string[] = ['CHROMANCE'];
-
+  
   urlSite: string = 'system://chromance.neural.net';
-
   linhas: number[] = Array(16).fill(0);
 
   private intervalCarregamento?: ReturnType<typeof setInterval>;
   private timeoutInicial?: ReturnType<typeof setTimeout>;
-
+  
   private readonly mensagensCompletas = [
     'Inicializando protocolos de segurança...',
     'Conectando à rede neural...',
@@ -73,7 +59,7 @@ export class LandingPage implements OnInit, OnDestroy {
       if (etapaAtual < totalEtapas) {
         this.mensagemAtual = this.mensagensCompletas[etapaAtual];
         this.progressoCarregamento = Math.floor(((etapaAtual + 1) / totalEtapas) * 100);
-
+        
         if (etapaAtual === totalEtapas - 1) {
           this.textoCarregamento = 'Sistema pronto para acesso';
         } else {
@@ -85,7 +71,7 @@ export class LandingPage implements OnInit, OnDestroy {
       } else {
         this.finalizarCarregamento();
       }
-    }, 800);
+    }, 800); 
   }
 
   private finalizarCarregamento(): void {
@@ -95,60 +81,24 @@ export class LandingPage implements OnInit, OnDestroy {
     
     setTimeout(() => {
       this.sistemaCarregado = true;
-      console.log('🚀 Sistema Chromance online! Botão de acesso liberado.');
+      console.log('Sistema Chromance online! Botão de acesso liberado.');
     }, 1000);
   }
 
   entrarJogo(): void {
+    console.log('Navegando para tela de login...');
     this.router.navigate(['auth/login']);
   }
-  onIconeClick(icone: Icone): void {
-    console.log(`Sistema ativado: ${icone.tooltip}`);
-    this.ativarEfeitoIcone(icone);
-    switch (icone.classe) {
-      case 'bx-brain':
-        this.mostrarNotificacao('Interface Neural Online');
-        break;
-        
-      case 'bx-chip':
-        this.mostrarNotificacao('Core Cibernético Ativo');
-        break;
-        
-      case 'bx-shield-alt-2':
-        this.mostrarNotificacao('Firewall Sistema Ativo');
-        break;
-    }
-  }
 
-  private ativarEfeitoIcone(icone: Icone): void {
-    const elemento = document.querySelector(`[data-tooltip="${icone.tooltip}"]`);
-    if (elemento) {
-      elemento.classList.add('efeito-ativado');
-
-      setTimeout(() => {
-        elemento.classList.remove('efeito-ativado');
-      }, 1500);
-    }
-  }
-
-  private mostrarNotificacao(mensagem: string): void {
-    console.log(`Notificação: ${mensagem}`);
-    if (!this.sistemaCarregado) {
-      const mensagemOriginal = this.mensagemAtual;
-      this.mensagemAtual = mensagem;
-      
-      setTimeout(() => {
-        this.mensagemAtual = mensagemOriginal;
-      }, 2000);
-    }
-  }
   copiarUrl(): void {
     navigator.clipboard.writeText(this.urlSite).then(() => {
-      this.mostrarNotificacao('URL Copiada');
+      console.log('URL copiada para área de transferência');
     }).catch(err => {
       console.error('Erro ao copiar URL:', err);
     });
   }
+
+
   resetarSistema(): void {
     console.log('Resetando sistema Chromance...');
     this.limparIntervalos();
@@ -157,7 +107,7 @@ export class LandingPage implements OnInit, OnDestroy {
     this.mensagemAtual = '';
     this.textoCarregamento = 'Iniciando sistema Chromance...';
     this.isExiting = false;
-    
+
     this.iniciarCarregamentoSistema();
   }
 
