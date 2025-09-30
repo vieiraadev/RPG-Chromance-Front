@@ -249,9 +249,12 @@
       </div>
 
       <div class="equipment-section">
-        <h4><i class="fas fa-shield-alt"></i> Equipamentos</h4>
+        <h4><i class="fas fa-shield-alt"></i> Inventário</h4>
         <div class="equipment-grid">
-          <div class="equipment-slot" *ngFor="let slot of equipmentSlots">
+          <div class="equipment-slot" 
+               *ngFor="let slot of equipmentSlots"
+               (click)="useItemFromSlot(slot)"
+               [style.cursor]="slot.item ? 'pointer' : 'default'">
             <div class="slot-icon">
               <i [class]="slot.icon"></i>
             </div>
@@ -265,28 +268,13 @@
           </div>
         </div>
       </div>
-
-      <div class="quick-inventory">
-        <h4><i class="fas fa-backpack"></i> Inventário Rápido</h4>
-        <div class="inventory-grid">
-          <div
-            class="inventory-item"
-            *ngFor="let item of quickInventory"
-            (click)="useItem(item)"
-            [title]="item.description">
-            <i [class]="item.icon"></i>
-            <span class="item-count" *ngIf="item.count > 1">{{ item.count }}</span>
-          </div>
-          <div class="inventory-item empty" *ngFor="let empty of emptySlots"></div>
-        </div>
-      </div>
     </div>
   </div>
 
-<app-loader 
-  *ngIf="isLoading"
-  message="Processando ação..."
-  size="large"
-  [overlay]="true">
-</app-loader>
+  <app-loader 
+    *ngIf="isLoading"
+    message="Processando ação..."
+    size="large"
+    [overlay]="true">
+  </app-loader>
 </div>

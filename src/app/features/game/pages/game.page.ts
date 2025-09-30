@@ -6,7 +6,7 @@ import { NavbarComponent } from '@app/shared/components/navbar/navbar.component'
 import { LoaderComponent } from '@app/shared/components/loader/loader.component';
 import { LLMService, ChatMessage, ContextualAction, ProgressionInfo } from '../../../core/services/llm.service';
 import { CampaignService, Campaign } from '../../../core/services/campaign.service';
-import { CharacterService, CharacterResponse } from '../../../core/services/character.service';
+import { CharacterService, CharacterResponse, InventoryItem } from '../../../core/services/character.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import { ConfirmationService } from '@app/core/services/confirmation.service';
 
@@ -29,13 +29,6 @@ interface EquipmentSlot {
     name: string;
     quality: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   };
-}
-
-interface InventoryItem {
-  id: string;
-  icon: string;
-  count: number;
-  description: string;
 }
 
 @Component({
@@ -80,65 +73,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   progressPercentage = 10;
   currentProgression: ProgressionInfo | null = null;
 
-  equipmentSlots: EquipmentSlot[] = [
-    {
-      type: 'weapon',
-      icon: 'bx bx-target-lock',
-      item: {
-        name: 'Pistola Neural',
-        quality: 'rare'
-      }
-    },
-    {
-      type: 'armor',
-      icon: 'bx bx-shield',
-      item: {
-        name: 'Jacket Reforçado',
-        quality: 'uncommon'
-      }
-    },
-    {
-      type: 'cybernetic',
-      icon: 'bx bx-chip',
-      item: {
-        name: 'Implante Ótico',
-        quality: 'epic'
-      }
-    },
-    {
-      type: 'accessory',
-      icon: 'bx bx-diamond'
-    }
-  ];
-
-  quickInventory: InventoryItem[] = [
-    {
-      id: 'medkit',
-      icon: 'bx bx-first-aid',
-      count: 3,
-      description: 'Kit médico básico'
-    },
-    {
-      id: 'energy_drink',
-      icon: 'bx bxs-battery',
-      count: 2,
-      description: 'Bebida energética'
-    },
-    {
-      id: 'hack_device',
-      icon: 'bx bx-mobile-alt',
-      count: 1,
-      description: 'Dispositivo de hacking'
-    },
-    {
-      id: 'ammo',
-      icon: 'bx bx-square-rounded',
-      count: 24,
-      description: 'Munição para pistola'
-    }
-  ];
-
-  emptySlots = new Array(8);
   private shouldScrollToBottom = false;
 
   constructor(
@@ -148,6 +82,19 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     private notification: NotificationService,
     private confirmation: ConfirmationService
   ) {}
+
+  get equipmentSlots(): EquipmentSlot[] {
+    const inventory = this.activeCharacter?.inventory || [];
+    
+    return inventory.map(item => ({
+      type: item.type,
+      icon: this.getItemIcon(item),
+      item: {
+        name: item.name,
+        quality: this.mapRarityToQuality(item.metadata?.rarity)
+      }
+    }));
+  }
 
   ngOnInit() {
     setTimeout(() => {
@@ -266,9 +213,16 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
               this.updateCharacterDisplay(character);
               this.currentCharacterId = character._id;
               
+              console.log('Inventário do personagem:', character.inventory);
+              
               if (this.storyLog.length === 0) {
                 this.addStoryEntry('system', `Personagem carregado: ${character.name} (${character.raca} ${character.classe})`);
               }
+              
+              if (character.inventory && character.inventory.length > 0) {
+                this.addStoryEntry('system', `${character.inventory.length} itens carregados no inventário.`);
+              }
+              
               this.notification.info(`Bem-vindo, ${character.name}!`);
             }
           } catch (characterError) {
@@ -290,7 +244,15 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
             this.activeCharacter = character;
             this.updateCharacterDisplay(character);
             this.currentCharacterId = character._id;
+            
+            console.log('Inventário do personagem:', character.inventory);
+            
             this.addStoryEntry('system', `Personagem selecionado carregado: ${character.name}`);
+            
+            if (character.inventory && character.inventory.length > 0) {
+              this.addStoryEntry('system', `${character.inventory.length} itens no inventário.`);
+            }
+            
             this.notification.warning('Nenhuma campanha ativa. Usando personagem selecionado.');
           } else {
             this.addStoryEntry('system', 'Nenhuma campanha ativa ou personagem selecionado encontrado.');
@@ -325,52 +287,52 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     }
   }
 
-private async loadCampaignHistoryFromChroma(campaignId: string) {
-  try {
-    console.log(`Carregando histórico do ChromaDB para campanha: ${campaignId}`);
-    
-    const result = await this.llmService.loadCampaignHistory(campaignId);
-    
-    if (result.success && result.history.length > 0) {
-      console.log(`${result.history.length} mensagens carregadas do histórico`);
+  private async loadCampaignHistoryFromChroma(campaignId: string) {
+    try {
+      console.log(`Carregando histórico do ChromaDB para campanha: ${campaignId}`);
       
-      this.storyLog = [];
+      const result = await this.llmService.loadCampaignHistory(campaignId);
       
-      this.addStoryEntry('system', `Histórico carregado: ${result.history.length} interações anteriores recuperadas`);
-      
-      result.history.forEach((msg: any) => {
-        if (msg.role === 'user') {
-          this.addStoryEntry('player', msg.content);
-        } else if (msg.role === 'assistant') {
-          this.addStoryEntry('llm', msg.content);
-        }
-      });
-      
-      if (result.lastInteraction > 0) {
-        this.currentInteractionCount = result.lastInteraction + 1;
-        this.updateProgressionState();
+      if (result.success && result.history.length > 0) {
+        console.log(`${result.history.length} mensagens carregadas do histórico`);
         
-        this.addStoryEntry('system', 
-          `Continuando do ponto anterior - Interação ${this.currentInteractionCount}/${this.maxInteractions}`
-        );
+        this.storyLog = [];
+        
+        this.addStoryEntry('system', `Histórico carregado: ${result.history.length} interações anteriores recuperadas`);
+        
+        result.history.forEach((msg: any) => {
+          if (msg.role === 'user') {
+            this.addStoryEntry('player', msg.content);
+          } else if (msg.role === 'assistant') {
+            this.addStoryEntry('llm', msg.content);
+          }
+        });
+        
+        if (result.lastInteraction > 0) {
+          this.currentInteractionCount = result.lastInteraction + 1;
+          this.updateProgressionState();
+          
+          this.addStoryEntry('system', 
+            `Continuando do ponto anterior - Interação ${this.currentInteractionCount}/${this.maxInteractions}`
+          );
+        }
+        
+        const conversationHistory = result.history.map((msg: any) => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: new Date(msg.timestamp)
+        }));
+        this.llmService.setConversation(conversationHistory);
+        
+      } else {
+        console.log('Nenhum histórico encontrado no ChromaDB para esta campanha');
       }
       
-      const conversationHistory = result.history.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-        timestamp: new Date(msg.timestamp)
-      }));
-      this.llmService.setConversation(conversationHistory);
-      
-    } else {
-      console.log('Nenhum histórico encontrado no ChromaDB para esta campanha');
+    } catch (error) {
+      console.error('Erro ao carregar histórico do ChromaDB:', error);
+      this.addStoryEntry('system', 'Não foi possível carregar histórico anterior. Iniciando nova sessão.');
     }
-    
-  } catch (error) {
-    console.error('Erro ao carregar histórico do ChromaDB:', error);
-    this.addStoryEntry('system', 'Não foi possível carregar histórico anterior. Iniciando nova sessão.');
   }
-}
 
   private getChapterMessages(campaignTitle: string): { system: string; narrator: string } {
     const title = campaignTitle.toLowerCase();
@@ -568,7 +530,7 @@ private async loadCampaignHistoryFromChroma(campaignId: string) {
         this.updateProgressionState();
         
         if (this.currentInteractionCount > this.maxInteractions) {
-          this.addStoryEntry('system', '🎉 Capítulo concluído! Progressão resetada para novo ciclo.');
+          this.addStoryEntry('system', 'Capítulo concluído! Progressão resetada para novo ciclo.');
           this.resetProgressionForNewChapter();
         }
         
@@ -662,23 +624,84 @@ private async loadCampaignHistoryFromChroma(campaignId: string) {
     this.addStoryEntry('system', 'Função de alteração de avatar ainda não implementada.');
   }
 
-  useItem(item: InventoryItem) {
-    this.addStoryEntry('player', `Usar: ${item.description}`);
-    
-    switch (item.id) {
-      case 'medkit':
-        this.addStoryEntry('narrator', 'Você usa o kit médico. Seus ferimentos começam a cicatrizar e você se sente revigorado.');
-        break;
-      case 'energy_drink':
-        this.addStoryEntry('narrator', 'A bebida energética percorre seu sistema, restaurando sua energia neural.');
-        break;
-      case 'hack_device':
-        this.addStoryEntry('narrator', 'Você prepara o dispositivo de hacking, pronto para quebrar sistemas de segurança.');
-        break;
-      case 'ammo':
-        this.addStoryEntry('narrator', 'Você recarrega sua arma. Clique metálico ecoa enquanto a munição é inserida.');
-        break;
+  useItemFromSlot(slot: EquipmentSlot) {
+    if (!this.activeCharacter?._id || !slot.item) {
+      this.notification.warning('Nenhum item para usar');
+      return;
     }
+
+    const item = this.activeCharacter.inventory?.find(i => i.name === slot.item?.name);
+    
+    if (!item) {
+      this.notification.warning('Item não encontrado no inventário');
+      return;
+    }
+
+    this.addStoryEntry('player', `Usar: ${item.name}`);
+    this.isLoading = true;
+
+    this.characterService.useItem(this.activeCharacter._id, item.id).subscribe({
+      next: (updatedCharacter) => {
+        this.activeCharacter = updatedCharacter;
+        this.updateCharacterDisplay(updatedCharacter);
+        
+        this.addStoryEntry('narrator', `Você usou ${item.name}. ${item.description}`);
+        this.notification.success(`${item.name} usado com sucesso!`);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao usar item:', error);
+        this.notification.error('Erro ao usar item');
+        this.addStoryEntry('system', 'Erro ao usar item.');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private getItemIcon(item: InventoryItem): string {
+    const itemId = item.id.toLowerCase();
+    
+    if (itemId.includes('cubo_sombras') || itemId.includes('cubo')) {
+      return 'bx bx-cube-alt';
+    }
+    
+    if (itemId.includes('cristal_arcano') || itemId.includes('cristal')) {
+      return 'bx bx-diamond';
+    }
+    
+    if (itemId.includes('cinturao') || itemId.includes('campeao')) {
+      return 'bx bx-medal';
+    }
+    
+    const typeIcons: { [key: string]: string } = {
+      'reward': 'bx bx-gift',
+      'weapon': 'bx bx-target-lock',
+      'armor': 'bx bx-shield',
+      'potion': 'bx bx-first-aid',
+      'key': 'bx bx-key',
+      'artifact': 'bx bx-diamond',
+      'tech': 'bx bx-chip',
+      'consumable': 'bx bxs-battery'
+    };
+    
+    return typeIcons[item.type] || 'bx bx-cube';
+  }
+
+  private mapRarityToQuality(rarity?: string): 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' {
+    const rarityMap: { [key: string]: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' } = {
+      'comum': 'common',
+      'common': 'common',
+      'incomum': 'uncommon',
+      'uncommon': 'uncommon',
+      'raro': 'rare',
+      'rare': 'rare',
+      'épico': 'epic',
+      'epic': 'epic',
+      'lendário': 'legendary',
+      'legendary': 'legendary'
+    };
+    
+    return rarityMap[rarity?.toLowerCase() || ''] || 'common';
   }
 
   getActionsByPriority(): ContextualAction[] {
