@@ -44,5 +44,7 @@
 <app-item-detail-modal
   [isOpen]="isItemModalOpen"
   [item]="selectedItem"
-  (closeModal)="closeItemModal()">
+  [characterId]="selectedCharacterId"
+  (closeModal)="closeItemModal()"
+  (itemUsed)="onItemUsed()">
 </app-item-detail-modal>

@@ -77,6 +77,10 @@
   
         <div class="modal-footer">
           <button class="btn-close" (click)="close()">Fechar</button>
+          <button class="btn-use" (click)="useItem()" [disabled]="isUsing">
+            <i class='bx bx-check-circle'></i>
+            {{ isUsing ? 'Usando...' : 'Usar Item' }}
+          </button>
         </div>
       </div>
     </div>

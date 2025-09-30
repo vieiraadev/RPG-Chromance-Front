@@ -30,6 +30,7 @@ export class CharactersPageComponent implements OnInit {
   isItemModalOpen = false;
   characterToEdit: Character | null = null;
   selectedItem: InventoryItem | null = null;
+  selectedCharacterId: string | null = null;
   errorMessage = '';
   
   currentPage = 1;
@@ -142,8 +143,16 @@ export class CharactersPageComponent implements OnInit {
 
   onItemClick(item: InventoryItem): void {
     console.log('Item clicado:', item);
-    this.selectedItem = item;
-    this.isItemModalOpen = true;
+    
+    const character = this.characters.find(c => 
+      c.inventory?.some(i => i.id === item.id)
+    );
+    
+    if (character) {
+      this.selectedCharacterId = character.id;
+      this.selectedItem = item;
+      this.isItemModalOpen = true;
+    }
   }
 
   createNewCharacter(): void {
@@ -163,6 +172,12 @@ export class CharactersPageComponent implements OnInit {
   closeItemModal(): void {
     this.isItemModalOpen = false;
     this.selectedItem = null;
+    this.selectedCharacterId = null;
+  }
+
+  onItemUsed(): void {
+    console.log('Item usado, recarregando personagens...');
+    this.loadCharacters();
   }
 
   onCharacterCreated(newCharacter: any): void {

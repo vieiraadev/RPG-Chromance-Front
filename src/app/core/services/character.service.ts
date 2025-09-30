@@ -140,4 +140,21 @@ export class CharacterService {
   getCurrentSelectedCharacter(): CharacterResponse | null {
     return this.selectedCharacterSubject.value;
   }
+
+  useItem(characterId: string, itemId: string): Observable<CharacterResponse> {
+    return this.http.post<CharacterResponse>(
+      `${this.apiUrl}/${characterId}/inventory/${itemId}/use`, 
+      {}
+    ).pipe(
+      tap(updatedCharacter => {
+        console.log('Item usado, personagem atualizado:', updatedCharacter);
+        if (!updatedCharacter.inventory) {
+          updatedCharacter.inventory = [];
+        }
+        if (updatedCharacter.is_selected) {
+          this.selectedCharacterSubject.next(updatedCharacter);
+        }
+      })
+    );
+  }
 }
