@@ -88,10 +88,7 @@ export class CampaignsComponent implements OnInit {
         image: './assets/images/campaign-thumb1.jpg',
         thumbnail: './assets/images/campaign-thumb1.jpg',
         rewards: [
-          { type: 'weapon', name: 'Lâmina Cybernética', icon: 'sword' },
-          { type: 'armor', name: 'Escudo Neural', icon: 'shield' },
-          { type: 'health', name: 'Vida +100', icon: 'heart' },
-          { type: 'tech', name: 'Chip de Combate', icon: 'chip' }
+          { type: 'artifact', name: 'Cubo das Sombras', icon: 'cubo_sombras' }
         ],
         is_locked: false
       },
@@ -105,10 +102,7 @@ export class CampaignsComponent implements OnInit {
         image: './assets/images/campaign-thumb2.jpg',
         thumbnail: './assets/images/campaign-thumb2.jpg',
         rewards: [
-          { type: 'weapon', name: 'Bastão Arcano', icon: 'sword' },
-          { type: 'armor', name: 'Manto de Cristal', icon: 'shield' },
-          { type: 'health', name: 'Poção Vital', icon: 'heart' },
-          { type: 'tech', name: 'Cristal Energético', icon: 'chip' }
+          { type: 'crystal', name: 'Cristal Arcano Puro', icon: 'cristal_arcano' }
         ],
         is_locked: false
       },
@@ -122,10 +116,7 @@ export class CampaignsComponent implements OnInit {
         image: './assets/images/campaign-image3.jpg',
         thumbnail: './assets/images/campaign-image3.jpg',
         rewards: [
-          { type: 'weapon', name: 'Cetro do Caos', icon: 'sword' },
-          { type: 'armor', name: 'Armadura Prismática', icon: 'shield' },
-          { type: 'health', name: 'Elixir da Vida', icon: 'heart' },
-          { type: 'tech', name: 'Núcleo de Energia', icon: 'chip' }
+          { type: 'belt', name: 'Cinturão do Campeão', icon: 'cinturao_campeao' }
         ],
         is_locked: false
       }
@@ -324,10 +315,9 @@ export class CampaignsComponent implements OnInit {
 
   getRewardIconClass(icon: string): string {
     const iconMap: { [key: string]: string } = {
-      'sword': 'bx bx-sword',
-      'shield': 'bx bx-shield',
-      'heart': 'bx bx-heart',
-      'chip': 'bx bx-chip'
+      'cubo_sombras': 'bx bx-cube-alt',
+      'cristal_arcano': 'bx bx-diamond',
+      'cinturao_campeao': 'bx bx-medal'
     };
     return iconMap[icon] || 'bx bx-gift';
   }
