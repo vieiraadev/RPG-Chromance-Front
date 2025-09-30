@@ -115,16 +115,10 @@
           <div 
             class="inventory-item" 
             *ngFor="let item of character.inventory"
-            [title]="item.name + ' - ' + item.description">
+            (click)="onItemClick(item)">
             <div class="item-icon-wrapper" [style.border-color]="getItemRarityColor(item)">
               <i class='bx' [ngClass]="getItemIcon(item)" [style.color]="getItemRarityColor(item)"></i>
               <div class="item-glow" [style.background]="getItemRarityColor(item)"></div>
-            </div>
-            <div class="item-info">
-              <span class="item-name">{{ item.name }}</span>
-              <span class="item-rarity" [style.color]="getItemRarityColor(item)">
-                {{ item.metadata.rarity }}
-              </span>
             </div>
           </div>
         </div>

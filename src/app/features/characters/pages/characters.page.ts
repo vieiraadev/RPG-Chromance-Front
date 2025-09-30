@@ -4,8 +4,9 @@ import { NavbarComponent } from '@app/shared/components/navbar/navbar.component'
 import { CharacterCardComponent } from '@app/shared/components/character-card/character-card.component';
 import { AddCharacterModalComponent } from '@app/shared/components/add-character-modal/add-character-modal.component';
 import { EditCharacterModalComponent } from '@app/shared/components/edit-character-modal/edit-character-modal.component';
+import { ItemDetailModalComponent } from '@app/shared/components/item-detail-modal/item-detail-modal.component';
 import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
-import type { Character } from '@app/shared/components/character-card/character-card.component';
+import type { Character, InventoryItem } from '@app/shared/components/character-card/character-card.component';
 
 @Component({
   selector: 'app-characters',
@@ -15,7 +16,8 @@ import type { Character } from '@app/shared/components/character-card/character-
     NavbarComponent,
     CharacterCardComponent,
     AddCharacterModalComponent,
-    EditCharacterModalComponent
+    EditCharacterModalComponent,
+    ItemDetailModalComponent
   ],
   templateUrl: './characters.page.html',
   styleUrls: ['./characters.page.scss'],
@@ -25,7 +27,9 @@ export class CharactersPageComponent implements OnInit {
   isLoading = false;
   isModalOpen = false;
   isEditModalOpen = false;
+  isItemModalOpen = false;
   characterToEdit: Character | null = null;
+  selectedItem: InventoryItem | null = null;
   errorMessage = '';
   
   currentPage = 1;
@@ -136,6 +140,12 @@ export class CharactersPageComponent implements OnInit {
     this.loadCharacters();
   }
 
+  onItemClick(item: InventoryItem): void {
+    console.log('Item clicado:', item);
+    this.selectedItem = item;
+    this.isItemModalOpen = true;
+  }
+
   createNewCharacter(): void {
     this.isModalOpen = true;
     console.log('Abrindo modal para criar novo personagem');
@@ -148,6 +158,11 @@ export class CharactersPageComponent implements OnInit {
   closeEditModal(): void {
     this.isEditModalOpen = false;
     this.characterToEdit = null;
+  }
+
+  closeItemModal(): void {
+    this.isItemModalOpen = false;
+    this.selectedItem = null;
   }
 
   onCharacterCreated(newCharacter: any): void {

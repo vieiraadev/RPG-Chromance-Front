@@ -7,7 +7,6 @@
         <p class="page-subtitle">Forje e programe seus personagens nas ruas neon</p>
       </div>
     </div>
-    
     <div class="characters-grid">
       <app-character-card
         *ngFor="let char of characters"
@@ -16,9 +15,9 @@
         [showActions]="true"
         (editClicked)="onEditCharacter($event)"
         (deleteClicked)="onDeleteCharacter($event)"
-        (characterSelected)="onSelectCharacter($event)">
+        (characterSelected)="onSelectCharacter($event)"
+        (itemClicked)="onItemClick($event)">
       </app-character-card>
-      
       <div class="add-character-card" (click)="createNewCharacter()">
         <div class="add-card-content">
           <div class="add-icon">+</div>
@@ -41,3 +40,9 @@
   (closeModal)="closeEditModal()"
   (characterUpdated)="onCharacterUpdated($event)">
 </app-edit-character-modal>
+
+<app-item-detail-modal
+  [isOpen]="isItemModalOpen"
+  [item]="selectedItem"
+  (closeModal)="closeItemModal()">
+</app-item-detail-modal>

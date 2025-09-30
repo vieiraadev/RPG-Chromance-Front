@@ -1,0 +1,83 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="close()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <button class="close-button" (click)="close()">
+        <i class='bx bx-x'></i>
+      </button>
+  
+      <div class="modal-content" *ngIf="item">
+        <div class="item-header">
+          <div class="item-icon-large" [style.border-color]="getRarityColor()">
+            <i class='bx' [ngClass]="getItemIcon()" [style.color]="getRarityColor()"></i>
+            <div class="item-glow-large" [style.background]="getRarityColor()"></div>
+          </div>
+          
+          <div class="item-title-section">
+            <h2 class="item-name">{{ item.name }}</h2>
+            <span class="item-rarity" [style.color]="getRarityColor()">
+              {{ item.metadata.rarity }}
+            </span>
+            <span class="item-type">{{ item.type }}</span>
+          </div>
+        </div>
+  
+        <div class="modal-body">
+          <div class="info-section">
+            <h3 class="section-title">
+              <i class='bx bx-info-circle'></i>
+              Descrição
+            </h3>
+            <p class="item-description">{{ item.description }}</p>
+          </div>
+  
+          <div class="info-section" *ngIf="item.metadata.power || item.metadata.effect">
+            <h3 class="section-title">
+              <i class='bx bx-scatter-chart'></i>
+              Atributos
+            </h3>
+            <div class="attributes-list">
+              <div class="attribute-item" *ngIf="item.metadata.power">
+                <div class="attribute-icon">
+                    <i class='bx bx-shield'></i>
+                </div>
+                <div class="attribute-content">
+                  <span class="attribute-label">Poder</span>
+                  <span class="attribute-value">{{ item.metadata.power }}</span>
+                </div>
+              </div>
+              
+              <div class="attribute-item" *ngIf="item.metadata.effect">
+                <div class="attribute-icon">
+                  <i class='bx bx-star'></i>
+                </div>
+                <div class="attribute-content">
+                  <span class="attribute-label">Efeito</span>
+                  <span class="attribute-value">{{ item.metadata.effect }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="info-section">
+            <h3 class="section-title">
+              <i class='bx bx-book-open'></i>
+              Informações
+            </h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Capítulo</span>
+                <span class="info-value">{{ item.chapter }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Obtido em</span>
+                <span class="info-value">{{ item.obtained_at | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="modal-footer">
+          <button class="btn-close" (click)="close()">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>

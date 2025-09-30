@@ -53,6 +53,7 @@ export class CharacterCardComponent implements OnInit {
   @Output() editClicked = new EventEmitter<Character>();
   @Output() deleteClicked = new EventEmitter<Character>();
   @Output() characterSelected = new EventEmitter<Character>();
+  @Output() itemClicked = new EventEmitter<InventoryItem>();
 
   private characterService = inject(CharacterService);
   private confirmation = inject(ConfirmationService);
@@ -160,5 +161,9 @@ export class CharacterCardComponent implements OnInit {
       return `${baseClass} selected`;
     }
     return `${baseClass} select`;
+  }
+
+  onItemClick(item: InventoryItem): void {
+    this.itemClicked.emit(item);
   }
 }
