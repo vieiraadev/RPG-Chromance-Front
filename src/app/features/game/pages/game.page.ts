@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router'; 
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
@@ -76,6 +77,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   private shouldScrollToBottom = false;
 
   constructor(
+    private router: Router,
     private llmService: LLMService,
     private campaignService: CampaignService,
     private characterService: CharacterService,
@@ -138,6 +140,9 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   resetProgressionForNewChapter() {
     this.currentInteractionCount = 1;
     this.updateProgressionState();
+    this.availableActions = [];
+    this.llmService.clearContextualActions();
+    
     this.addStoryEntry('system', `Nova progressão de capítulo iniciada (1/10 interações)`);
   }
 
@@ -177,7 +182,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       const success = await this.llmService.resetChapterProgression();
       if (success) {
         this.resetProgressionForNewChapter();
-        this.clearStoryLog();
+        this.clearStoryLogWithoutConfirmation(); // Limpa histórico visual
         this.addStoryEntry('system', 'Capítulo reiniciado. Nova progressão narrativa iniciada.');
       } else {
         this.addStoryEntry('system', 'Erro ao reiniciar capítulo. Tente novamente.');
@@ -473,9 +478,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
         this.updateProgressionState();
   
         if (this.currentInteractionCount > this.maxInteractions) {
-          this.notification.success('Capítulo concluído!');
-          this.addStoryEntry('system', 'Capítulo concluído! Progressão resetada para novo ciclo.');
-          this.resetProgressionForNewChapter();
+          this.completeChapterAndRedirect();
         }
         
         if (response.progression) {
@@ -492,6 +495,38 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.notification.error('Erro de conexão com o Mestre IA.');
       this.addStoryEntry('system', 'Erro de conexão com o Mestre IA.');
     }
+  }
+  
+  private completeChapterAndRedirect(): void {
+    if (!this.activeCampaign?.campaign_id || !this.currentCharacterId) {
+      this.notification.error('Dados da campanha não encontrados');
+      return;
+    }
+  
+    const currentChapter = this.activeCampaign.current_chapter || 1;
+    
+    this.notification.success('Capítulo concluído! Extraindo conhecimento...');
+    this.addStoryEntry('system', 'Capítulo concluído! Processando...');
+  
+    this.campaignService.completeChapter(
+      this.activeCampaign.campaign_id,
+      this.currentCharacterId,
+      currentChapter
+    ).subscribe({
+      next: (response) => {
+        this.addStoryEntry('system', '✓ Lore extraído e arquivado!');
+        
+        setTimeout(() => {
+          this.router.navigate(['/campaigns'], {
+            queryParams: { completed: currentChapter }
+          });
+        }, 2000);
+      },
+      error: (err) => {
+        console.error('Erro ao completar capítulo:', err);
+        this.notification.error('Erro ao finalizar capítulo');
+      }
+    });
   }
 
   handleProgressionInfo(progression: ProgressionInfo) {
@@ -574,6 +609,13 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.customCommand = suggestion;
   }
 
+  private clearStoryLogWithoutConfirmation() {
+    this.storyLog = [];
+    this.llmService.clearConversation();
+    this.availableActions = [];
+    this.llmService.clearContextualActions();
+  }
+
   async clearStoryLog() {
     this.confirmation.confirm({
       title: 'Limpar Histórico',
@@ -583,8 +625,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       type: 'warning'
     }).subscribe(async (confirmed) => {
       if (confirmed) {
-        this.storyLog = [];
-        this.llmService.clearConversation();
+        this.clearStoryLogWithoutConfirmation();
   
         if (this.activeCampaign?.campaign_id) {
           try {

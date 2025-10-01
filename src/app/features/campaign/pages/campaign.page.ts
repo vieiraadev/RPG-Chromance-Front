@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
 import { SelectCharacterModalComponent } from '@app/shared/components/select-character-modal/select-character-modal.component';
 import { Character } from '@app/shared/components/character-card/character-card.component';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CampaignService, Campaign, ActiveCampaignStatus } from '@app/core/services/campaign.service';
 import { LLMService } from '@app/core/services/llm.service';
 import { NotificationService } from '@app/core/services/notification.service';
@@ -31,6 +31,7 @@ export class CampaignsComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private campaignService: CampaignService,
     private llmService: LLMService,
     private notification: NotificationService,
@@ -40,6 +41,20 @@ export class CampaignsComponent implements OnInit {
   ngOnInit(): void {
     this.loadCampaigns();
     this.loadActiveCampaignStatus();
+    
+    this.route.queryParams.subscribe(params => {
+      if (params['completed']) {
+        const chapter = params['completed'];
+        this.notification.success(
+          `Parabéns por concluir o Capítulo ${chapter}! Todos os capítulos foram liberados novamente.`
+        );
+        
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {}
+        });
+      }
+    });
   }
 
   private loadCampaigns(): void {
@@ -129,6 +144,11 @@ export class CampaignsComponent implements OnInit {
     }
     
     const activeCampaign = this.activeCampaignStatus.active_campaign;
+    
+    if (activeCampaign?.status === 'completed') {
+      return false;
+    }
+    
     return activeCampaign?.campaign_id === campaign.campaign_id;
   }
 
@@ -138,6 +158,11 @@ export class CampaignsComponent implements OnInit {
     }
     
     const activeCampaign = this.activeCampaignStatus.active_campaign;
+    
+    if (activeCampaign?.status === 'completed') {
+      return false;
+    }
+    
     return activeCampaign?.campaign_id !== campaign.campaign_id;
   }
 
@@ -147,6 +172,11 @@ export class CampaignsComponent implements OnInit {
     }
     
     const activeCampaign = this.activeCampaignStatus.active_campaign;
+    
+    if (activeCampaign?.status === 'completed') {
+      return 'Iniciar Campanha';
+    }
+    
     if (activeCampaign && activeCampaign.campaign_id === campaign.campaign_id) {
       return 'Continue';
     }
@@ -160,11 +190,18 @@ export class CampaignsComponent implements OnInit {
     }
     
     const activeCampaign = this.activeCampaignStatus.active_campaign;
+    
+    // Se está completed, habilita todos
+    if (activeCampaign?.status === 'completed') {
+      return true;
+    }
+    
     return activeCampaign?.campaign_id === campaign.campaign_id;
   }
 
   onCampaignButtonClick(campaign: Campaign): void {
-    if (!this.activeCampaignStatus.has_active_campaign) {
+    if (!this.activeCampaignStatus.has_active_campaign || 
+        this.activeCampaignStatus.active_campaign?.status === 'completed') {
       this.startNewCampaign(campaign);
     } else {
       const activeCampaign = this.activeCampaignStatus.active_campaign;
@@ -207,10 +244,10 @@ export class CampaignsComponent implements OnInit {
   cancelActiveCampaign(): void {
     const activeCampaign = this.activeCampaignStatus.active_campaign;
     if (!activeCampaign) return;
-
+  
     this.confirmation.confirm({
       title: 'Encerrar Campanha',
-      message: `Deseja encerrar a campanha ativa "${activeCampaign.title}"? O progresso e histórico serão perdidos.`,
+      message: `Deseja encerrar a campanha ativa "${activeCampaign.title}"? As narrativas atuais serão removidas, mas o conhecimento do mundo será preservado.`,
       confirmText: 'Encerrar',
       cancelText: 'Cancelar',
       type: 'danger'
@@ -219,15 +256,15 @@ export class CampaignsComponent implements OnInit {
         this.campaignService.cancelCampaign(activeCampaign.campaign_id).subscribe({
           next: async (response) => {
             try {
-              const chromaCleared = await this.llmService.clearCampaignHistory(activeCampaign.campaign_id);
+              const currentCleared = await this.llmService.clearCurrentCampaignOnly(activeCampaign.campaign_id);
               
-              if (chromaCleared) {
-                this.notification.success('Campanha e histórico encerrados com sucesso!');
+              if (currentCleared) {
+                this.notification.success('Campanha encerrada! Conhecimento do mundo preservado.');
               } else {
-                this.notification.warning('Campanha encerrada, mas houve problema ao limpar histórico');
+                this.notification.warning('Campanha encerrada, mas houve problema ao limpar narrativas atuais');
               }
             } catch (error) {
-              console.error('Erro ao limpar histórico do ChromaDB:', error);
+              console.error('Erro ao limpar narrativas:', error);
               this.notification.success('Campanha encerrada com sucesso!');
             }
             

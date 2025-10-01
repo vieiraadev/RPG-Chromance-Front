@@ -96,14 +96,13 @@ export class CampaignService {
   cancelCampaign(campaignId: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${campaignId}/cancel`);
   }
+
   
-  completeChapter(campaignId: string, characterId: string, chapterCompleted: number): Observable<any> {
-    const request = {
+  completeChapter(campaignId: string, characterId: string, chapter: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${campaignId}/complete-chapter`, {
       character_id: characterId,
-      chapter_completed: chapterCompleted
-    };
-    
-    return this.http.put<any>(`${this.apiUrl}/${campaignId}/complete-chapter`, request);
+      chapter_completed: chapter
+    });
   }
   
   isUserAuthenticated(): boolean {

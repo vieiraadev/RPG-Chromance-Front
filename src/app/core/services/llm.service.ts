@@ -337,4 +337,22 @@ async clearCampaignHistory(campaignId: string): Promise<boolean> {
   }
 }
 
+clearCurrentCampaignOnly(campaignId: string): Promise<boolean> {
+  return this.http
+    .delete<any>(`${this.apiUrl}/chroma/campaign/${campaignId}/current-only`)
+    .toPromise()
+    .then((response) => {
+      console.log('Campaign current limpa:', response);
+      return response?.success || false;
+    })
+    .catch((error) => {
+      console.error('Erro ao limpar campaign current:', error);
+      return false;
+    });
+}
+
+clearContextualActions(): void {
+  this.contextualActionsSubject.next([]);
+}
+
 }
