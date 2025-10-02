@@ -23,6 +23,8 @@ export class NavbarComponent implements OnInit {
   @Input() initialActive: string = 'home';
   
   activeIcon: string = 'home';
+  isMobileMenuOpen = false;
+
   navigationItems: NavigationItem[] = [
     { id: 'home', label: 'Home', icon: 'bx-home', path: '/home' },
     { id: 'characters', label: 'Meus Personagens', icon: 'bx-group', path: '/characters' },
@@ -31,8 +33,8 @@ export class NavbarComponent implements OnInit {
   ];
 
   constructor(
-    private authService: AuthService,  
-    private router: Router          
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -43,8 +45,26 @@ export class NavbarComponent implements OnInit {
     return this.activeIcon === iconId;
   }
 
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    if (window.innerWidth <= 768) {
+      this.isMobileMenuOpen = false;
+    }
+  }
+
+  onNavigationClick(itemId: string) {
+    this.activeIcon = itemId;
+    this.navigationChange.emit(itemId);
+    this.closeMobileMenu();
+  }
+
   logout(): void {
-    this.authService.logout();       
-    this.router.navigate(['/login']);   
+    this.authService.logout();
+    this.router.navigate(['/login']);
+    this.logoutEmitter.emit();
+    this.closeMobileMenu();
   }
 }
