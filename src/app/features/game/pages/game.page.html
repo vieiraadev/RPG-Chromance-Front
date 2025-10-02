@@ -96,25 +96,6 @@
         </div>
       </div>
 
-      <div class="quick-actions">
-        <button class="action-btn" (click)="performAction('examine')">
-          <i class="fas fa-search"></i>
-          <span>Examinar</span>
-        </button>
-        <button class="action-btn" (click)="performAction('inventory')">
-          <i class="fas fa-backpack"></i>
-          <span>Inventário</span>
-        </button>
-        <button class="action-btn" (click)="performAction('stats')">
-          <i class="fas fa-chart-bar"></i>
-          <span>Status</span>
-        </button>
-        <button class="action-btn" (click)="performAction('help')">
-          <i class="fas fa-question-circle"></i>
-          <span>Ajuda</span>
-        </button>
-      </div>
-
       <div class="contextual-actions" *ngIf="availableActions.length > 0">
         <div class="contextual-header">
           <h4>

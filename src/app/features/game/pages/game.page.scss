@@ -101,6 +101,7 @@ button.llm-mode:hover:not(:disabled) {
 
 .game-page.game-container {
   min-height: 100vh;
+  height: 100vh;
   background: #000000;
   margin-left: 80px;
   padding: 20px;
@@ -123,9 +124,9 @@ body:has(.sidebar:hover) .game-page.game-container {
   display: flex;
   gap: 20px;
   flex: 1;
-  min-height: 0;
+  min-height: 0; // Importante para flex children
+  overflow: hidden;
 }
-
 .story-panel {
   flex: 2;
   background: var(--card-bg);
@@ -136,9 +137,7 @@ body:has(.sidebar:hover) .game-page.game-container {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  height: calc(100vh - 140px);
-  min-height: 500px;
-  max-height: calc(100vh - 140px);
+  min-height: 0; // Importante!
 
   .story-header {
     display: flex;
@@ -147,7 +146,7 @@ body:has(.sidebar:hover) .game-page.game-container {
     padding: 15px 20px;
     background: var(--primary-blue-bg);
     border-bottom: 1px solid var(--primary-blue-border);
-    flex-shrink: 0;
+    flex-shrink: 0; 
 
     i {
       color: var(--primary-blue);
@@ -214,6 +213,7 @@ body:has(.sidebar:hover) .game-page.game-container {
     overflow-x: hidden;
     font-family: 'Rajdhani', sans-serif;
     line-height: 1.6;
+    min-height: 0;
 
     scrollbar-width: thin;
     scrollbar-color: var(--primary-blue) transparent;
@@ -367,8 +367,9 @@ body:has(.sidebar:hover) .game-page.game-container {
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 
   .action-header {
     display: flex;

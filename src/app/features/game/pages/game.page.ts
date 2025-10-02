@@ -182,7 +182,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       const success = await this.llmService.resetChapterProgression();
       if (success) {
         this.resetProgressionForNewChapter();
-        this.clearStoryLogWithoutConfirmation(); // Limpa histórico visual
+        this.clearStoryLogWithoutConfirmation();
         this.addStoryEntry('system', 'Capítulo reiniciado. Nova progressão narrativa iniciada.');
       } else {
         this.addStoryEntry('system', 'Erro ao reiniciar capítulo. Tente novamente.');
@@ -577,25 +577,6 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.addStoryEntry('system', 'Erro ao processar ação.');
     } finally {
       this.isLoading = false;
-    }
-  }
-
-  performAction(action: string) {
-    this.addStoryEntry('player', `Ação: ${action}`);
-    
-    switch (action) {
-      case 'examine':
-        this.addStoryEntry('narrator', 'Você examina cuidadosamente os arredores, notando detalhes que haviam passado despercebidos anteriormente.');
-        break;
-      case 'inventory':
-        this.addStoryEntry('system', 'Verificando inventário... Painel lateral atualizado.');
-        break;
-      case 'stats':
-        this.addStoryEntry('system', 'Analisando status do personagem... Dados biométricos atualizados.');
-        break;
-      case 'help':
-        this.addStoryEntry('system', 'Digite comandos para interagir com o Mestre IA ou use os botões de ação rápida. As ações contextuais são geradas dinamicamente pela IA baseadas na situação atual.');
-        break;
     }
   }
 
