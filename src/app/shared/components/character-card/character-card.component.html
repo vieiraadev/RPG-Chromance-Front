@@ -21,6 +21,13 @@
       <p class="character-class">{{ character.classe | uppercase }}</p>
     </div>
     
+    <div class="mobile-details-btn-container">
+      <button class="btn-details" (click)="openDetailsModal()">
+        <i class='bx bx-show'></i>
+        Ver Detalhes
+      </button>
+    </div>
+
     <div class="character-stats">
       <div class="stat-group">
         <div class="stat-label">Nome</div>
@@ -147,5 +154,108 @@
       *ngIf="showSelectButton">
       {{ selectButtonText }}
     </button>
+  </div>
+</div>
+
+<div class="details-modal-overlay" [class.active]="isModalOpen" (click)="closeDetailsModal()">
+  <div class="details-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeDetailsModal()">
+      <i class='bx bx-x'></i>
+    </button>
+
+    <div class="modal-header">
+      <h2 class="modal-title">{{ character.name }}</h2>
+      <p class="modal-subtitle">{{ character.classe | uppercase }}</p>
+    </div>
+
+    <div class="modal-content">
+      <div class="modal-section">
+        <div class="modal-label">Raça</div>
+        <div class="modal-value">{{ character.raca }}</div>
+      </div>
+
+      <div class="modal-section attributes-modal">
+        <div class="modal-label">Atributos</div>
+        
+        <div class="attribute-container health">
+          <div class="attribute-label">
+            <span class="attribute-name">Vida</span>
+            <span class="attribute-value">{{ character.atributos.vida }}/20</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-glow"></div>
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="(character.atributos.vida / 20) * 100">
+            </div>
+          </div>
+        </div>
+
+        <div class="attribute-container energy">
+          <div class="attribute-label">
+            <span class="attribute-name">Energia</span>
+            <span class="attribute-value">{{ character.atributos.energia }}/20</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-glow"></div>
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="(character.atributos.energia / 20) * 100">
+            </div>
+          </div>
+        </div>
+
+        <div class="attribute-container strength">
+          <div class="attribute-label">
+            <span class="attribute-name">Força</span>
+            <span class="attribute-value">{{ character.atributos.forca }}/20</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-glow"></div>
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="(character.atributos.forca / 20) * 100">
+            </div>
+          </div>
+        </div>
+
+        <div class="attribute-container intelligence">
+          <div class="attribute-label">
+            <span class="attribute-name">Inteligência</span>
+            <span class="attribute-value">{{ character.atributos.inteligencia }}/20</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-glow"></div>
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="(character.atributos.inteligencia / 20) * 100">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section" *ngIf="character.descricao">
+        <div class="modal-label">Descrição</div>
+        <div class="modal-description">{{ character.descricao }}</div>
+      </div>
+
+      <div class="modal-section" *ngIf="character.inventory && character.inventory.length > 0">
+        <div class="modal-label">
+          <i class='bx bx-package'></i> 
+          Inventário ({{ character.inventory.length }})
+        </div>
+        <div class="inventory-grid">
+          <div 
+            class="inventory-item" 
+            *ngFor="let item of character.inventory"
+            (click)="onItemClick(item)">
+            <div class="item-icon-wrapper" [style.border-color]="getItemRarityColor(item)">
+              <i class='bx' [ngClass]="getItemIcon(item)" [style.color]="getItemRarityColor(item)"></i>
+              <div class="item-glow" [style.background]="getItemRarityColor(item)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

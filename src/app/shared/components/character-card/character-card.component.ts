@@ -62,6 +62,7 @@ export class CharacterCardComponent implements OnInit {
   hasValidImage = false;
   formattedName = '';
   isSelecting = false;
+  isModalOpen = false;
 
   itemIcons: { [key: string]: string } = {
     'cubo_sombras': 'bx-cube-alt',
@@ -96,6 +97,16 @@ export class CharacterCardComponent implements OnInit {
         this.formattedName = this.character.name;
       }
     }
+  }
+
+  openDetailsModal(): void {
+    this.isModalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeDetailsModal(): void {
+    this.isModalOpen = false;
+    document.body.style.overflow = '';
   }
 
   getItemIcon(item: InventoryItem): string {
