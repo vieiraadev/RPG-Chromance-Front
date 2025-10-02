@@ -69,10 +69,10 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   characterAttributes: CharacterAttribute[] = [];
 
-  currentInteractionCount = 1;
+  currentInteractionCount = 0;
   maxInteractions = 10;
   currentPhase: 'introduction' | 'development' | 'resolution' = 'introduction';
-  progressPercentage = 10;
+  progressPercentage = 0;
   currentProgression: ProgressionInfo | null = null;
 
   private shouldScrollToBottom = false;
@@ -139,12 +139,12 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   }
 
   resetProgressionForNewChapter() {
-    this.currentInteractionCount = 1;
+    this.currentInteractionCount = 0;
     this.updateProgressionState();
     this.availableActions = [];
     this.llmService.clearContextualActions();
     
-    this.addStoryEntry('system', `Nova progressão de capítulo iniciada (1/10 interações)`);
+    this.addStoryEntry('system', `Nova progressão de capítulo iniciada (0/10 interações)`);
   }
 
   updateProgressionState() {
@@ -315,7 +315,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
         });
         
         if (result.lastInteraction > 0) {
-          this.currentInteractionCount = result.lastInteraction + 1;
+          this.currentInteractionCount = result.lastInteraction;
           this.updateProgressionState();
           
           this.addStoryEntry('system', 
@@ -458,6 +458,8 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   
     this.addStoryEntry('player', message);
   
+    this.currentInteractionCount++;
+    
     this.addStoryEntry('system', 
       `Interação ${this.currentInteractionCount}/10 | Fase: ${this.getPhaseDisplayName()}${
         this.shouldShowFinalRewardHint() ? ' | ZONA DE RECOMPENSA!' : ''
@@ -475,10 +477,9 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
         
-        this.currentInteractionCount++;
         this.updateProgressionState();
   
-        if (this.currentInteractionCount > this.maxInteractions) {
+        if (this.currentInteractionCount >= this.maxInteractions) {
           this.completeChapterAndRedirect();
         }
         
@@ -546,6 +547,8 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
   async performContextAction(action: ContextualAction) {
     this.addStoryEntry('player', `${action.name}: ${action.description}`);
     
+    this.currentInteractionCount++;
+    
     this.addStoryEntry('system', 
       `Interação ${this.currentInteractionCount}/10 | Fase: ${this.getPhaseDisplayName()}`
     );
@@ -562,10 +565,9 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
       if (response.success && response.response) {
         this.addStoryEntry('llm', response.response);
 
-        this.currentInteractionCount++;
         this.updateProgressionState();
         
-        if (this.currentInteractionCount > this.maxInteractions) {
+        if (this.currentInteractionCount >= this.maxInteractions) {
           this.addStoryEntry('system', 'Capítulo concluído! Progressão resetada para novo ciclo.');
           this.resetProgressionForNewChapter();
         }

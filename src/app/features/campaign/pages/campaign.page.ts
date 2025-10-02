@@ -191,7 +191,6 @@ export class CampaignsComponent implements OnInit {
     
     const activeCampaign = this.activeCampaignStatus.active_campaign;
     
-    // Se está completed, habilita todos
     if (activeCampaign?.status === 'completed') {
       return true;
     }
