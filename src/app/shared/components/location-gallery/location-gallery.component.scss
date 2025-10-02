@@ -1,7 +1,6 @@
 :host {
   display: block;
   width: 100%;
-  
   --local-bg: #0a0a0a;
   --local-card-bg: rgba(10, 10, 20, 0.9);
   --local-card-border: rgba(0, 255, 255, 0.3);
@@ -26,27 +25,27 @@
   width: 100%;
   padding: 0 80px;
   margin-bottom: 30px;
-}
 
-.gallery-header .gallery-title {
-  color: var(--local-accent);
-  font-family: 'Orbitron', monospace;
-  font-size: 2.8rem;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
+  .gallery-title {
+    color: var(--local-accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
 
-.gallery-header .gallery-subtitle {
-  color: #ffffff;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 400;
-  margin: 0;
-  letter-spacing: 1px;
-  opacity: 0.9;
+  .gallery-subtitle {
+    color: #ffffff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 1px;
+    opacity: 0.9;
+  }
 }
 
 .gallery-container {
@@ -73,33 +72,33 @@
   position: relative;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
   animation: cardGlow 3s ease-in-out infinite alternate;
-}
 
-.gallery-location-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 255, 255, 0.03) 2px,
-    rgba(0, 255, 255, 0.03) 4px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 255, 0.03) 2px,
+      rgba(0, 255, 255, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
 
-.gallery-location-card:hover {
-  transform: scale(1.05);
-  box-shadow: 
-    var(--local-shadow), 
-    0 0 50px rgba(0, 255, 255, 0.4),
-    0 0 100px rgba(0, 255, 255, 0.2);
-  border-color: var(--local-accent);
+  &:hover {
+    transform: scale(1.05);
+    box-shadow:
+      var(--local-shadow),
+      0 0 50px rgba(0, 255, 255, 0.4),
+      0 0 100px rgba(0, 255, 255, 0.2);
+    border-color: var(--local-accent);
+  }
 }
 
 .location-image {
@@ -107,19 +106,19 @@
   height: 320px;
   overflow: hidden;
   border-bottom: 2px solid var(--local-border);
-}
 
-.location-image .location-portrait {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  filter: sepia(100%) hue-rotate(200deg) saturate(2) brightness(0.8);
-  transition: filter 0.3s ease;
-}
+  .location-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: sepia(100%) hue-rotate(200deg) saturate(2) brightness(0.8);
+    transition: filter 0.3s ease;
 
-.location-image .location-portrait:hover {
-  filter: sepia(100%) hue-rotate(180deg) saturate(3) brightness(1.1);
+    &:hover {
+      filter: sepia(100%) hue-rotate(180deg) saturate(3) brightness(1.1);
+    }
+  }
 }
 
 .location-content {
@@ -127,210 +126,108 @@
   text-align: center;
   position: relative;
   z-index: 2;
-}
 
-.location-content .location-name {
-  font-family: 'Orbitron', monospace;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--local-text-bright);
-  margin: 0 0 8px 0;
-  text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+  .location-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--local-text-bright);
+    margin: 0 0 8px 0;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
 
-.location-content .location-subtitle {
-  color: var(--local-accent);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin: 0;
-  text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-  font-family: 'Rajdhani', sans-serif;
+  .location-subtitle {
+    color: var(--local-accent);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    font-family: 'Rajdhani', sans-serif;
+  }
 }
 
 @keyframes cardGlow {
-  0% { 
-    box-shadow: var(--local-shadow), 0 0 30px rgba(0, 255, 255, 0.2); 
+  0% {
+    box-shadow: var(--local-shadow), 0 0 30px rgba(0, 255, 255, 0.2);
   }
-  100% { 
-    box-shadow: var(--local-shadow), 0 0 50px rgba(0, 255, 255, 0.4); 
-  }
-}
-
-@media (min-width: 1200px) {
-  .gallery-locations {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 1400px) {
-  .gallery-header,
-  .gallery-container {
-    padding: 0 60px;
-  }
-  
-  .gallery-locations {
-    gap: 25px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .gallery-header,
-  .gallery-container {
-    padding: 0 40px;
-  }
-  
-  .gallery-header .gallery-title {
-    font-size: 2.4rem;
-  }
-  
-  .gallery-locations {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-  }
-  
-  .location-image {
-    height: 280px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .gallery-header,
-  .gallery-container {
-    padding: 0 30px;
-  }
-  
-  .gallery-header .gallery-title {
-    font-size: 2.2rem;
-  }
-  
-  .gallery-locations {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-  }
-  
-  .location-image {
-    height: 250px;
-  }
-  
-  .location-content .location-name {
-    font-size: 16px;
+  100% {
+    box-shadow: var(--local-shadow), 0 0 50px rgba(0, 255, 255, 0.4);
   }
 }
 
 @media (max-width: 768px) {
-  .gallery-header,
+  .gallery-header {
+    padding: 0 20px;
+    margin-bottom: 20px;
+
+    .gallery-title {
+      font-size: 2rem;
+    }
+
+    .gallery-subtitle {
+      font-size: 1rem;
+    }
+  }
+
   .gallery-container {
     padding: 0 20px;
   }
-  
-  .gallery-header .gallery-title {
-    font-size: 1.9rem;
-  }
-  
-  .gallery-header .gallery-subtitle {
-    font-size: 1rem;
-  }
-  
+
   .gallery-locations {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-left: 0;
   }
-  
+
+  .gallery-location-card {
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
   .location-image {
-    height: 200px;
-  }
-  
-  .location-content {
-    padding: 15px;
-  }
-  
-  .location-content .location-name {
-    font-size: 14px;
-  }
-  
-  .location-content .location-subtitle {
-    font-size: 10px;
+    height: 250px;
   }
 }
 
-@media (max-width: 540px) {
-  .gallery-header,
+@media (max-width: 480px) {
+  .gallery-header {
+    padding: 0 15px;
+
+    .gallery-title {
+      font-size: 1.8rem;
+    }
+
+    .gallery-subtitle {
+      font-size: 0.95rem;
+    }
+  }
+
   .gallery-container {
     padding: 0 15px;
   }
-  
-  .gallery-header .gallery-title {
-    font-size: 1.6rem;
-    letter-spacing: 1px;
-  }
-  
-  .gallery-header .gallery-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .gallery-locations {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 8px;
-  }
-  
-  .location-image {
-    height: 160px;
-  }
-  
-  .location-content {
-    padding: 12px;
-  }
-  
-  .location-content .location-name {
-    font-size: 11px;
-  }
-  
-  .location-content .location-subtitle {
-    font-size: 8px;
-    letter-spacing: 1px;
-  }
-  
-  .gallery-location-card {
-    border-radius: 15px;
-  }
-}
 
-@media (max-width: 400px) {
-  .gallery-header,
-  .gallery-container {
-    padding: 0 10px;
-  }
-  
-  .gallery-header .gallery-title {
-    font-size: 1.3rem;
-  }
-  
   .gallery-locations {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 5px;
+    gap: 15px;
   }
-  
+
   .location-image {
-    height: 120px;
+    height: 220px;
   }
-  
+
   .location-content {
-    padding: 8px;
-  }
-  
-  .location-content .location-name {
-    font-size: 9px;
-  }
-  
-  .location-content .location-subtitle {
-    font-size: 7px;
-  }
-  
-  .gallery-location-card {
-    border-radius: 10px;
+    padding: 15px;
+
+    .location-name {
+      font-size: 16px;
+    }
+
+    .location-subtitle {
+      font-size: 11px;
+    }
   }
 }
