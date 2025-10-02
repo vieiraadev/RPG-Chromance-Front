@@ -1041,15 +1041,15 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
 
 @media (max-width: 768px) {
   .campaigns-page.campaigns-container {
-    margin-left: 60px;
-    width: calc(100% - 60px);
+    margin-left: 0 !important;
+    width: 100% !important;
     padding: 15px;
   }
 
   .sidebar:hover ~ .campaigns-page.campaigns-container,
   body:has(.sidebar:hover) .campaigns-page.campaigns-container {
-    margin-left: 200px;
-    width: calc(100% - 200px);
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 
   .campaigns-page-header {
@@ -1066,21 +1066,21 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
 
   .campaigns-list-grid {
     flex-direction: column;
+    gap: 20px;
   }
 
   .campaigns-list-card {
-    width: 100%;
+    width: 100% !important;
     min-width: unset;
-    flex-direction: row;
-    min-height: 200px;
+    min-height: auto;
 
     .campaigns-card-image-container {
-      width: 200px;
-      height: 100%;
+      width: 100%;
+      height: 220px;
     }
 
     .campaigns-card-content {
-      flex: 1;
+      padding: 20px;
 
       .campaigns-card-footer {
         .campaigns-card-stats {
@@ -1088,16 +1088,17 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
         }
 
         .campaigns-card-actions {
+          flex-direction: column;
           gap: 10px;
 
           .campaigns-btn-play {
-            flex: 1;
+            width: 100%;
             padding: 12px 20px;
             font-size: 1rem;
           }
 
           .campaigns-btn-info {
-            width: 45px;
+            width: 100%;
             height: 45px;
           }
         }
@@ -1119,12 +1120,38 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
       }
     }
   }
+
+  .active-campaign-status {
+    .status-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+      
+      .status-info {
+        width: 100%;
+      }
+      
+      .btn-cancel-global {
+        align-self: flex-end;
+      }
+    }
+  }
+
+  .detail-actions-group {
+    flex-direction: column;
+    gap: 10px;
+    
+    .campaigns-btn-continue-detail,
+    .campaigns-btn-cancel-detail {
+      width: 100%;
+    }
+  }
 }
 
 @media (max-width: 480px) {
   .campaigns-page.campaigns-container {
-    margin-left: 60px;
-    width: calc(100% - 60px);
+    margin-left: 0 !important;
+    width: 100% !important;
     padding: 10px;
   }
 
@@ -1139,16 +1166,12 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
   }
 
   .campaigns-list-card {
-    flex-direction: column;
-    min-height: auto;
-
     .campaigns-card-image-container {
-      width: 100%;
       height: 180px;
     }
 
     .campaigns-card-content {
-      padding: 20px;
+      padding: 15px;
       
       .campaigns-card-header {
         .campaigns-card-title {
@@ -1162,23 +1185,32 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
       
       .campaigns-card-footer {
         .campaigns-card-stats {
-          flex-direction: column;
           gap: 8px;
+          
+          .campaigns-stat-item {
+            font-size: 0.85rem;
+          }
         }
 
         .campaigns-card-actions {
-          flex-direction: column;
-          gap: 10px;
+          gap: 8px;
 
           .campaigns-btn-play {
-            width: 100%;
+            padding: 10px 16px;
+            font-size: 0.95rem;
           }
 
           .campaigns-btn-info {
-            align-self: center;
+            height: 40px;
           }
         }
       }
     }
+  }
+
+  .campaigns-active-indicator,
+  .campaigns-occupied-indicator {
+    font-size: 0.8rem;
+    padding: 6px 10px;
   }
 }
