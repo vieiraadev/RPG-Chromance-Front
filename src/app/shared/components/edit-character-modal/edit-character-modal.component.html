@@ -1,166 +1,193 @@
 <div class="modal-overlay" [style.display]="isOpen ? 'flex' : 'none'" (click)="onClose(); closeDropdowns()">
-    <div class="modal-container" (click)="$event.stopPropagation(); closeDropdowns()">
-      <div class="modal-header">
-        <h2 class="modal-title">Editar Personagem</h2>
-        <button class="close-btn" (click)="onClose()">×</button>
+  <div class="modal-container" (click)="$event.stopPropagation(); closeDropdowns()">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        {{ currentStep === 1 ? 'Escolha o Avatar' : 'Editar Personagem' }}
+      </h2>
+      <button class="close-btn" (click)="onClose()">×</button>
+    </div>
+    
+    <div class="progress-indicator">
+      <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Avatar</div>
       </div>
-      
-      <div class="modal-body">
-        <div class="image-selection">
-          <h3 class="section-title">Escolha um Avatar</h3>
-          <div class="images-grid">
-            <div 
-              class="image-option"
-              [class.selected]="selectedImageIndex === i"
-              (click)="selectImage(i)"
-              *ngFor="let image of availableImages; let i = index; trackBy: trackByImage">
-              <img [src]="image" [alt]="'Avatar ' + (i + 1)" class="avatar-preview">
-              <div class="image-overlay" [style.display]="selectedImageIndex === i ? 'flex' : 'none'">
-                <div class="check-icon">✓</div>
+      <div class="progress-line" [class.completed]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep === 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Atributos</div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="step-content" *ngIf="currentStep === 1">
+        <div class="image-selection-full">
+          <div class="images-grid-wrapper">
+            <div class="images-grid">
+              <div 
+                class="image-option"
+                [class.selected]="selectedImageIndex === i"
+                (click)="selectImage(i)"
+                *ngFor="let image of availableImages; let i = index; trackBy: trackByImage">
+                <img [src]="image" [alt]="'Avatar ' + (i + 1)" class="avatar-preview">
+                <div class="image-overlay" [style.display]="selectedImageIndex === i ? 'flex' : 'none'">
+                  <div class="check-icon">✓</div>
+                </div>
               </div>
             </div>
           </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-secondary" (click)="onClose()">
+              Cancelar
+            </button>
+            <button type="button" class="btn-primary" (click)="nextStep()">
+              Próximo
+            </button>
+          </div>
         </div>
-  
+      </div>
+      <div class="step-content" *ngIf="currentStep === 2">
         <div class="character-form">
-          <h3 class="section-title">Atributos do Personagem</h3>
-          
-          <form (ngSubmit)="onSubmit()" #characterForm="ngForm">
-            <div class="form-section">
-              <div class="form-group">
-                <label for="name">Nome</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  name="name"
-                  [(ngModel)]="editingCharacter.name" 
-                  required
-                  placeholder="Digite o nome do personagem"
-                  class="form-input">
-              </div>
-  
-              <div class="form-row">
+          <div class="form-content">
+            <form (ngSubmit)="onSubmit()" #characterForm="ngForm">
+              <div class="form-section">
                 <div class="form-group">
-                  <label for="raca">Raça</label>
-                  <div class="custom-dropdown" [class.open]="isRacaDropdownOpen">
-                    <div class="dropdown-trigger" (click)="toggleRacaDropdown(); $event.stopPropagation()">
-                      <span class="selected-value">
-                        {{ getSelectedRaca()?.label || 'Selecione uma raça' }}
-                      </span>
-                      <span class="dropdown-arrow" [class.rotated]="isRacaDropdownOpen">▼</span>
+                  <label for="name">Nome</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    name="name"
+                    [(ngModel)]="editingCharacter.name" 
+                    required
+                    placeholder="Digite o nome do personagem"
+                    class="form-input">
+                </div>
+  
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="raca">Raça</label>
+                    <div class="custom-dropdown" [class.open]="isRacaDropdownOpen">
+                      <div class="dropdown-trigger" (click)="toggleRacaDropdown(); $event.stopPropagation()">
+                        <span class="selected-value">
+                          {{ getSelectedRaca()?.label || 'Selecione uma raça' }}
+                        </span>
+                        <span class="dropdown-arrow" [class.rotated]="isRacaDropdownOpen">▼</span>
+                      </div>
+                      <div class="dropdown-menu" [style.display]="isRacaDropdownOpen ? 'block' : 'none'">
+                        <div 
+                          class="dropdown-item" 
+                          (click)="selectRaca(raca); $event.stopPropagation()"
+                          [class.selected]="editingCharacter.raca === raca.value"
+                          *ngFor="let raca of racas; trackBy: trackByRaca">
+                          <span class="item-label">{{ raca.label }}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="dropdown-menu" [style.display]="isRacaDropdownOpen ? 'block' : 'none'">
-                      <div 
-                        class="dropdown-item" 
-                        (click)="selectRaca(raca); $event.stopPropagation()"
-                        [class.selected]="editingCharacter.raca === raca.value"
-                        *ngFor="let raca of racas; trackBy: trackByRaca">
-                        <span class="item-label">{{ raca.label }}</span>
+                  </div>
+  
+                  <div class="form-group">
+                    <label for="classe">Classe</label>
+                    <div class="custom-dropdown" [class.open]="isClasseDropdownOpen">
+                      <div class="dropdown-trigger" (click)="toggleClasseDropdown(); $event.stopPropagation()">
+                        <span class="selected-value">
+                          {{ getSelectedClasse()?.label || 'Selecione uma classe' }}
+                        </span>
+                        <span class="dropdown-arrow" [class.rotated]="isClasseDropdownOpen">▼</span>
+                      </div>
+                      <div class="dropdown-menu" [style.display]="isClasseDropdownOpen ? 'block' : 'none'">
+                        <div 
+                          class="dropdown-item" 
+                          (click)="selectClasse(classe); $event.stopPropagation()"
+                          [class.selected]="editingCharacter.classe === classe.value"
+                          *ngFor="let classe of classes; trackBy: trackByClasse">
+                          <span class="item-label">{{ classe.label }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
   
                 <div class="form-group">
-                  <label for="classe">Classe</label>
-                  <div class="custom-dropdown" [class.open]="isClasseDropdownOpen">
-                    <div class="dropdown-trigger" (click)="toggleClasseDropdown(); $event.stopPropagation()">
-                      <span class="selected-value">
-                        {{ getSelectedClasse()?.label || 'Selecione uma classe' }}
-                      </span>
-                      <span class="dropdown-arrow" [class.rotated]="isClasseDropdownOpen">▼</span>
+                  <label for="descricao">Descrição</label>
+                  <textarea 
+                    id="descricao" 
+                    name="descricao"
+                    [(ngModel)]="editingCharacter.descricao"
+                    placeholder="Descreva seu personagem..."
+                    class="form-textarea"
+                    rows="3"></textarea>
+                </div>
+              </div>
+  
+              <div class="form-section">
+                <div class="attributes-header">
+                  <h4>Distribuição de Atributos</h4>
+                  <div class="points-counter">
+                    <span class="points-remaining">{{remainingPoints}} pontos restantes</span>
+                    <span class="total-points">{{totalPoints}}/{{originalTotalPoints}}</span>
+                  </div>
+                </div>
+              
+                <div class="attributes-container">
+                  <div class="attribute-control">
+                    <label>Vida</label>
+                    <div class="attribute-input">
+                      <button type="button" class="attr-btn minus" (click)="decrementAttribute('vida')" 
+                              [disabled]="editingCharacter.atributos.vida <= 8">-</button>
+                      <span class="attr-value">{{editingCharacter.atributos.vida}}</span>
+                      <button type="button" class="attr-btn plus" (click)="incrementAttribute('vida')"
+                              [disabled]="remainingPoints <= 0 || editingCharacter.atributos.vida >= 20">+</button>
                     </div>
-                    <div class="dropdown-menu" [style.display]="isClasseDropdownOpen ? 'block' : 'none'">
-                      <div 
-                        class="dropdown-item" 
-                        (click)="selectClasse(classe); $event.stopPropagation()"
-                        [class.selected]="editingCharacter.classe === classe.value"
-                        *ngFor="let classe of classes; trackBy: trackByClasse">
-                        <span class="item-label">{{ classe.label }}</span>
-                      </div>
+                  </div>
+              
+                  <div class="attribute-control">
+                    <label>Energia</label>
+                    <div class="attribute-input">
+                      <button type="button" class="attr-btn minus" (click)="decrementAttribute('energia')"
+                              [disabled]="editingCharacter.atributos.energia <= 8">-</button>
+                      <span class="attr-value">{{editingCharacter.atributos.energia}}</span>
+                      <button type="button" class="attr-btn plus" (click)="incrementAttribute('energia')"
+                              [disabled]="remainingPoints <= 0 || editingCharacter.atributos.energia >= 20">+</button>
+                    </div>
+                  </div>
+              
+                  <div class="attribute-control">
+                    <label>Força</label>
+                    <div class="attribute-input">
+                      <button type="button" class="attr-btn minus" (click)="decrementAttribute('forca')" 
+                              [disabled]="editingCharacter.atributos.forca <= 8">-</button>
+                      <span class="attr-value">{{editingCharacter.atributos.forca}}</span>
+                      <button type="button" class="attr-btn plus" (click)="incrementAttribute('forca')"
+                              [disabled]="remainingPoints <= 0 || editingCharacter.atributos.forca >= 20">+</button>
+                    </div>
+                  </div>
+              
+                  <div class="attribute-control">
+                    <label>Inteligência</label>
+                    <div class="attribute-input">
+                      <button type="button" class="attr-btn minus" (click)="decrementAttribute('inteligencia')"
+                              [disabled]="editingCharacter.atributos.inteligencia <= 8">-</button>
+                      <span class="attr-value">{{editingCharacter.atributos.inteligencia}}</span>
+                      <button type="button" class="attr-btn plus" (click)="incrementAttribute('inteligencia')"
+                              [disabled]="remainingPoints <= 0 || editingCharacter.atributos.inteligencia >= 20">+</button>
                     </div>
                   </div>
                 </div>
               </div>
+            </form>
+          </div>
   
-              <div class="form-group">
-                <label for="descricao">Descrição</label>
-                <textarea 
-                  id="descricao" 
-                  name="descricao"
-                  [(ngModel)]="editingCharacter.descricao"
-                  placeholder="Descreva seu personagem..."
-                  class="form-textarea"
-                  rows="3"></textarea>
-              </div>
-            </div>
-  
-            <div class="form-section">
-              <div class="attributes-header">
-                <h4>Distribuição de Atributos</h4>
-                <div class="points-counter">
-                  <span class="points-remaining">{{remainingPoints}} pontos restantes</span>
-                  <span class="total-points">{{totalPoints}}/{{originalTotalPoints}}</span>
-                </div>
-              </div>
-            
-              <div class="attributes-container">
-                <div class="attribute-control">
-                  <label>Vida</label>
-                  <div class="attribute-input">
-                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('vida')" 
-                            [disabled]="editingCharacter.atributos.vida <= 8">-</button>
-                    <span class="attr-value">{{editingCharacter.atributos.vida}}</span>
-                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('vida')"
-                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.vida >= 20">+</button>
-                  </div>
-                </div>
-            
-                <div class="attribute-control">
-                  <label>Energia</label>
-                  <div class="attribute-input">
-                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('energia')"
-                            [disabled]="editingCharacter.atributos.energia <= 8">-</button>
-                    <span class="attr-value">{{editingCharacter.atributos.energia}}</span>
-                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('energia')"
-                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.energia >= 20">+</button>
-                  </div>
-                </div>
-            
-                <div class="attribute-control">
-                  <label>Força</label>
-                  <div class="attribute-input">
-                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('forca')" 
-                            [disabled]="editingCharacter.atributos.forca <= 8">-</button>
-                    <span class="attr-value">{{editingCharacter.atributos.forca}}</span>
-                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('forca')"
-                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.forca >= 20">+</button>
-                  </div>
-                </div>
-            
-                <div class="attribute-control">
-                  <label>Inteligência</label>
-                  <div class="attribute-input">
-                    <button type="button" class="attr-btn minus" (click)="decrementAttribute('inteligencia')"
-                            [disabled]="editingCharacter.atributos.inteligencia <= 8">-</button>
-                    <span class="attr-value">{{editingCharacter.atributos.inteligencia}}</span>
-                    <button type="button" class="attr-btn plus" (click)="incrementAttribute('inteligencia')"
-                            [disabled]="remainingPoints <= 0 || editingCharacter.atributos.inteligencia >= 20">+</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-  
-            <div class="form-actions">
-              <button type="button" class="btn-secondary" (click)="onClose()">
-                Cancelar
-              </button>
-              <button type="submit" class="btn-primary" [disabled]="!isFormValid()">
-                Salvar Alterações
-              </button>
-            </div>
-          </form>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="previousStep()">
+              Voltar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="!isFormValid()" (click)="onSubmit()">
+              Salvar Alterações
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>

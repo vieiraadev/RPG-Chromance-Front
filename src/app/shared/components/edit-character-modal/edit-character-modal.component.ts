@@ -20,6 +20,7 @@ export class EditCharacterModalComponent implements OnChanges {
   isRacaDropdownOpen = false;
   isClasseDropdownOpen = false;
   originalTotalPoints = 0;
+  currentStep: number = 1;
   
   availableImages = [
     'assets/images/card-image1.jpg',
@@ -98,6 +99,8 @@ export class EditCharacterModalComponent implements OnChanges {
         this.editingCharacter.imageUrl = this.availableImages[0];
         this.selectedImageIndex = 0;
       }
+
+      this.currentStep = 1;
     }
   }
 
@@ -135,8 +138,21 @@ export class EditCharacterModalComponent implements OnChanges {
     this.isClasseDropdownOpen = false;
   }
 
+  nextStep(): void {
+    if (this.currentStep === 1) {
+      this.currentStep = 2;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep === 2) {
+      this.currentStep = 1;
+    }
+  }
+
   onClose(): void {
     this.closeDropdowns();
+    this.currentStep = 1;
     this.closeModal.emit();
   }
 

@@ -37,6 +37,7 @@ export class AddCharacterModalComponent {
   isClasseDropdownOpen = false;
   isLoading = false;
   errorMessage = '';
+  currentStep = 1; 
   
   availableImages = [
     'assets/images/card-image1.jpg',
@@ -118,9 +119,22 @@ export class AddCharacterModalComponent {
     this.isClasseDropdownOpen = false;
   }
 
+  nextStep(): void {
+    if (this.currentStep === 1) {
+      this.currentStep = 2;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep === 2) {
+      this.currentStep = 1;
+    }
+  }
+
   onClose(): void {
     this.closeModal.emit();
     this.errorMessage = '';
+    this.currentStep = 1;
   }
 
   onSubmit(): void {
@@ -195,6 +209,7 @@ export class AddCharacterModalComponent {
     this.selectedImageIndex = 0;
     this.closeDropdowns();
     this.errorMessage = '';
+    this.currentStep = 1;
   }
 
   get totalPoints(): number {
