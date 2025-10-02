@@ -64,6 +64,7 @@ export class GamePageComponent implements OnInit, AfterViewChecked, OnDestroy {
     'Quem sou eu? ',
     'Descreva o ambiente',
     'O que devo fazer agora?',
+    'Qual é o objetivo?',
   ];
 
   characterAttributes: CharacterAttribute[] = [];
