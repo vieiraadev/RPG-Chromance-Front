@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
 import { CharacterCardComponent } from '@app/shared/components/character-card/character-card.component';
@@ -6,6 +6,7 @@ import { AddCharacterModalComponent } from '@app/shared/components/add-character
 import { EditCharacterModalComponent } from '@app/shared/components/edit-character-modal/edit-character-modal.component';
 import { ItemDetailModalComponent } from '@app/shared/components/item-detail-modal/item-detail-modal.component';
 import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
+import { NotificationService } from '@app/core/services/notification.service';
 import type { Character, InventoryItem } from '@app/shared/components/character-card/character-card.component';
 
 @Component({
@@ -23,6 +24,9 @@ import type { Character, InventoryItem } from '@app/shared/components/character-
   styleUrls: ['./characters.page.scss'],
 })
 export class CharactersPageComponent implements OnInit {
+  private characterService = inject(CharacterService);
+  private notification = inject(NotificationService);
+
   characters: Character[] = [];
   isLoading = false;
   isModalOpen = false;
@@ -36,8 +40,6 @@ export class CharactersPageComponent implements OnInit {
   currentPage = 1;
   totalPages = 1;
   totalCharacters = 0;
-
-  constructor(private characterService: CharacterService) {}
 
   ngOnInit(): void {
     this.loadCharacters();
@@ -60,7 +62,7 @@ export class CharactersPageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar personagens:', error);
-        this.errorMessage = 'Erro ao carregar personagens. Tentando usar dados locais...';
+        this.notification.warning('Erro ao carregar personagens. Usando dados locais...');
         this.isLoading = false;
         
         this.loadLocalCharacters();
@@ -120,6 +122,7 @@ export class CharactersPageComponent implements OnInit {
     
     if (String(character.id).startsWith('local-')) {
       this.characters = this.characters.filter((c) => c.id !== character.id);
+      this.notification.success(`${character.name} foi removido com sucesso!`);
       console.log('Personagem local removido');
       return;
     }
@@ -127,11 +130,12 @@ export class CharactersPageComponent implements OnInit {
     this.characterService.deleteCharacter(String(character.id)).subscribe({
       next: () => {
         this.characters = this.characters.filter((c) => c.id !== character.id);
+        this.notification.success(`${character.name} foi deletado com sucesso!`);
         console.log('Personagem deletado do banco com sucesso!');
       },
       error: (error) => {
         console.error('Erro ao deletar personagem:', error);
-        alert('Erro ao deletar personagem. Tente novamente.');
+        this.notification.error('Erro ao deletar personagem. Tente novamente.');
       }
     });
   }
@@ -177,6 +181,7 @@ export class CharactersPageComponent implements OnInit {
 
   onItemUsed(): void {
     console.log('Item usado, recarregando personagens...');
+    this.notification.success('Item usado com sucesso!');
     this.loadCharacters();
   }
 
@@ -194,6 +199,7 @@ export class CharactersPageComponent implements OnInit {
     };
     
     this.characters.unshift(characterToAdd);
+    this.notification.success(`Personagem ${characterToAdd.name} criado com sucesso!`);
     console.log('Novo personagem adicionado à lista:', characterToAdd.name);
   }
 
@@ -204,6 +210,7 @@ export class CharactersPageComponent implements OnInit {
       const index = this.characters.findIndex(c => c.id === updatedCharacter.id);
       if (index !== -1) {
         this.characters[index] = { ...updatedCharacter };
+        this.notification.success('Personagem atualizado com sucesso!');
         console.log('Personagem local atualizado');
       }
       return;
@@ -223,12 +230,13 @@ export class CharactersPageComponent implements OnInit {
         const index = this.characters.findIndex(c => c.id === updatedCharacter.id);
         if (index !== -1) {
           this.characters[index] = this.convertToFrontendFormat(response);
+          this.notification.success(`${response.name} atualizado com sucesso!`);
           console.log('Personagem atualizado no banco:', response.name);
         }
       },
       error: (error) => {
         console.error('Erro ao atualizar personagem:', error);
-        alert('Erro ao atualizar personagem. Tente novamente.');
+        this.notification.error('Erro ao atualizar personagem. Tente novamente.');
       }
     });
   }

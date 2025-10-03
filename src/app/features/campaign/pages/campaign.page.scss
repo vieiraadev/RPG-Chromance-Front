@@ -411,7 +411,7 @@ body:has(.sidebar:hover) .campaigns-page.campaigns-container {
   background: rgba(10, 10, 10, 0.95);
   border-left: 1px solid var(--card-border);
   box-shadow: -15px 0 40px rgba(0, 0, 0, 0.7), -5px 0 30px rgba(0, 255, 255, 0.1);
-  z-index: 1001;
+  z-index: 9999;
   transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow-y: auto;
   backdrop-filter: blur(20px);

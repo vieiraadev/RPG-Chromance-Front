@@ -69,7 +69,6 @@
                 (click)="onConfirmSelection()">
           <div class="button-content">
             <i class='bx bx-loader-alt bx-spin' *ngIf="isStartingCampaign"></i>
-            <i class='bx bx-play-circle' *ngIf="!isStartingCampaign"></i>
             <span>{{ isStartingCampaign ? 'Iniciando...' : 'Iniciar com este Personagem' }}</span>
           </div>
         </button>

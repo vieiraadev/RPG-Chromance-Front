@@ -223,10 +223,6 @@ export class ProfilePageComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  changeAvatar() {
-    this.notification.info('Função de alterar avatar será implementada em breve');
-  }
-
   getMemberSince(): string {
     if (!this.userProfile.memberSince) return 'N/A';
     return this.formatDate(this.userProfile.memberSince);

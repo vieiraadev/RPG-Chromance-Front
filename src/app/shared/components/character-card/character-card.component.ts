@@ -133,7 +133,6 @@ export class CharacterCardComponent implements OnInit {
     }).subscribe(confirmed => {
       if (confirmed) {
         this.deleteClicked.emit(this.character);
-        this.notification.success(`${this.character.name} foi excluído com sucesso`);
       }
     });
   }
@@ -144,17 +143,27 @@ export class CharacterCardComponent implements OnInit {
       return;
     }
 
-    this.isSelecting = true;
-    this.characterService.selectCharacter(this.character.id).subscribe({
-      next: (selectedCharacter) => {
-        this.characterSelected.emit(this.character);
-        this.notification.success(`${this.character.name} foi selecionado`);
-        this.isSelecting = false;
-      },
-      error: (error) => {
-        console.error('Erro ao selecionar personagem:', error);
-        this.notification.error('Erro ao selecionar personagem. Tente novamente.');
-        this.isSelecting = false;
+    this.confirmation.confirm({
+      title: 'Selecionar Personagem',
+      message: `Deseja selecionar ${this.character.name} como seu personagem ativo? Isso irá desmarcar qualquer outro personagem.`,
+      confirmText: 'Selecionar',
+      cancelText: 'Cancelar',
+      type: 'info'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.isSelecting = true;
+        this.characterService.selectCharacter(this.character.id).subscribe({
+          next: (selectedCharacter) => {
+            this.characterSelected.emit(this.character);
+            this.notification.success(`${this.character.name} foi selecionado`);
+            this.isSelecting = false;
+          },
+          error: (error) => {
+            console.error('Erro ao selecionar personagem:', error);
+            this.notification.error('Erro ao selecionar personagem. Tente novamente.');
+            this.isSelecting = false;
+          }
+        });
       }
     });
   }
