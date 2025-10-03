@@ -5,6 +5,7 @@ import { CharacterCardComponent } from '@app/shared/components/character-card/ch
 import { AddCharacterModalComponent } from '@app/shared/components/add-character-modal/add-character-modal.component';
 import { EditCharacterModalComponent } from '@app/shared/components/edit-character-modal/edit-character-modal.component';
 import { ItemDetailModalComponent } from '@app/shared/components/item-detail-modal/item-detail-modal.component';
+import { CharacterDetailsModalComponent } from '@app/shared/components/character-details-modal/character-details-modal.component';
 import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
 import { NotificationService } from '@app/core/services/notification.service';
 import type { Character, InventoryItem } from '@app/shared/components/character-card/character-card.component';
@@ -18,7 +19,8 @@ import type { Character, InventoryItem } from '@app/shared/components/character-
     CharacterCardComponent,
     AddCharacterModalComponent,
     EditCharacterModalComponent,
-    ItemDetailModalComponent
+    ItemDetailModalComponent,
+    CharacterDetailsModalComponent
   ],
   templateUrl: './characters.page.html',
   styleUrls: ['./characters.page.scss'],
@@ -32,7 +34,9 @@ export class CharactersPageComponent implements OnInit {
   isModalOpen = false;
   isEditModalOpen = false;
   isItemModalOpen = false;
+  isDetailsModalOpen = false;
   characterToEdit: Character | null = null;
+  characterToView: Character | null = null;
   selectedItem: InventoryItem | null = null;
   selectedCharacterId: string | null = null;
   errorMessage = '';
@@ -111,6 +115,17 @@ export class CharactersPageComponent implements OnInit {
     ];
   }
 
+  onDetailsClicked(character: Character): void {
+    console.log('Abrindo modal de detalhes para:', character.name);
+    this.characterToView = character;
+    this.isDetailsModalOpen = true;
+  }
+
+  closeDetailsModal(): void {
+    this.isDetailsModalOpen = false;
+    this.characterToView = null;
+  }
+
   onEditCharacter(character: Character): void {
     console.log('Abrindo modal de edição para:', character.name);
     this.characterToEdit = { ...character };
@@ -156,6 +171,10 @@ export class CharactersPageComponent implements OnInit {
       this.selectedCharacterId = character.id;
       this.selectedItem = item;
       this.isItemModalOpen = true;
+      
+      if (this.isDetailsModalOpen) {
+        this.isDetailsModalOpen = false;
+      }
     }
   }
 

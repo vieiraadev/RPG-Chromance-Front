@@ -54,6 +54,7 @@ export class CharacterCardComponent implements OnInit {
   @Output() deleteClicked = new EventEmitter<Character>();
   @Output() characterSelected = new EventEmitter<Character>();
   @Output() itemClicked = new EventEmitter<InventoryItem>();
+  @Output() detailsClicked = new EventEmitter<Character>();
 
   private characterService = inject(CharacterService);
   private confirmation = inject(ConfirmationService);
@@ -62,7 +63,6 @@ export class CharacterCardComponent implements OnInit {
   hasValidImage = false;
   formattedName = '';
   isSelecting = false;
-  isModalOpen = false;
 
   itemIcons: { [key: string]: string } = {
     'cubo_sombras': 'bx-cube-alt',
@@ -100,13 +100,7 @@ export class CharacterCardComponent implements OnInit {
   }
 
   openDetailsModal(): void {
-    this.isModalOpen = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  closeDetailsModal(): void {
-    this.isModalOpen = false;
-    document.body.style.overflow = '';
+    this.detailsClicked.emit(this.character);
   }
 
   getItemIcon(item: InventoryItem): string {

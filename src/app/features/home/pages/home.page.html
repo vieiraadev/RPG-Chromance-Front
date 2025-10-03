@@ -12,19 +12,21 @@
   </div>
 
   <app-villain-carousel></app-villain-carousel>
-  
+
   <div class="selected-character-section" *ngIf="!isLoading">
     <div class="section-header">
       <h2 class="section-title">Personagem Selecionado:</h2>
     </div>
-    
+
     <div class="selected-character-container" *ngIf="selectedCharacter; else noCharacterSelected">
       <app-character-card
         [character]="selectedCharacter"
         [showActions]="false"
         (editClicked)="onEditSelectedCharacter()"
         (deleteClicked)="onDeleteSelectedCharacter()"
-        (characterSelected)="onSelectCharacter()">
+        (characterSelected)="onSelectCharacter()"
+        (detailsClicked)="onDetailsClicked($event)"
+        (itemClicked)="onItemClick($event)">
       </app-character-card>
     </div>
 
@@ -42,6 +44,12 @@
     </ng-template>
   </div>
 
-<app-location-gallery></app-location-gallery>
-
+  <app-location-gallery></app-location-gallery>
 </div>
+
+<app-character-details-modal
+  [isOpen]="isDetailsModalOpen"
+  [character]="characterToView"
+  (closeModal)="closeDetailsModal()"
+  (itemClicked)="onItemClick($event)">
+</app-character-details-modal>

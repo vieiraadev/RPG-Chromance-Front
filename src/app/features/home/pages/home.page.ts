@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NavbarComponent } from '@app/shared/components/navbar/navbar.component';
 import { VillainCarouselComponent } from '@app/shared/components/villain-carousel/villain-carousel.component';
-import { CharacterCardComponent, Character } from '@app/shared/components/character-card/character-card.component';
+import { CharacterCardComponent, Character, InventoryItem } from '@app/shared/components/character-card/character-card.component';
+import { CharacterDetailsModalComponent } from '@app/shared/components/character-details-modal/character-details-modal.component';
 import { LocationGalleryComponent } from '@app/shared/components/location-gallery/location-gallery.component';
 import { AuthService, UserOut } from '@app/core/services/auth.service';
 import { CharacterService, CharacterResponse } from '@app/core/services/character.service';
@@ -17,6 +18,7 @@ import { CharacterService, CharacterResponse } from '@app/core/services/characte
     NavbarComponent,
     VillainCarouselComponent,
     CharacterCardComponent,
+    CharacterDetailsModalComponent,
     LocationGalleryComponent,
   ],
   templateUrl: './home.page.html',
@@ -26,6 +28,8 @@ export class HomePageComponent implements OnInit, OnDestroy {
   userName: string = 'Jogador';
   isLoading: boolean = true;
   selectedCharacter: Character | null = null;
+  isDetailsModalOpen: boolean = false;
+  characterToView: Character | null = null; 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -95,10 +99,27 @@ export class HomePageComponent implements OnInit, OnDestroy {
       classe: characterResponse.classe,
       descricao: characterResponse.descricao,
       atributos: characterResponse.atributos,
-      inventory: characterResponse.inventory || [], 
+      inventory: characterResponse.inventory || [],
       imageUrl: characterResponse.imageUrl,
-      is_selected: characterResponse.is_selected || false 
+      is_selected: characterResponse.is_selected || false
     };
+  }
+
+  onDetailsClicked(character: Character): void {
+    console.log('Abrindo modal de detalhes para:', character.name);
+    this.characterToView = character;
+    this.isDetailsModalOpen = true;
+  }
+  closeDetailsModal(): void {
+    console.log('Fechando modal de detalhes');
+    this.isDetailsModalOpen = false;
+    this.characterToView = null;
+  }
+  onItemClick(item: InventoryItem): void {
+    console.log('Item clicado:', item);
+    if (this.isDetailsModalOpen) {
+      this.isDetailsModalOpen = false;
+    }
   }
 
   onEditSelectedCharacter(): void {
